@@ -1,0 +1,10 @@
+Para a persistencia funcionar, precisam de ter uma base de dados MYSQL com os seguintes parametros:
+
+jdbc:mysql://localhost:3306/persistency
+BD na porta 3306 e com o nome persistency
+
+username = root
+password = WORKpc
+
+Alternativamente:
+Alterem application.properties para a vossa DB local
