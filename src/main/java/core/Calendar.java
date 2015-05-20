@@ -16,8 +16,8 @@ public class Calendar {
     }
 
     private void initCourses() {
-        // TODO Auto-generated method stub
-
+        // TODO Get all Courses from Fenix
+        // TODO Add all Courses to the Calendar
     }
 
     public void setYear(int year) {

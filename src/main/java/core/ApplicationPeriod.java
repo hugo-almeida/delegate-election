@@ -13,7 +13,8 @@ public class ApplicationPeriod extends Period {
         candidates = new HashSet<Student>();
     }
 
-    public void addCandidate() {
-
+    public void addCandidate(Student s) {
+        candidates.add(s);
+        s.apply();
     }
 }

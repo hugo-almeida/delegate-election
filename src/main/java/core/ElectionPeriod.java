@@ -23,6 +23,5 @@ public class ElectionPeriod extends Period {
             votes.put(voted, new ArrayList<Vote>());
             votes.get(voted).add(v);
         }
-
     }
 }

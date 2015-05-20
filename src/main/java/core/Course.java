@@ -12,8 +12,8 @@ public class Course {
     }
 
     private void initCourseYears() {
-        // TODO Auto-generated method stub
-
+        // TODO Get the amount of years of each Course from Fenix
+        // TODO Create all the years for this Course.
     }
 
     public String getName() {

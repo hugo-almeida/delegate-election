@@ -27,4 +27,11 @@ public abstract class Period {
     public void setEnd(Date end) {
         this.end = end;
     }
+
+    public boolean conflictsWith(Period p) {
+        if (end.before(p.getStart()) || start.after(p.getEnd())) {
+            return false;
+        }
+        return true;
+    }
 }
