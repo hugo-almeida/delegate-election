@@ -2,30 +2,34 @@ package core;
 
 public class Student {
     private final String name;
-    private final int number;
+    private final String username;
     private final String email;
     private boolean applied;
 
-    //private whatever photo;
+    private final byte[] photo;
 
-    public Student(String name, int number, String email /*whatever photo*/) {
+    public Student(String name, String username, String email, byte[] photo) {
         this.name = name;
-        this.number = number;
+        this.username = username;
         this.email = email;
         this.applied = false;
-        //this.photo = photo;
+        this.photo = photo;
     }
 
     public String getName() {
         return name;
     }
 
-    public int getNumber() {
-        return number;
+    public String getUsername() {
+        return username;
     }
 
     public String getEmail() {
         return email;
+    }
+
+    public byte[] getPhoto() {
+        return photo;
     }
 
     public boolean hasApplied() {
