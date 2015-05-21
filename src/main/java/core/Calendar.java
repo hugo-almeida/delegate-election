@@ -1,6 +1,9 @@
 package core;
 
+import java.util.Arrays;
 import java.util.Set;
+
+import org.springframework.web.client.RestTemplate;
 
 public class Calendar {
     private int year;
@@ -16,8 +19,9 @@ public class Calendar {
     }
 
     private void initCourses() {
-        // TODO Get all Courses from Fenix
-        // TODO Add all Courses to the Calendar
+        RestTemplate t = new RestTemplate();
+        Course[] c = t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees", Course[].class);
+        courses.addAll(Arrays.asList(c));
     }
 
     public void setYear(int year) {
