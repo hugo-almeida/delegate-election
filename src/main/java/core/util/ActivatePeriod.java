@@ -2,15 +2,15 @@ package core.util;
 
 import java.util.TimerTask;
 
-import core.CourseYear;
+import core.DegreeYear;
 import core.Period;
 
 public class ActivatePeriod extends TimerTask {
 
-    private final CourseYear courseYear;
+    private final DegreeYear courseYear;
     private final Period period;
 
-    public ActivatePeriod(CourseYear courseYear, Period period) {
+    public ActivatePeriod(DegreeYear courseYear, Period period) {
         super();
         this.courseYear = courseYear;
         this.period = period;

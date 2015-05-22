@@ -3,17 +3,17 @@ package core;
 import java.util.Date;
 import java.util.Set;
 
-public class CourseYear {
+public class DegreeYear {
     private final int year;
     private Period activePeriod;
     private Set<Period> inactivePeriods;
     private Set<Student> students;
 
-    public CourseYear(int year) {
+    public DegreeYear(int year) {
         this.year = year;
     }
 
-    public int getCourseYear() {
+    public int getDegreeYear() {
         return year;
     }
 
@@ -52,7 +52,7 @@ public class CourseYear {
         }
 
         // We should also check for conflicting periods
-        for (Period p : inactivePeriods) {
+        for (final Period p : inactivePeriods) {
             if (period.conflictsWith(p)) {
                 //TODO Throw Invalid Period
             }

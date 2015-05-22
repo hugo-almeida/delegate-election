@@ -2,13 +2,13 @@ package core.util;
 
 import java.util.TimerTask;
 
-import core.CourseYear;
+import core.DegreeYear;
 
 public class RetrieveStudentListTask extends TimerTask {
 
-    private final CourseYear courseYear;
+    private final DegreeYear courseYear;
 
-    public RetrieveStudentListTask(CourseYear year) {
+    public RetrieveStudentListTask(DegreeYear year) {
         courseYear = year;
     }
 

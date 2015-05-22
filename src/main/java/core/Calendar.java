@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 
 public class Calendar {
     private int year;
-    private Set<Course> courses;
+    private Set<Degree> degrees;
 
     public int getYear() {
         return year;
@@ -15,13 +15,13 @@ public class Calendar {
 
     public Calendar(int year) {
         this.year = year;
-        initCourses();
+        initDegrees();
     }
 
-    private void initCourses() {
-        RestTemplate t = new RestTemplate();
-        Course[] c = t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees", Course[].class);
-        courses.addAll(Arrays.asList(c));
+    private void initDegrees() {
+        final RestTemplate t = new RestTemplate();
+        final Degree[] c = t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees", Degree[].class);
+        degrees.addAll(Arrays.asList(c));
     }
 
     public void setYear(int year) {
