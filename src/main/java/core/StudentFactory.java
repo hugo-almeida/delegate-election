@@ -6,6 +6,9 @@ public class StudentFactory {
 
     private static StudentFactory instance;
 
+    private StudentFactory() {
+    }
+
     public static StudentFactory getInstance() {
         if (instance == null) {
             instance = new StudentFactory();

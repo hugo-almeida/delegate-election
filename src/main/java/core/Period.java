@@ -8,6 +8,9 @@ public abstract class Period {
     private Date end;
 
     public Period(Date start, Date end) {
+        if (end.before(start)) {
+            //Throws a nice exception saying that nothing ends before starting
+        }
         this.start = start;
         this.end = end;
     }

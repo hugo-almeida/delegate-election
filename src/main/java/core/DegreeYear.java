@@ -42,19 +42,22 @@ public class DegreeYear {
     }
 
     public void addPeriod(Period period) {
-        // Be carefull not to add an active period here
         if (period.getStart().before(new Date())) {
-            //TODO Throw Invalid Period
+            //TODO Throw Invalid Period Exception - The start date should be in the future
         }
 
         if (activePeriod != null && period.getStart().before(activePeriod.getEnd())) {
-            //TODO Throw Invalid Period
+            //TODO Throw Invalid Period Exception - A period can't start before the active period ends
         }
 
+<<<<<<< HEAD:delegados/src/main/java/core/DegreeYear.java
         // We should also check for conflicting periods
         for (final Period p : inactivePeriods) {
+=======
+        for (Period p : inactivePeriods) {
+>>>>>>> StudentFactory's constructor is now private.:delegados/src/main/java/core/CourseYear.java
             if (period.conflictsWith(p)) {
-                //TODO Throw Invalid Period
+                //TODO Throw Invalid Period Exception - There should not be overlapping periods
             }
         }
 
