@@ -14,6 +14,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import core.exception.InvalidPeriodException;
+
 @Entity
 @Table(name = "DegreeYear")
 public class DegreeYear {
@@ -89,18 +91,18 @@ public class DegreeYear {
         activePeriod = period;
     }
 
-    public void addPeriod(Period period) {
+    public void addPeriod(Period period) throws InvalidPeriodException {
         if (period.getStart().before(new Date())) {
-            //TODO Throw Invalid Period Exception - The start date should be in the future
+            throw new InvalidPeriodException("The start date should be in the future");
         }
 
         if (activePeriod != null && period.getStart().before(activePeriod.getEnd())) {
-            //TODO Throw Invalid Period Exception - A period can't start before the active period ends
+            throw new InvalidPeriodException("A period can't start before the active period ends");
         }
 
-        for (Period p : inactivePeriods) {
+        for (final Period p : inactivePeriods) {
             if (period.conflictsWith(p)) {
-                //TODO Throw Invalid Period Exception - There should not be overlapping periods
+                throw new InvalidPeriodException("There should not be overlapping periods");
             }
         }
 
