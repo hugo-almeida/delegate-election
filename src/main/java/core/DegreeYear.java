@@ -50,12 +50,7 @@ public class DegreeYear {
             //TODO Throw Invalid Period Exception - A period can't start before the active period ends
         }
 
-<<<<<<< HEAD:delegados/src/main/java/core/DegreeYear.java
-        // We should also check for conflicting periods
-        for (final Period p : inactivePeriods) {
-=======
         for (Period p : inactivePeriods) {
->>>>>>> StudentFactory's constructor is now private.:delegados/src/main/java/core/CourseYear.java
             if (period.conflictsWith(p)) {
                 //TODO Throw Invalid Period Exception - There should not be overlapping periods
             }
