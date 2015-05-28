@@ -6,12 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//@Entity
+//@Table(name = "ElectionPeriod")
 public class ElectionPeriod extends Period {
 
     private final Map<Integer, List<Vote>> votes;
 
-    public ElectionPeriod(Date start, Date end) {
-        super(start, end);
+    public ElectionPeriod(Date start, Date end, DegreeYear degreeYear) {
+        super(start, end, degreeYear);
         votes = new HashMap<Integer, List<Vote>>();
     }
 
