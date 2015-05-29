@@ -40,6 +40,10 @@ public class Calendar {
     private void initDegrees() {
         final RestTemplate t = new RestTemplate();
         final Degree[] c = t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees", Degree[].class);
+        for (Degree element : c) {
+            element.setCalendar(this);
+            element.setKey();
+        }
         degrees.addAll(Arrays.asList(c));
     }
 

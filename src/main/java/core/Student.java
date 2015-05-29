@@ -38,6 +38,15 @@ public class Student {
 
     }
 
+    public Student(String name, String username, String email, String photoType, byte[] photoBytes) {
+        this.name = name;
+        this.username = username;
+        this.email = email;
+        this.applied = false;
+        this.photoType = photoType;
+        this.photoBytes = photoBytes;
+    }
+
     public Student(String name, String username, String email, String photoType, byte[] photoBytes, Period p, DegreeYear d) {
         this.name = name;
         this.username = username;

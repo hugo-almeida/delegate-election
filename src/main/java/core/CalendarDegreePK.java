@@ -9,13 +9,14 @@ import javax.persistence.Embeddable;
 public class CalendarDegreePK implements Serializable {
 
     @Column(name = "CalendarDegreePK_DegreeName")
-    private String degreeName;
+    private final String degreeName;
 
     @Column(name = "CalendarDegreePK_CalendarYear")
-    private int calendarYear;
+    private final int calendarYear;
 
     CalendarDegreePK() {
-
+        degreeName = "";
+        calendarYear = 0;
     }
 
     public CalendarDegreePK(String name, int year) {

@@ -30,12 +30,11 @@ public class Degree {
     private Set<DegreeYear> years;
 
     private String name;
-    private String acronym;
     private String id;
+    private String acronym;
     private String type;
 
     Degree() {
-
     }
 
     public Degree(String name, String acronym, String id, String type, Calendar c) {
@@ -47,6 +46,14 @@ public class Degree {
         this.type = type;
         this.years = new HashSet<DegreeYear>();
         initDegreeYears();
+    }
+
+    public void setCalendar(Calendar c) {
+        this.calendar = c;
+    }
+
+    public void setKey() {
+        this.calendarDegreePK = new CalendarDegreePK(acronym, calendar.getYear());
     }
 
     private void initDegreeYears() {
