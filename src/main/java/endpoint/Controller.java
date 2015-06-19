@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -23,11 +22,8 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
-
-import com.google.gson.JsonObject;
 
 @EnableOAuth2Sso
 @RestController
@@ -40,16 +36,16 @@ public class Controller {
         return auth.getName();
     }
 
-    @RequestMapping("/resource")
-    public @ResponseBody String resource() {
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        final WebAuthenticationDetails details = (WebAuthenticationDetails) auth.getDetails();
-        cred = auth.getCredentials();
-        final RestTemplate rt = new RestTemplate();
-        final JsonObject j =
-                rt.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + s2, JsonObject.class);
-        return j.toString();
-    }
+    /*  @RequestMapping("/resource")
+      public @ResponseBody String resource() {
+          final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+          final WebAuthenticationDetails details = (WebAuthenticationDetails) auth.getDetails();
+         /* cred = auth.getCredentials();
+          final RestTemplate rt = new RestTemplate();
+          final JsonObject j =
+                  rt.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + s2, JsonObject.class);
+          return j.toString();
+      }*/
 
     @Configuration
     protected static class SecurityConfiguration extends OAuth2SsoConfigurerAdapter {
