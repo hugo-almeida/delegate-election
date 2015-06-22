@@ -48,6 +48,16 @@ public class DegreeYear {
         this.degree = d;
         this.year = year;
         initPeriod();
+        initStudents();
+    }
+
+    private void initStudents() {
+//        RestTemplate t = new RestTemplate();
+//        Student[] s =
+//                t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees/" + degree.getId()
+//                        + "/students?curricularYear=" + year, Student[].class);
+//        students.addAll(Arrays.asList(s));
+
     }
 
     private void initPeriod() {
