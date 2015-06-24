@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
+import com.google.gson.Gson;
+
 @EnableOAuth2Sso
 @RestController
 public class Controller {
@@ -40,7 +42,10 @@ public class Controller {
         final OAuth2AuthenticationDetails authDetails = (OAuth2AuthenticationDetails) auth.getDetails();
         authDetails.getTokenValue();
 
-        return userDetails.toString();
+        final Gson gson = new Gson();
+        final String json = gson.toJson(userDetails);
+
+        return json;
     }
 
     /*  @RequestMapping("/resource")

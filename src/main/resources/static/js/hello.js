@@ -38,7 +38,8 @@ function($rootScope, $scope, $http, $location, $route) {
 	}
 
 }).controller('home', function($scope, $http) {
-	$http.get('resource').success(function(data) {
+	$scope.greeting = "";
+	$http.get('user').success(function(data) {
 		$scope.greeting = data;
 	})
 });
