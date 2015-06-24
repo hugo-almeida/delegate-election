@@ -1,6 +1,7 @@
 package endpoint;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -13,8 +14,9 @@ import org.springframework.cloud.security.oauth2.sso.EnableOAuth2Sso;
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurerAdapter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -32,8 +34,13 @@ public class Controller {
     @RequestMapping("/user")
     public @ResponseBody String user() {
 
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getName();
+        final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
+        final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
+
+        final OAuth2AuthenticationDetails authDetails = (OAuth2AuthenticationDetails) auth.getDetails();
+        authDetails.getTokenValue();
+
+        return userDetails.toString();
     }
 
     /*  @RequestMapping("/resource")
@@ -52,10 +59,9 @@ public class Controller {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.logout().and().antMatcher("/**").authorizeRequests()
-                    .antMatchers("/index.html", "/home.html", "/", "/login", "/resource", "/user").permitAll().anyRequest()
-                    .authenticated().and().csrf().csrfTokenRepository(csrfTokenRepository()).and()
-                    .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
+            http.logout().and().antMatcher("/**").authorizeRequests().antMatchers("/index.html", "/", "/login").permitAll().and()
+                    .antMatcher("/**").authorizeRequests().antMatchers("/home.html", "/resource", "/user").authenticated().and()
+                    .csrf().csrfTokenRepository(csrfTokenRepository()).and().addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
         }
 
         private Filter csrfHeaderFilter() {
