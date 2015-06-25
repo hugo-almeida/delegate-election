@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "Student")
+@Table(name = "student")
 public class Student {
 
     @Id
@@ -24,14 +24,19 @@ public class Student {
     private Period applicationPeriod;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({ @JoinColumn(name = "DegreeDegreeYearPK_DegreeName", insertable = true, updatable = false),
-            @JoinColumn(name = "DegreeYearPK_DegreeYear", insertable = true, updatable = false),
-            @JoinColumn(name = "DegreeYearPK_CalendarYear", insertable = true, updatable = false) })
+    @JoinColumns({
+            @JoinColumn(name = "degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = true,
+                    updatable = false),
+            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year_pk_degree_year", insertable = true,
+                    updatable = false),
+            @JoinColumn(name = "calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = true,
+                    updatable = false) })
     private DegreeYear degreeYear;
 
     private String name;
     private String email;
     private boolean applied;
+    private boolean voted;
     private String photoType;
     @Column(length = 100000)
     private String photoBytes;
@@ -80,6 +85,14 @@ public class Student {
         return photoBytes;
     }
 
+    public DegreeYear getDegreeYear() {
+        return degreeYear;
+    }
+
+    public void setDegreeYear(DegreeYear degreeYear) {
+        this.degreeYear = degreeYear;
+    }
+
     public boolean hasApplied() {
         return applied;
     }
@@ -100,7 +113,11 @@ public class Student {
         photoBytes = bytes;
     }
 
-    public void setDegreeYear(DegreeYear dy) {
-        degreeYear = dy;
+    public boolean hasVoted() {
+        return voted;
+    }
+
+    public void vote() {
+        voted = true;
     }
 }

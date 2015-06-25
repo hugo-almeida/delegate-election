@@ -34,8 +34,11 @@ public class DegreeYear {
     private DegreeDegreeYearPK degreeDegreeYearPK;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({ @JoinColumn(name = "CalendarDegreePK_DegreeName", insertable = true, updatable = false),
-            @JoinColumn(name = "CalendarDegreePK_CalendarYear", insertable = true, updatable = false) })
+    @JoinColumns({
+            @JoinColumn(name = "degree_name", referencedColumnName = "degree_pk_degree_name", insertable = true,
+                    updatable = false),
+            @JoinColumn(name = "calendar_year", referencedColumnName = "degree_pk_calendar_year", insertable = true,
+                    updatable = false) })
     private Degree degree;
 
     //private int year;

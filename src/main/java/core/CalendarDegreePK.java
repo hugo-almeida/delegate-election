@@ -8,10 +8,10 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class CalendarDegreePK implements Serializable {
 
-    @Column(name = "CalendarDegreePK_DegreeName")
+    @Column(name = "degree_pk_degree_name")
     private final String degreeName;
 
-    @Column(name = "CalendarDegreePK_CalendarYear")
+    @Column(name = "degree_pk_calendar_year")
     private final int calendarYear;
 
     CalendarDegreePK() {

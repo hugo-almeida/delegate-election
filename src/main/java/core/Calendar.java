@@ -14,11 +14,11 @@ import javax.persistence.Table;
 import org.springframework.web.client.RestTemplate;
 
 @Entity
-@Table(name = "Calendar")
+@Table(name = "calendar")
 public class Calendar {
 
     @Id
-    @Column(name = "Calendar_Year")
+    @Column(name = "year")
     private int year;
 
     @OneToMany(mappedBy = "calendar", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

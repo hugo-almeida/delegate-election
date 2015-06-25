@@ -14,24 +14,28 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "Degree")
+@Table(name = "degree")
 public class Degree {
 
     @EmbeddedId
-    @Column(name = "Course_CalendarDegreePK")
+    @Column(name = "degree_id")
     private CalendarDegreePK calendarDegreePK;
 
     @ManyToOne(fetch = FetchType.LAZY)
     //  @Column(name = "Course_Calendar")
-    @JoinColumn(name = "Calendar_Year")
+    @JoinColumn(name = "calendar_year", referencedColumnName = "year")
     private Calendar calendar;
 
     @OneToMany(mappedBy = "degree", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<DegreeYear> years = new HashSet<DegreeYear>();
 
+    @Column(name = "name")
     private String name;
+    @Column(name = "id")
     private String id;
+    @Column(name = "acronym")
     private String acronym;
+    @Column(name = "type")
     private String type;
 
     Degree() {
