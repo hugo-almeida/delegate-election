@@ -1,5 +1,6 @@
 package core;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -23,22 +24,23 @@ public class Student {
     private Period applicationPeriod;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({ @JoinColumn(name = "DegreeDegreeYearPK_DegreeName", insertable = false, updatable = false),
-            @JoinColumn(name = "DegreeYearPK_DegreeYear", insertable = false, updatable = false),
-            @JoinColumn(name = "DegreeYearPK_CalendarYear", insertable = false, updatable = false) })
+    @JoinColumns({ @JoinColumn(name = "DegreeDegreeYearPK_DegreeName", insertable = true, updatable = false),
+            @JoinColumn(name = "DegreeYearPK_DegreeYear", insertable = true, updatable = false),
+            @JoinColumn(name = "DegreeYearPK_CalendarYear", insertable = true, updatable = false) })
     private DegreeYear degreeYear;
 
     private String name;
     private String email;
     private boolean applied;
     private String photoType;
-    private byte[] photoBytes;
+    @Column(length = 100000)
+    private String photoBytes;
 
     Student() {
 
     }
 
-    public Student(String name, String username, String email, String photoType, byte[] photoBytes) {
+    public Student(String name, String username, String email, String photoType, String photoBytes) {
         this.name = name;
         this.username = username;
         this.email = email;
@@ -47,7 +49,7 @@ public class Student {
         this.photoBytes = photoBytes;
     }
 
-    public Student(String name, String username, String email, String photoType, byte[] photoBytes, Period p, DegreeYear d) {
+    public Student(String name, String username, String email, String photoType, String photoBytes, Period p, DegreeYear d) {
         this.name = name;
         this.username = username;
         this.email = email;
@@ -74,7 +76,7 @@ public class Student {
         return photoType;
     }
 
-    public byte[] getPhotoBytes() {
+    public String getPhotoBytes() {
         return photoBytes;
     }
 
@@ -84,5 +86,21 @@ public class Student {
 
     public void apply() {
         applied = true;
+    }
+
+    public void setEmail(String e) {
+        email = e;
+    }
+
+    public void setPhotoType(String type) {
+        photoType = type;
+    }
+
+    public void setPhotoBytes(String bytes) {
+        photoBytes = bytes;
+    }
+
+    public void setDegreeYear(DegreeYear dy) {
+        degreeYear = dy;
     }
 }

@@ -27,7 +27,7 @@ public class Degree {
     private Calendar calendar;
 
     @OneToMany(mappedBy = "degree", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<DegreeYear> years;
+    private Set<DegreeYear> years = new HashSet<DegreeYear>();
 
     private String name;
     private String id;
@@ -45,7 +45,7 @@ public class Degree {
         this.id = id;
         this.type = type;
         this.years = new HashSet<DegreeYear>();
-        initDegreeYears();
+        //initDegreeYears();
     }
 
     public void setCalendar(Calendar c) {
@@ -56,19 +56,22 @@ public class Degree {
         this.calendarDegreePK = new CalendarDegreePK(acronym, calendar.getYear());
     }
 
-    private void initDegreeYears() {
-        if (type.equals("BOLONHA_MASTER_DEGREE")) {
-            for (int i = 0; i < 2; i++) {
+    public void initDegreeYears() {
+        if (type.equals("Mestrado Bolonha")) {
+            for (int i = 1; i <= 2; i++) {
                 years.add(new DegreeYear(i, this));
             }
-        } else if (type.equals("BOLONHA_DEGREE")) {
-            for (int i = 0; i < 3; i++) {
+        } else if (type.equals("Licenciatura Bolonha")) {
+            for (int i = 1; i <= 3; i++) {
                 years.add(new DegreeYear(i, this));
             }
-        } else if (type.equals("BOLONHA_INTEGRATED_MASTER_DEGREE")) {
-            for (int i = 0; i < 5; i++) {
+        } else if (type.equals("Mestrado Integrado")) {
+            for (int i = 1; i <= 5; i++) {
                 years.add(new DegreeYear(i, this));
             }
+        }
+        for (DegreeYear y : years) {
+            y.initStudents();
         }
     }
 
@@ -94,6 +97,14 @@ public class Degree {
 
     public Set<DegreeYear> getYears() {
         return years;
+    }
+
+    public void addYear(int i) {
+        years.add(new DegreeYear(i, this));
+    }
+
+    public String print() {
+        return "Name: " + name + " Type: " + type + " Teste Integrado: " + type.equals("Mestrado Integrado");
     }
 
 }
