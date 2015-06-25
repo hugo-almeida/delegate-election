@@ -1,7 +1,5 @@
 package core;
 
-import org.fenixedu.sdk.ApplicationConfiguration;
-import org.fenixedu.sdk.FenixEduClientImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,16 +29,6 @@ public class TestController {
     public int testCalendar2() {
         Calendar c = cd.findByYear(2014);
         return c.getDegrees().size();
-    }
-
-    @RequestMapping("/students")
-    public String students() {
-        final ApplicationConfiguration config = ApplicationConfiguration.fromPropertyFilename("/fenixedu.properties");
-        FenixEduClientImpl client = new FenixEduClientImpl(config);
-        return client.publicScope().getDegree("2761663971475").toString();
-//        return new ModelAndView(
-//                "redirect:https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees/2761663971475/students?curricularYear=1");
-
     }
 
     @RequestMapping("/add-years")
