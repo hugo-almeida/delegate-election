@@ -16,28 +16,37 @@ import javax.persistence.Table;
 
 @Entity
 @Inheritance
-@DiscriminatorColumn(name = "Period_Type")
-@Table(name = "Period")
+@DiscriminatorColumn(name = "period_type")
+@Table(name = "period")
 public abstract class Period {
 
     @EmbeddedId
+    @Column(name = "period_id")
     private PeriodPK periodPK;
 
-    @Column(name = "Period_Start")
+    @Column(name = "start")
     private Date start;
-    @Column(name = "Period_End")
+    @Column(name = "end")
     private Date end;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({ @JoinColumn(name = "DegreeDegreeYearPK_DegreeName", insertable = false, updatable = false),
-            @JoinColumn(name = "DegreeYearPK_DegreeYear", insertable = false, updatable = false),
-            @JoinColumn(name = "DegreeYearPK_CalendarYear", insertable = false, updatable = false) })
+    @JoinColumns({
+            @JoinColumn(name = "degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = false,
+                    updatable = false),
+            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year_pk_degree_year", insertable = false,
+                    updatable = false),
+            @JoinColumn(name = "calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = false,
+                    updatable = false) })
     private DegreeYear degreeYear;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumns({ @JoinColumn(name = "DegreeDegreeYearPK_DegreeName", insertable = false, updatable = false),
-            @JoinColumn(name = "DegreeYearPK_DegreeYear", insertable = false, updatable = false),
-            @JoinColumn(name = "DegreeYearPK_CalendarYear", insertable = false, updatable = false) })
+    @JoinColumns({
+            @JoinColumn(name = "active_degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = false,
+                    updatable = false),
+            @JoinColumn(name = "active_degree_year", referencedColumnName = "degree_year_pk_degree_year", insertable = false,
+                    updatable = false),
+            @JoinColumn(name = "active_calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = false,
+                    updatable = false) })
     private DegreeYear activeDegreeYear;
 
     Period() {

@@ -1,6 +1,5 @@
 package core;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,11 +14,11 @@ import javax.persistence.Table;
 import org.springframework.web.client.RestTemplate;
 
 @Entity
-@Table(name = "Calendar")
+@Table(name = "calendar")
 public class Calendar {
 
     @Id
-    @Column(name = "Calendar_Year")
+    @Column(name = "year")
     private int year;
 
     @OneToMany(mappedBy = "calendar", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -34,17 +33,25 @@ public class Calendar {
 
     public Calendar(int year) {
         this.year = year;
-        initDegrees();
+        //initDegrees();
     }
 
-    private void initDegrees() {
+    public void init() {
         final RestTemplate t = new RestTemplate();
         final Degree[] c = t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees", Degree[].class);
+        Set<Degree> toRemove = new HashSet<Degree>();
         for (Degree element : c) {
-            element.setCalendar(this);
-            element.setKey();
+            if (element.getType().equals("Licenciatura Bolonha") || element.getType().equals("Mestrado Bolonha")
+                    || element.getType().equals("Mestrado Integrado")) {
+                element.setCalendar(this);
+                element.setKey();
+                degrees.add(element);
+            }
         }
-        degrees.addAll(Arrays.asList(c));
+        degrees.iterator().next().initDegreeYears();
+//        for (Degree d : degrees) {
+//            d.initDegreeYears();
+//        }
     }
 
     public void setYear(int year) {

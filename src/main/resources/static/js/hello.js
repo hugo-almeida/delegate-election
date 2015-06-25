@@ -42,7 +42,6 @@ function($rootScope, $scope, $http, $location, $route) {
 	$scope.greeting = "";
 	$http.get('user').success(function(data) {
 		$scope.greeting = data;
-	})
 	
 	$scope.curPeriod = "pega";
 	$scope.period = function() {
@@ -50,4 +49,5 @@ function($rootScope, $scope, $http, $location, $route) {
 			$scope.curPeriod = data;
 		})
 	}
+});
 });

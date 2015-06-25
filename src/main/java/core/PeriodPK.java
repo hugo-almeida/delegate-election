@@ -10,16 +10,16 @@ import javax.persistence.GenerationType;
 @Embeddable
 public class PeriodPK implements Serializable {
 
-    @Column(name = "PeriodPK_DegreeName")
+    @Column(name = "degree_name")
     private String degreeName;
 
-    @Column(name = "PeriodPK_DegreeYear")
+    @Column(name = "degree_year")
     private int degreeYear;
 
-    @Column(name = "PeriodPK_CalendarYear")
+    @Column(name = "calendar_year")
     private int calendarYear;
 
-    @Column(name = "PeriodPK_Id")
+    @Column(name = "peroid_pk_Id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 

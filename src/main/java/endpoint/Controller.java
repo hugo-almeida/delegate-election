@@ -75,7 +75,7 @@ public class Controller {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.logout().and().antMatcher("/**").authorizeRequests().antMatchers("/index.html", "/", "/login").permitAll().and()
+            http.logout().and().antMatcher("/**").authorizeRequests().antMatchers("/index.html", "/", "/login", "/test-calendar").permitAll().and()
                     .antMatcher("/**").authorizeRequests()
                     .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user").authenticated().and().csrf()
                     .csrfTokenRepository(csrfTokenRepository()).and().addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);

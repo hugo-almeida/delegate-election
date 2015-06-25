@@ -8,13 +8,13 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class DegreeDegreeYearPK implements Serializable {
 
-    @Column(name = "DegreeDegreeYearPK_DegreeName")
+    @Column(name = "degree_year_pk_degree_name")
     private String degreeName;
 
-    @Column(name = "DegreeDegreeYearPK_DegreeYear")
+    @Column(name = "degree_year_pk_degree_year")
     private int degreeYear;
 
-    @Column(name = "DegreeDegreeYearPK_CalendarYear")
+    @Column(name = "degree_year_pk_calendar_year")
     private int calendarYear;
 
     DegreeDegreeYearPK() {
