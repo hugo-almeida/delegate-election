@@ -18,6 +18,7 @@ function($rootScope, $scope, $http, $location, $route) {
 	$http.get('user').success(function(data) {
 		if (data) {
 			$rootScope.authenticated = true;
+			$rootScope.id = data.name;
 		} else {
 			$rootScope.authenticated = false;
 		}
@@ -25,7 +26,7 @@ function($rootScope, $scope, $http, $location, $route) {
 		$rootScope.authenticated = false;
 	});
 
-	$scope.credentials = {};
+	//$scope.credentials = {};
 
 	$scope.logout = function() {
 		$http.post('logout', {}).success(function() {
@@ -42,4 +43,11 @@ function($rootScope, $scope, $http, $location, $route) {
 	$http.get('user').success(function(data) {
 		$scope.greeting = data;
 	})
+	
+	$scope.curPeriod = "pega";
+	$scope.period = function() {
+		$http.post('period', {msg:'ist167066'}).success(function(data) {
+			$scope.curPeriod = data;
+		})
+	}
 });

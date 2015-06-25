@@ -16,16 +16,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
+
+import services.ApplyToDelegateService;
+import services.GetCurrentPeriodService;
+import services.VoteService;
 
 import com.google.gson.Gson;
 
@@ -39,8 +43,8 @@ public class Controller {
         final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
         final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
 
-        final OAuth2AuthenticationDetails authDetails = (OAuth2AuthenticationDetails) auth.getDetails();
-        authDetails.getTokenValue();
+        /*   final OAuth2AuthenticationDetails authDetails = (OAuth2AuthenticationDetails) auth.getDetails();
+           authDetails.getTokenValue();*/
 
         final Gson gson = new Gson();
         final String json = gson.toJson(userDetails);
@@ -48,16 +52,23 @@ public class Controller {
         return json;
     }
 
-    /*  @RequestMapping("/resource")
-      public @ResponseBody String resource() {
-          final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-          final WebAuthenticationDetails details = (WebAuthenticationDetails) auth.getDetails();
-         /* cred = auth.getCredentials();
-          final RestTemplate rt = new RestTemplate();
-          final JsonObject j =
-                  rt.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + s2, JsonObject.class);
-          return j.toString();
-      }*/
+    @RequestMapping("/period")
+    public @ResponseBody String currentPeriod(@RequestBody String istid) {
+        final GetCurrentPeriodService svc = new GetCurrentPeriodService(istid);
+        return svc.execute();
+    }
+
+    @RequestMapping("/vote")
+    public @ResponseBody String vote(@RequestBody String istid, String vote) {
+        final VoteService svc = new VoteService(istid, vote);
+        return svc.execute();
+    }
+
+    @RequestMapping("/apply")
+    public @ResponseBody String vote(@RequestBody String istid) {
+        final ApplyToDelegateService svc = new ApplyToDelegateService(istid);
+        return svc.execute();
+    }
 
     @Configuration
     protected static class SecurityConfiguration extends OAuth2SsoConfigurerAdapter {
@@ -65,8 +76,9 @@ public class Controller {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http.logout().and().antMatcher("/**").authorizeRequests().antMatchers("/index.html", "/", "/login").permitAll().and()
-                    .antMatcher("/**").authorizeRequests().antMatchers("/home.html", "/resource", "/user").authenticated().and()
-                    .csrf().csrfTokenRepository(csrfTokenRepository()).and().addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
+                    .antMatcher("/**").authorizeRequests()
+                    .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user").authenticated().and().csrf()
+                    .csrfTokenRepository(csrfTokenRepository()).and().addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
         }
 
         private Filter csrfHeaderFilter() {

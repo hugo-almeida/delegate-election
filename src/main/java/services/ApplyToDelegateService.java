@@ -2,6 +2,8 @@ package services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.gson.Gson;
+
 import core.ApplicationPeriod;
 import core.Period;
 import core.Student;
@@ -19,15 +21,18 @@ public class ApplyToDelegateService implements DelegatesService {
 
     @Override
     public String execute() {
-        Student applicant = studentDAO.findByUsername(applicantId);
-        Period period = applicant.getDegreeYear().getActivePeriod();
+        final Student applicant = studentDAO.findByUsername(applicantId);
+        final Period period = applicant.getDegreeYear().getActivePeriod();
         try {
-            ApplicationPeriod aPeriod = (ApplicationPeriod) period;
+            final ApplicationPeriod aPeriod = (ApplicationPeriod) period;
             aPeriod.addCandidate(applicant);
-        } catch (ClassCastException e) {
+        } catch (final ClassCastException e) {
             // Se o cast não foi possivel, o periodo actual nao e de condidatura
+            final Gson gson = new Gson();
+            return gson.toJson("fail");
         }
-        return null;
+        final Gson gson = new Gson();
+        return gson.toJson("success");
     }
 
 }

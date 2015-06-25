@@ -2,6 +2,8 @@ package services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.gson.Gson;
+
 import core.ElectionPeriod;
 import core.Period;
 import core.Student;
@@ -21,15 +23,19 @@ public class VoteService implements DelegatesService {
 
     @Override
     public String execute() {
-        Student voter = studentDAO.findByUsername(voterId);
-        Student voted = studentDAO.findByUsername(votedId);
-        Period period = voter.getDegreeYear().getActivePeriod();
+        final Student voter = studentDAO.findByUsername(voterId);
+        final Student voted = studentDAO.findByUsername(votedId);
+        final Period period = voter.getDegreeYear().getActivePeriod();
         try {
-            ElectionPeriod ePeriod = (ElectionPeriod) period;
+            final ElectionPeriod ePeriod = (ElectionPeriod) period;
             ePeriod.vote(voter, voted);
-        } catch (ClassCastException e) {
+        } catch (final ClassCastException e) {
             // Se o cast não foi possivel, o periodo actual nao e de eleicao
+            final Gson gson = new Gson();
+            return gson.toJson("fail");
         }
-        return null;
+
+        final Gson gson = new Gson();
+        return gson.toJson("success");
     }
 }
