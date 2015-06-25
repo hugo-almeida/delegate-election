@@ -34,6 +34,5 @@ public class TestController {
     public ModelAndView students() {
         return new ModelAndView(
                 "redirect:https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees/2761663971475/students?curricularYear=1");
-
     }
 }

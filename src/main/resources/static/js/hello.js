@@ -41,5 +41,5 @@ function($rootScope, $scope, $http, $location, $route) {
 	$scope.greeting = "";
 	$http.get('user').success(function(data) {
 		$scope.greeting = data;
-	})
+	});
 });
