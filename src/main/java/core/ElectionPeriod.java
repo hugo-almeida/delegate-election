@@ -10,20 +10,21 @@ import java.util.Map;
 //@Table(name = "ElectionPeriod")
 public class ElectionPeriod extends Period {
 
-    private final Map<Integer, List<Vote>> votes;
+    private final Map<String, List<Vote>> votes;
 
     public ElectionPeriod(Date start, Date end, DegreeYear degreeYear) {
         super(start, end, degreeYear);
-        votes = new HashMap<Integer, List<Vote>>();
+        votes = new HashMap<String, List<Vote>>();
     }
 
-    public void vote(int voter, int voted) {
-        final Vote v = new Vote(voter, voted);
-        if (votes.containsKey(voted)) {
-            votes.get(voted).add(v);
+    public void vote(Student voter, Student voted) {
+        final Vote v = new Vote(voter.getUsername(), voted.getUsername());
+        if (votes.containsKey(voted.getUsername())) {
+            votes.get(voted.getUsername()).add(v);
         } else {
-            votes.put(voted, new ArrayList<Vote>());
-            votes.get(voted).add(v);
+            votes.put(voted.getUsername(), new ArrayList<Vote>());
+            votes.get(voted.getUsername()).add(v);
         }
+        voter.vote();
     }
 }

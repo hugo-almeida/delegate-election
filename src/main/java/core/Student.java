@@ -31,6 +31,7 @@ public class Student {
     private String name;
     private String email;
     private boolean applied;
+    private boolean voted;
     private String photoType;
     private byte[] photoBytes;
 
@@ -78,11 +79,27 @@ public class Student {
         return photoBytes;
     }
 
+    public DegreeYear getDegreeYear() {
+        return degreeYear;
+    }
+
+    public void setDegreeYear(DegreeYear degreeYear) {
+        this.degreeYear = degreeYear;
+    }
+
     public boolean hasApplied() {
         return applied;
     }
 
     public void apply() {
         applied = true;
+    }
+
+    public boolean hasVoted() {
+        return voted;
+    }
+
+    public void vote() {
+        voted = true;
     }
 }

@@ -2,19 +2,19 @@ package core;
 
 public class Vote {
 
-    private final int voter;
-    private final int voted;
+    private final String voter;
+    private final String voted;
 
-    public Vote(int voter, int voted) {
+    public Vote(String voter, String voted) {
         this.voter = voter;
         this.voted = voted;
     }
 
-    public int getVoter() {
+    public String getVoter() {
         return voter;
     }
 
-    public int getVoted() {
+    public String getVoted() {
         return voted;
     }
 
