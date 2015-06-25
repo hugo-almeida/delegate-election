@@ -25,7 +25,6 @@ public class StudentFactory {
         final JsonObject photodetails = json.getAsJsonObject("photo");
         final String type = photodetails.get("type").toString();
         final String photoData = photodetails.get("data").toString();
-        final byte[] photoBytes = photoData.getBytes();
-        return new Student(username, name, email, type, photoBytes);
+        return new Student(username, name, email, type, photoData);
     }
 }
