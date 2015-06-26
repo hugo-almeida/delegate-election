@@ -138,6 +138,16 @@ public class DegreeYear {
         activePeriod = period;
     }
 
+    public Set<Student> getCandidates() {
+        Set<Student> candidates = new HashSet<Student>();
+        for (Student st : students) {
+            if (st.hasApplied()) {
+                candidates.add(st);
+            }
+        }
+        return candidates;
+    }
+
     public void addPeriod(Period period) throws InvalidPeriodException {
         if (period.getStart().before(new Date())) {
             throw new InvalidPeriodException("The start date should be in the future");

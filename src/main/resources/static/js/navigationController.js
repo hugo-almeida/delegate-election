@@ -4,6 +4,7 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		if (data) {
 			$rootScope.authenticated = true;
 			$rootScope.id = data.name;
+			$rootScope.credentials = data;
 		} else {
 			$rootScope.authenticated = false;
 		}

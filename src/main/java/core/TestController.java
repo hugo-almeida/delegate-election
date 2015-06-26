@@ -2,12 +2,15 @@ package core;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class TestController {
     @Autowired
     CalendarDAO cd;
+    @Autowired
+    StudentDAO st;
 
     @RequestMapping("/sanity")
     public String test() {
@@ -23,6 +26,12 @@ public class TestController {
         cd.save(c);
 //        cd.save(c2);
         return "Done";
+    }
+
+    @RequestMapping("/find-student")
+    public String findStudent(@RequestParam(value = "username", required = true) String username) {
+        Student s = st.findByUsername(username);
+        return s.getName();
     }
 
     @RequestMapping("/test-calendar2")

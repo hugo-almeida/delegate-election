@@ -10,6 +10,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.security.oauth2.sso.EnableOAuth2Sso;
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurerAdapter;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -29,13 +31,19 @@ import org.springframework.web.util.WebUtils;
 
 import services.ApplyToDelegateService;
 import services.GetCurrentPeriodService;
-import services.VoteService;
 
 import com.google.gson.Gson;
+
+import core.DegreeYear;
+import core.Student;
+import core.StudentDAO;
 
 @EnableOAuth2Sso
 @RestController
 public class Controller {
+
+    @Autowired
+    StudentDAO st;
 
     @RequestMapping("/user")
     public @ResponseBody String user() {
@@ -59,15 +67,25 @@ public class Controller {
     }
 
     @RequestMapping("/vote")
-    public @ResponseBody String vote(@RequestBody String istid, String vote) {
-        final VoteService svc = new VoteService(istid, vote);
-        return svc.execute();
+    public @ResponseBody String vote(@RequestBody String json) {
+//        final VoteService svc = new VoteService(istid, vote);
+//        return svc.execute();
+        return "ok";
     }
 
     @RequestMapping("/apply")
-    public @ResponseBody String vote(@RequestBody String istid) {
+    public @ResponseBody String apply(@RequestBody String istid) {
         final ApplyToDelegateService svc = new ApplyToDelegateService(istid);
         return svc.execute();
+    }
+
+    @RequestMapping(value = "/get-candidates", method = RequestMethod.POST)
+    public @ResponseBody String getCandidates(@RequestBody String username) {
+        Student s = st.findByUsername(username);
+        DegreeYear dy = s.getDegreeYear();
+        Gson g = new Gson();
+        return g.toJson(dy.getCandidates());
+
     }
 
     @Configuration
@@ -75,10 +93,11 @@ public class Controller {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.logout().and().antMatcher("/**").authorizeRequests().antMatchers("/index.html", "/", "/login", "/test-calendar").permitAll().and()
-                    .antMatcher("/**").authorizeRequests()
-                    .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user").authenticated().and().csrf()
-                    .csrfTokenRepository(csrfTokenRepository()).and().addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
+            http.logout().and().antMatcher("/**").authorizeRequests().antMatchers("/index.html", "/", "/login", "/test-calendar")
+                    .permitAll().and().antMatcher("/**").authorizeRequests()
+                    .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user", "/get-candidates")
+                    .authenticated().and().csrf().csrfTokenRepository(csrfTokenRepository()).and()
+                    .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
         }
 
         private Filter csrfHeaderFilter() {

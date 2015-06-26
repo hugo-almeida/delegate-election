@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@ComponentScan({ "endpoint", "core" })
-@EnableJpaRepositories(basePackages = { "core" })
-@EntityScan(basePackages = { "core" })
+@ComponentScan({ "endpoint", "core", "services" })
+@EnableJpaRepositories(basePackages = { "endpoint", "core", "services" })
+@EntityScan(basePackages = { "endpoint", "core", "services" })
 @EnableAutoConfiguration
 public class App {
     public static void main(String[] args) {
