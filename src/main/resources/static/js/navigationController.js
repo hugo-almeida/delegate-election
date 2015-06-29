@@ -17,6 +17,7 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	$scope.logout = function() {
 		$http.post('logout', {}).success(function() {
 			$rootScope.authenticated = false;
+			$rootScope.credentials = {};
 			//$location.path("/");
 		}).error(function(data) {
 			console.log("Logout failed")

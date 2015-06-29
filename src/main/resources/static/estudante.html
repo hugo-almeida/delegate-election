@@ -8,9 +8,9 @@
 	</ol>
 </div>
 
-
-
+<p>{{credentials}}</p>
+<img ng-show="authenticated" ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}">{{credentials.username}} {{credentials.name}}</img> 
 <p>This is an ordinary paragraph that is long enough to wrap to multiple lines so that  you can see how the line spacing looks. This is an ordinary paragraph that is long enough to wrap to multiple lines so that  you can see how the line spacing looks.</p>
 
-<div class="container" ng-include="'votar.html'"></div>
-<div class="container" ng-include="'candidatar.html'"></div>
+<div class="container" ng-include="'votar.html'" ng-show="authenticated"></div>
+<div class="container" ng-include="'candidatar.html'" ng-show="authenticated"></div>

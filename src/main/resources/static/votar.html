@@ -1,45 +1,53 @@
-<div ng-controller="votar">
-	<!-- Default panel contents -->
-	<h3>Detalhes</h3>
+<div  ng-controller="voteCtrl as vote">
+	<div>
+		<!-- Default panel contents -->
+		<h3>Detalhes</h3>
+		
+		<!-- Table -->
+		<table class="table">
+			<tr>
+				<th>Curso</th>
+				<td>{{credentials.roles[1].registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
+			</tr>
+			<tr>
+				<th>Ano Lectivo</th>
+				<td>2014/2015</td>
+			</tr>
+			<tr>
+				<th>Candidaturas</th>
+				<td>{{candidatos.length}}</td>
+			</tr>
+			<tr>
+				<th>Período de votação</th>
+				<td>23/04/2015 - 25/04/2015</td>
+			</tr>
+		</table>
+	</div>
 	
-	<!-- Table -->
-	<table class="table">
-		<tr>
-			<th>Curso</th>
-			<td>Engenharia Informática e de Computadores - Alameda</td>
-		</tr>
-		<tr>
-			<th>Ano Lectivo</th>
-			<td>2014/2015</td>
-		</tr>
-		<tr>
-			<th>Candidaturas</th>
-			<td>1</td>
-		</tr>
-		<tr>
-			<th>Período de votação</th>
-			<td>23/04/2015 - 25/04/2015</td>
-		</tr>
-	</table>
-</div>
-
-<h3>Votação</h3>
-<form action="" class="panel panel-default">
-	<div class="panel-heading">Name</div>
-	<ul class="list-group">
-		<li class="list-group-item"><input type="radio"> Sara Nunes</li>
-		<li class="list-group-item"><input type="radio"> André Araújo</li>
-		<li class="list-group-item"><input type="radio"> Dinis Gonçalves</li>
-		<li class="list-group-item"><input type="radio"> Votar em branco</li>
-		<li class="list-group-item"><input type="radio"> Outro
-			<ul>
-				<li class="list-group-item"><span class="glyphicon glyphicon-search" aria-hidden="true"><input type="text"></span></li>
-				<li class="list-group-item"><input type="radio"> Carlos Martins</li>
-				<li class="list-group-item"><input type="radio"> Carlos Araújo</li>
-				<li class="list-group-item"><input type="radio"> Carlos Gonçalves</li>
-			</ul>
-		</li>
-	</ul>
-	<button type="submit" class="btn btn-default">Votar</button>
-</form>
+	<h3>Votação</h3>
+	<form action="" class="panel panel-default">
+		<div class="panel-heading">Name</div>
+		<ul class="list-group">
+			<!--li class="list-group-item"><input type="radio"> Sara Nunes</li>
+			<li class="list-group-item"><input type="radio"> André Araújo</li>
+			<li class="list-group-item"><input type="radio"> Dinis Gonçalves</li>
+			<li class="list-group-item"><input type="radio"> Votar em branco</li-->
+			<li class="list-group-item" ng-repeat="candidato in candidatos | orderBy:'name'">
+				<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
+				<img ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}" height="42" width="42"> <!-- using logged user photo, should use candidate photo -->
+					 {{candidato.name}} - {{candidato.username}} </li>
+			<li class="list-group-item"><input type="radio" ng-model="selected" value="nil" name="voted" > Votar em branco </li>
+			<li class="list-group-item"><input type="radio" ng-model="selected" value="other" name="voted" > Outro - Podes dar o teu voto a um aluno que nao se candidatou {{search}}
+				<ul>
+					<li class="list-group-item"><span class="glyphicon glyphicon-search" aria-hidden="true" ng-show="selected == 'other'">
+						<input type="text"></span></li>
+					<li class="list-group-item"><input type="radio"> Carlos Martins</li>
+					<li class="list-group-item"><input type="radio"> Carlos Araújo</li>
+					<li class="list-group-item"><input type="radio"> Carlos Gonçalves</li>
+				</ul>
+			</li>
+		</ul>
+	</form>
+	<button class="btn btn-default" ng-click="vote()" ng-hide="voted">Votar</button>
+	{{result}}
 </div>
