@@ -29,21 +29,21 @@
 		<div class="panel-heading">Name</div>
 		<ul class="list-group">
 			<!--li class="list-group-item"><input type="radio"> Sara Nunes</li>
-			<li class="list-group-item"><input type="radio"> André Araújo</li>
-			<li class="list-group-item"><input type="radio"> Dinis Gonçalves</li>
+			<li class="list-group-item"><input type="radio"> AndrÃ© AraÃºjo</li>
+			<li class="list-group-item"><input type="radio"> Dinis GonÃ§alves</li>
 			<li class="list-group-item"><input type="radio"> Votar em branco</li-->
-			<li class="list-group-item" ng-repeat="candidato in candidatos | orderBy:'name'">
+			<li class="list-group-item" ng-repeat="candidato in candidatos | orderBy:'username'">
 				<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
 				<img ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}" height="42" width="42"> <!-- using logged user photo, should use candidate photo -->
 					 {{candidato.name}} - {{candidato.username}} </li>
 			<li class="list-group-item"><input type="radio" ng-model="selected" value="nil" name="voted" > Votar em branco </li>
-			<li class="list-group-item"><input type="radio" ng-model="selected" value="other" name="voted" > Outro - Podes dar o teu voto a um aluno que nao se candidatou {{search}}
-				<ul>
-					<li class="list-group-item"><span class="glyphicon glyphicon-search" aria-hidden="true" ng-show="selected == 'other'">
-						<input type="text"></span></li>
-					<li class="list-group-item"><input type="radio"> Carlos Martins</li>
-					<li class="list-group-item"><input type="radio"> Carlos Araújo</li>
-					<li class="list-group-item"><input type="radio"> Carlos Gonçalves</li>
+			<li class="list-group-item"><input type="radio" ng-model="selected" value="other" name="voted" ng-change="loadStudents()"> Outro - Podes dar o teu voto a um aluno que não se candidatou {{search}}
+				<ul ng-show="selected == 'other'">
+					<li class="list-group-item"><span class="glyphicon glyphicon-search" aria-hidden="true">
+						<input type="text" ng-model="query"></span></li>
+					<li class="list-group-item" ng-repeat="student in students | filter:query | orderBy:'username'" ng-model="selected" 
+						value="{{student.username}}" name = "voted" ng-hide="query==null || query==''">
+						<input type="radio">{{student.name}} - {{student.username}}</li>
 				</ul>
 			</li>
 		</ul>

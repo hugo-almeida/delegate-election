@@ -18,5 +18,24 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 			sc.result = 'user ' + rc.credentials.username + ' voted on ' + sc.selected;
 			sc.voted = true;
 		}
+		
+		sc.loadedStudents = false;
+		
+		sc.loadStudents = function() {
+			if(!sc.loadedStudents){ 
+				/*http.post('get-students', rc.credentials.username )
+				.success(function(data) { 
+					
+				});*/
+				sc.loadedStudents = true;
+				sc.students = [ 
+	               {name:'Ricardo Pires', username:'ist167066'}, 
+	               {name:'Hugo Almeida', username:'ist166997'}, 
+	               {name:'Fernando Santos', username:'ist123456'},
+	               {name:'Anton Petrov', username:'ist166947'},
+	               {name:'José Vasco', username:'ist167027'}
+	            ]
+			}
+		}
 	}
 ]);
