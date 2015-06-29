@@ -49,6 +49,12 @@ public class Calendar {
             }
         }
         degrees.iterator().next().initDegreeYears();
+//        Degree d = null;
+//        Iterator<Degree> it = degrees.iterator();
+//        do {
+//            d = it.next();
+//        } while (!d.getAcronym().equals("MEIC-A"));
+//        d.initDegreeYears();
 //        for (Degree d : degrees) {
 //            d.initDegreeYears();
 //        }

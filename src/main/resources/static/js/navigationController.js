@@ -24,7 +24,17 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	});
 
 	//$scope.credentials = {};
+	
+	$scope.specialLogin = function(){
 
+		$http.post('get-user', $scope.special_username)
+									.success(function(data) {
+										$rootScope.credentials = data;
+										$rootScope.id = data.name;
+									});
+		$rootScope.authenticated = true;
+	}
+	
 	$scope.logout = function() {
 		$http.post('logout', {}).success(function() {
 			$rootScope.authenticated = false;

@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.security.oauth2.sso.EnableOAuth2Sso;
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurerAdapter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -26,13 +29,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
-import services.ApplyToDelegateService;
 import services.GetCurrentPeriodService;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import core.DegreeYear;
 import core.Student;
@@ -60,6 +65,20 @@ public class Controller {
         return json;
     }
 
+    @RequestMapping(value = "/get-user", method = RequestMethod.POST)
+    public @ResponseBody String getUser(@RequestBody String username) {
+        RestTemplate t = new RestTemplate();
+        String url =
+                "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("__username__", username);
+        HttpEntity entity = new HttpEntity(headers);
+        HttpEntity<String> response = t.exchange(url, HttpMethod.GET, entity, String.class);
+        JsonObject res = new JsonParser().parse(response.getBody()).getAsJsonObject();
+        Gson gson = new Gson();
+        return gson.toJson(res);
+    }
+
     @RequestMapping("/period")
     public @ResponseBody String currentPeriod(@RequestBody String istid) {
         final GetCurrentPeriodService svc = new GetCurrentPeriodService(istid);
@@ -73,10 +92,11 @@ public class Controller {
         return "ok";
     }
 
-    @RequestMapping("/apply")
-    public @ResponseBody String apply(@RequestBody String istid) {
-        final ApplyToDelegateService svc = new ApplyToDelegateService(istid);
-        return svc.execute();
+    @RequestMapping(value = "/apply", method = RequestMethod.POST)
+    public @ResponseBody String apply(@RequestBody String username) {
+        Student s = st.findByUsername(username);
+        s.apply();
+        return "Ok";
     }
 
     @RequestMapping(value = "/get-candidates", method = RequestMethod.POST)
@@ -93,8 +113,9 @@ public class Controller {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.logout().and().antMatcher("/**").authorizeRequests().antMatchers("/index.html", "/", "/login", "/test-calendar")
-                    .permitAll().and().antMatcher("/**").authorizeRequests()
+            http.logout().and().antMatcher("/**").authorizeRequests()
+                    .antMatchers("/index.html", "/", "/login", "/test-calendar", "/get-user").permitAll().and().antMatcher("/**")
+                    .authorizeRequests()
                     .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user", "/get-candidates")
                     .authenticated().and().csrf().csrfTokenRepository(csrfTokenRepository()).and()
                     .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
