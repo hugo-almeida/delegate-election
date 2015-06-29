@@ -7,7 +7,7 @@
 		<table class="table">
 			<tr>
 				<th>Curso</th>
-				<td>{{credentials.roles[1].registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
+				<td>{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
 			</tr>
 			<tr>
 				<th>Ano Lectivo</th>
@@ -25,14 +25,18 @@
 	</div>
 	
 	<h3>Candidatos</h3>
-	<button type="submit" class="btn btn-default" ng-click="apply()" ng-hide="applied">Candidata-te</button>
+	<button type="submit" class="btn btn-primary" ng-click="apply()" ng-hide="applied">
+		<i class="glyphicon glyphicon-plus"></i>
+		Candidata-te
+	</button>
 	<p></p>
 	<form action="" class="panel panel-default">
 		<div class="panel-heading">Name</div>
 		<ul class="list-group">
 			<li class="list-group-item" ng-repeat="candidato in candidatos | orderBy:'name'">
 				<img ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}" height="42" width="42"> <!-- using logged user photo, should use candidate photo -->
-					 {{candidato.name}} - {{candidato.username}}</li>
+				{{candidato.name}} - {{candidato.username}}
+			</li>
 		</ul>
 	</form>
 </div>

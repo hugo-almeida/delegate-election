@@ -8,9 +8,17 @@
 	</ol>
 </div>
 
-<p>{{credentials}}</p>
-<img ng-show="authenticated" ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}">{{credentials.username}} {{credentials.name}}</img> 
-<p>This is an ordinary paragraph that is long enough to wrap to multiple lines so that  you can see how the line spacing looks. This is an ordinary paragraph that is long enough to wrap to multiple lines so that  you can see how the line spacing looks.</p>
-
-<div class="container" ng-include="'votar.html'" ng-show="authenticated"></div>
-<div class="container" ng-include="'candidatar.html'" ng-show="authenticated"></div>
+<div ng-show="authenticated"> <!-- missing student check -->
+	<p ng-show="debug">{{credentials}}</p>
+	<p ng-show="debug">{{degrees}}</p>
+	<img ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}">{{credentials.username}} {{credentials.name}}</img> 
+	<p>This is an ordinary paragraph that is long enough to wrap to multiple lines so that  you can see how the line spacing looks. This is an ordinary paragraph that is long enough to wrap to multiple lines so that  you can see how the line spacing looks.</p>
+	
+	<button type="btn btn-primary" ng-click="debugVotePeriod()" ng-show="debug">Debug vote period</button>
+	<button type="btn btn-primary" ng-click="debugApplyPeriod()" ng-show="debug">Debug apply period</button>
+	
+	<div ng-repeat="degree in degrees">
+		<div class="container" ng-include="'votar.html'" ng-show="votePeriod"></div> <!-- missing check for active period -->
+		<div class="container" ng-include="'candidatar.html'" ng-show="appPeriod"></div> <!-- missing check for active period -->
+	</div>
+</div>
