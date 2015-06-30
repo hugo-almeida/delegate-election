@@ -1,4 +1,4 @@
-angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$http', function(rc, sc, http) {
+angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$http', '$log', function(rc, sc, http,log) {
 		sc.candidatos = [];
 		sc.students = [];
 		http.post('get-candidates', rc.credentials.username)
@@ -31,13 +31,13 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		sc.loadedStudents = false;
 		
 		sc.loadStudents = function() {
-			if(!sc.loadedStudents){ 
+			if(!sc.loadedStudents){
+				log.log('doing stuff');
 				http.post('get-students', rc.credentials.username )
 				.success(function(data) { 
 					sc.students = data;
+					sc.loadedStudents = true;
 				});
-				sc.loadedStudents = true;
-				
 			}
 		}
 	}

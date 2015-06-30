@@ -55,7 +55,7 @@
 								<tr ng-repeat="student in students | filter:query | orderBy:'username'"  ng-hide="query==null || query==''">
 									<td>
 										<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
-										<img ng-src="data:{{$parent.candidato.photo.type}};base64,{{$parent.candidato.photo.data}}" height="42" width="42">
+										<img ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}" height="42" width="42">
 										<strong>{{student.name}}</strong>
 										<small>{{student.username}}</small>
 									</td>
