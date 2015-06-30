@@ -1,6 +1,7 @@
 package endpoint;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -67,8 +69,13 @@ public class Controller {
 
     @RequestMapping(value = "/get-user", method = RequestMethod.POST)
     public @ResponseBody String getUser(@RequestBody String username) {
+<<<<<<< .mine
         final RestTemplate t = new RestTemplate();
-        final String url =
+=======
+        RestTemplate t = new RestTemplate();
+>>>>>>> .theirs
+        t.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+        String url =
                 "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
         final HttpHeaders headers = new HttpHeaders();
         headers.set("__username__", username);
