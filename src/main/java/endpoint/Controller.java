@@ -38,11 +38,13 @@ import org.springframework.web.util.WebUtils;
 import services.GetCurrentPeriodService;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import core.DegreeYear;
 import core.Student;
+import core.StudentAdapter;
 import core.StudentDAO;
 
 @EnableOAuth2Sso
@@ -69,11 +71,7 @@ public class Controller {
 
     @RequestMapping(value = "/get-user", method = RequestMethod.POST)
     public @ResponseBody String getUser(@RequestBody String username) {
-<<<<<<< .mine
-        final RestTemplate t = new RestTemplate();
-=======
         RestTemplate t = new RestTemplate();
->>>>>>> .theirs
         t.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
         String url =
                 "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
@@ -109,13 +107,33 @@ public class Controller {
         return g.toJson("Ok");
     }
 
+    @RequestMapping(value = "/de-apply", method = RequestMethod.POST)
+    public @ResponseBody String deapply(@RequestBody String username) {
+        Student s = st.findByUsername(username);
+        s.deapply();
+        st.save(s);
+        Gson g = new Gson();
+        return g.toJson("Ok");
+    }
+
     @RequestMapping(value = "/get-candidates", method = RequestMethod.POST)
     public @ResponseBody String getCandidates(@RequestBody String username) {
-        final Student s = st.findByUsername(username);
-        final DegreeYear dy = s.getDegreeYear();
-        final Gson g = new Gson();
+        Student s = st.findByUsername(username);
+        DegreeYear dy = s.getDegreeYear();
+        GsonBuilder b = new GsonBuilder();
+        b.registerTypeHierarchyAdapter(Student.class, new StudentAdapter());
+        Gson g = b.create();
         return g.toJson(dy.getCandidates());
+    }
 
+    @RequestMapping(value = "/get-students", method = RequestMethod.POST)
+    public @ResponseBody String getStudents(@RequestBody String username) {
+        Student s = st.findByUsername(username);
+        DegreeYear dy = s.getDegreeYear();
+        GsonBuilder b = new GsonBuilder();
+        b.registerTypeHierarchyAdapter(Student.class, new StudentAdapter());
+        Gson g = b.create();
+        return g.toJson(dy.getStudents());
     }
 
     @Configuration
@@ -123,12 +141,18 @@ public class Controller {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.logout().and().antMatcher("/**").authorizeRequests()
-                    .antMatchers("/index.html", "/", "/login", "/test-calendar", "/get-user").permitAll().and().antMatcher("/**")
+            http.logout()
+                    .and()
+                    .antMatcher("/**")
                     .authorizeRequests()
-                    .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user", "/get-candidates")
-                    .authenticated().and().csrf().csrfTokenRepository(csrfTokenRepository()).and()
-                    .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
+                    .antMatchers("/index.html", "/", "/login", "/test-calendar", "/get-user")
+                    .permitAll()
+                    .and()
+                    .antMatcher("/**")
+                    .authorizeRequests()
+                    .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user", "/get-candidates", "/apply",
+                            "/deapply", "get-students").authenticated().and().csrf().csrfTokenRepository(csrfTokenRepository())
+                    .and().addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
         }
 
         private Filter csrfHeaderFilter() {

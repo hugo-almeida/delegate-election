@@ -30,14 +30,12 @@
 		Candidata-te
 	</button>
 	<button type="submit" class="btn btn-primary" ng-click="reloadCandidates()" ng-show="debug">Reload Candidates</button>
-	
-	<p></p>
 	<div class="panel panel-default">
 		<div class="panel-heading">Name</div>
 		<table class="table">
 			<tr ng-repeat="candidato in candidatos | orderBy:'name'">
 				<td class="col-md-1">
-					<img class="center-block" ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}" height="42" width="42"></img><!-- using logged user photo, should use candidate photo -->
+					<img class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="42" width="42"></img><!-- using logged user photo, should use candidate photo -->
 				</td>
 				<td>
 					<strong>{{candidato.name}}</strong>
@@ -47,6 +45,4 @@
 			</tr>
 		</table>
 	</div>
-	
-	<button type="btn btn-primary" ng-click="debugCandidates()" ng-show="debug">DebugReload</button><!-- debug -->
 </div>
