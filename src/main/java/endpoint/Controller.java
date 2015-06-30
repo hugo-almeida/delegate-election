@@ -67,15 +67,15 @@ public class Controller {
 
     @RequestMapping(value = "/get-user", method = RequestMethod.POST)
     public @ResponseBody String getUser(@RequestBody String username) {
-        RestTemplate t = new RestTemplate();
-        String url =
+        final RestTemplate t = new RestTemplate();
+        final String url =
                 "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
-        HttpHeaders headers = new HttpHeaders();
+        final HttpHeaders headers = new HttpHeaders();
         headers.set("__username__", username);
-        HttpEntity entity = new HttpEntity(headers);
-        HttpEntity<String> response = t.exchange(url, HttpMethod.GET, entity, String.class);
-        JsonObject res = new JsonParser().parse(response.getBody()).getAsJsonObject();
-        Gson gson = new Gson();
+        final HttpEntity entity = new HttpEntity(headers);
+        final HttpEntity<String> response = t.exchange(url, HttpMethod.GET, entity, String.class);
+        final JsonObject res = new JsonParser().parse(response.getBody()).getAsJsonObject();
+        final Gson gson = new Gson();
         return gson.toJson(res);
     }
 
@@ -89,21 +89,24 @@ public class Controller {
     public @ResponseBody String vote(@RequestBody String json) {
 //        final VoteService svc = new VoteService(istid, vote);
 //        return svc.execute();
-        return "ok";
+        final Gson g = new Gson();
+        return g.toJson("Ok");
     }
 
     @RequestMapping(value = "/apply", method = RequestMethod.POST)
     public @ResponseBody String apply(@RequestBody String username) {
-        Student s = st.findByUsername(username);
+        final Student s = st.findByUsername(username);
         s.apply();
-        return "Ok";
+        st.save(s);
+        final Gson g = new Gson();
+        return g.toJson("Ok");
     }
 
     @RequestMapping(value = "/get-candidates", method = RequestMethod.POST)
     public @ResponseBody String getCandidates(@RequestBody String username) {
-        Student s = st.findByUsername(username);
-        DegreeYear dy = s.getDegreeYear();
-        Gson g = new Gson();
+        final Student s = st.findByUsername(username);
+        final DegreeYear dy = s.getDegreeYear();
+        final Gson g = new Gson();
         return g.toJson(dy.getCandidates());
 
     }

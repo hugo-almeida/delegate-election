@@ -55,5 +55,9 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	}
 	
 	$rootScope.debug = true;
+	
+	$rootScope.toggleDebug = function() {
+		$rootScope.debug = !$rootScope.debug;
+	}
 }]);
 

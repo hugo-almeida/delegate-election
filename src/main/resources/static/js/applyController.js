@@ -1,4 +1,4 @@
-angular.module('delegados').controller('applyCtrl', ['$rootScope', '$scope', '$http', function(rc, sc, http) {
+angular.module('delegados').controller('applyCtrl', ['$rootScope', '$scope', '$http', '$log', function(rc, sc, http, log) {
 		sc.candidatos = [];
 		http.post('get-candidates', rc.credentials.username)
 					.success(function(data) { 
@@ -8,11 +8,19 @@ angular.module('delegados').controller('applyCtrl', ['$rootScope', '$scope', '$h
 		
 		sc.applied = false;
 		sc.apply = function() {
+			log.log(rc.credentials.username);
 			http.post('apply', rc.credentials.username)
 			.success(function(data) { 
 				sc.applied = true;
 			});
 			sc.candidatos.push({name:rc.credentials.name, username:rc.credentials.username});
 		};
+		
+		sc.debugCandidates = function() {
+			http.post('get-candidates', rc.credentials.username)
+			.success(function(data) { 
+				sc.candidatos = data;
+		});
+		}
 	}
 ]);

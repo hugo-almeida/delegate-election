@@ -26,7 +26,7 @@
 	
 	<h3>Candidatos</h3>
 	<button type="submit" class="btn btn-primary" ng-click="apply()" ng-hide="applied">
-		<i class="glyphicon glyphicon-plus"></i>
+		<span class="glyphicon glyphicon-plus"></span>
 		Candidata-te
 	</button>
 	<p></p>
@@ -39,4 +39,6 @@
 			</li>
 		</ul>
 	</form>
+	
+	<button type="btn btn-primary" ng-click="debugCandidates()" ng-show="debug">DebugReload</button><!-- debug -->
 </div>

@@ -20,10 +20,11 @@
 	<div ng-controller="navigationCtrl" class="container">
 		<ul class="nav nav-tabs" role="tablist">
 			<li ng-hide="authenticated"><a href="login">login</a></li>
-			<li ng-show="authenticated"><a href="" ng-click="specialLogin()">Change Info</a></li>		
+			<li ng-show="authenticated && debug"><a href="" ng-click="specialLogin()">Change Info</a></li><!-- debug -->
 			<li ng-show="authenticated"><a href="" ng-click="logout()">logout</a></li>
-			<input ng-show="authenticated" ng-model="special_username" type="text" value="">
+			<input ng-show="authenticated && debug" ng-model="special_username" type="text" value=""><!-- debug -->
 		</ul>
+		<button class="btn btn-default" ng-click="toggleDebug()">Toggle Debug</button><!-- debug -->
 		<div class="container" ng-include="'estudante.html'">	</div>
 	</div>
 	<script src="webjars/fenixedu-canvas/js/bootstrap.min.js"></script>
