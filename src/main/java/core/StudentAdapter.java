@@ -19,8 +19,13 @@ public class StudentAdapter implements JsonSerializer<Student> {
         JsonObject jsonObject2 = new JsonObject();
         jsonObject.addProperty("name", s.getName());
         jsonObject.addProperty("username", s.getUsername());
-        jsonObject2.add("data", parser.parse(s.getPhotoBytes()));
-        jsonObject2.add("type", parser.parse(s.getPhotoType()));
+        if (s.getPhotoBytes() == null) {
+            jsonObject2.add("data", parser.parse(""));
+            jsonObject2.add("type", parser.parse(""));
+        } else {
+            jsonObject2.add("data", parser.parse(s.getPhotoBytes()));
+            jsonObject2.add("type", parser.parse(s.getPhotoType()));
+        }
         jsonObject.add("photo", jsonObject2);
         return jsonObject;
     }

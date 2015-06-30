@@ -25,12 +25,13 @@
 	</div>
 	
 	<h3>Votação</h3>
+	<button type="submit" class="btn btn-primary" ng-click="reloadCandidates()" ng-show="debug">Debug Reload Candidates</button>
 	<form action="" class="panel panel-default">
 		<div class="panel-heading">Name</div>
 		<ul class="list-group">
 			<li class="list-group-item" ng-repeat="candidato in candidatos | orderBy:'username'">
 				<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
-				<img ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}" height="42" width="42"> <!-- using logged user photo, should use candidate photo -->
+				<img ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="42" width="42"> <!-- using logged user photo, should use candidate photo -->
 					 {{candidato.name}} - {{candidato.username}} 
 			</li>
 			<li class="list-group-item"><input type="radio" ng-model="selected" value="nil" name="voted"> 
@@ -44,6 +45,7 @@
 					<ul>
 						<li class="list-group-item" ng-repeat="student in students | filter:query | orderBy:'username'" ng-model="selected" 
 							value="{{student.username}}" name = "voted" ng-hide="query==null || query==''">
+							<img ng-src="data:{{$parent.candidato.photo.type}};base64,{{$parent.candidato.photo.data}}" height="42" width="42">
 							<input type="radio">{{student.name}} - {{student.username}}</li>
 					</ul>
 				</div>

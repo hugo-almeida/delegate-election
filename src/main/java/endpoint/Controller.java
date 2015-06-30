@@ -107,6 +107,15 @@ public class Controller {
         return g.toJson("Ok");
     }
 
+    @RequestMapping(value = "/de-apply", method = RequestMethod.POST)
+    public @ResponseBody String deapply(@RequestBody String username) {
+        Student s = st.findByUsername(username);
+        s.deapply();
+        st.save(s);
+        Gson g = new Gson();
+        return g.toJson("Ok");
+    }
+
     @RequestMapping(value = "/get-candidates", method = RequestMethod.POST)
     public @ResponseBody String getCandidates(@RequestBody String username) {
         Student s = st.findByUsername(username);
@@ -117,17 +126,33 @@ public class Controller {
         return g.toJson(dy.getCandidates());
     }
 
+    @RequestMapping(value = "/get-students", method = RequestMethod.POST)
+    public @ResponseBody String getStudents(@RequestBody String username) {
+        Student s = st.findByUsername(username);
+        DegreeYear dy = s.getDegreeYear();
+        GsonBuilder b = new GsonBuilder();
+        b.registerTypeHierarchyAdapter(Student.class, new StudentAdapter());
+        Gson g = b.create();
+        return g.toJson(dy.getStudents());
+    }
+
     @Configuration
     protected static class SecurityConfiguration extends OAuth2SsoConfigurerAdapter {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.logout().and().antMatcher("/**").authorizeRequests()
-                    .antMatchers("/index.html", "/", "/login", "/test-calendar", "/get-user").permitAll().and().antMatcher("/**")
+            http.logout()
+                    .and()
+                    .antMatcher("/**")
                     .authorizeRequests()
-                    .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user", "/get-candidates")
-                    .authenticated().and().csrf().csrfTokenRepository(csrfTokenRepository()).and()
-                    .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
+                    .antMatchers("/index.html", "/", "/login", "/test-calendar", "/get-user")
+                    .permitAll()
+                    .and()
+                    .antMatcher("/**")
+                    .authorizeRequests()
+                    .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user", "/get-candidates", "/apply",
+                            "/deapply", "get-students").authenticated().and().csrf().csrfTokenRepository(csrfTokenRepository())
+                    .and().addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
         }
 
         private Filter csrfHeaderFilter() {

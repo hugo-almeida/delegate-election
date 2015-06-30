@@ -37,9 +37,9 @@ public class Student {
     private String email;
     private boolean applied;
     private boolean voted;
-    private String photoType;
+    private String photoType = null;
     @Column(length = 100000)
-    private String photoBytes;
+    private String photoBytes = null;
 
     Student() {
 
@@ -101,6 +101,10 @@ public class Student {
         applied = true;
     }
 
+    public void deapply() {
+        applied = false;
+    }
+
     public void setEmail(String e) {
         email = e;
     }
@@ -120,4 +124,5 @@ public class Student {
     public void vote() {
         voted = true;
     }
+
 }
