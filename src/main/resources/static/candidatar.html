@@ -29,18 +29,24 @@
 		<span class="glyphicon glyphicon-plus"></span>
 		Candidata-te
 	</button>
-	<button type="submit" class="btn btn-primary" ng-click="reloadCandidates()" >Reload Candidates</button>
+	<button type="submit" class="btn btn-primary" ng-click="reloadCandidates()" ng-show="debug">Reload Candidates</button>
 	
 	<p></p>
-	<form action="" class="panel panel-default">
+	<div class="panel panel-default">
 		<div class="panel-heading">Name</div>
-		<ul class="list-group">
-			<li class="list-group-item" ng-repeat="candidato in candidatos | orderBy:'name'">
-				<img ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}" height="42" width="42"> <!-- using logged user photo, should use candidate photo -->
-				{{candidato.name}} - {{candidato.username}}
-			</li>
-		</ul>
-	</form>
+		<table class="table">
+			<tr ng-repeat="candidato in candidatos | orderBy:'name'">
+				<td class="col-md-1">
+					<img class="center-block" ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}" height="42" width="42"></img><!-- using logged user photo, should use candidate photo -->
+				</td>
+				<td>
+					<strong>{{candidato.name}}</strong>
+					<small>{{candidato.username}}</small>
+					<button class="pull-right" ng-show="candidato.username == credentials.username">testing</button><!-- debug -->
+				</td>
+			</tr>
+		</table>
+	</div>
 	
 	<button type="btn btn-primary" ng-click="debugCandidates()" ng-show="debug">DebugReload</button><!-- debug -->
 </div>

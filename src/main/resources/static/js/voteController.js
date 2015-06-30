@@ -15,6 +15,9 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 			.success(function(data) { 
 				
 			});*/
+			if(sc.selected == 'other') {
+				sc.selected = sc.otherSelected;
+			}
 			sc.result = 'user ' + rc.credentials.username + ' voted on ' + sc.selected;
 			sc.voted = true;
 		}

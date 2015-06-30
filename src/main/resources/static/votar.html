@@ -6,8 +6,8 @@
 		<!-- Table -->
 		<table class="table">
 			<tr>
-				<th>Curso</th>
-				<td>{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
+				<th class="col-md-2">Curso</th>
+				<td class="col-md-8 col-md-8-offset-4">{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
 			</tr>
 			<tr>
 				<th>Ano Lectivo</th>
@@ -25,31 +25,46 @@
 	</div>
 	
 	<h3>Votação</h3>
-	<form action="" class="panel panel-default">
+	<div class="panel panel-default">
 		<div class="panel-heading">Name</div>
-		<ul class="list-group">
-			<li class="list-group-item" ng-repeat="candidato in candidatos | orderBy:'username'">
-				<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
-				<img ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}" height="42" width="42"> <!-- using logged user photo, should use candidate photo -->
-					 {{candidato.name}} - {{candidato.username}} 
-			</li>
-			<li class="list-group-item"><input type="radio" ng-model="selected" value="nil" name="voted"> 
-				Votar em branco
-			</li>
-			<li class="list-group-item"><input type="radio" ng-model="selected" value="other" name="voted" ng-change="loadStudents()">  
-				Outro - Podes dar o teu voto a um aluno que não se candidatou {{search}}
-				<div ng-show="selected == 'other'">
-					<span class="glyphicon glyphicon-search"></span>
-					<input type="text" ng-model="$parent.query"></input>
-					<ul>
-						<li class="list-group-item" ng-repeat="student in students | filter:query | orderBy:'username'" ng-model="selected" 
-							value="{{student.username}}" name = "voted" ng-hide="query==null || query==''">
-							<input type="radio">{{student.name}} - {{student.username}}</li>
-					</ul>
-				</div>
-			</li>
-		</ul>
-	</form>
+		<table class="table"> <!-- probably needs to be changed to a table -->
+			<tr ng-repeat="candidato in candidatos | orderBy:'username'">
+				<td>
+					<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
+					<img ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}" height="42" width="42"> <!-- using logged user photo, should use candidate photo -->
+					<strong>{{candidato.name}}</strong><small>{{candidato.username}}</small>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="radio" ng-model="selected" value="nil" name="voted">
+					<strong>Votar em branco</strong>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="radio" ng-model="selected" value="other" name="voted" ng-change="loadStudents()">  
+					<strong>Outro</strong>
+					<small>Podes dar o teu voto a um aluno que não se candidatou {{search}}</small>
+					<div class="row" ng-show="selected == 'other'">
+						<div class="container">
+							<span class="glyphicon glyphicon-search"></span>
+							<input type="text" ng-model="$parent.query"></input>
+							<table class="table">
+								<tr ng-repeat="student in students | filter:query | orderBy:'username'"  ng-hide="query==null || query==''">
+									<td>
+										<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
+										<strong>{{student.name}}</strong>
+										<small>{{student.username}}</small>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
 	<button class="btn btn-primary" ng-click="vote()" ng-hide="voted">Votar</button>
 	{{result}}
 </div>
