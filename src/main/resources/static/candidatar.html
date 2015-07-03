@@ -25,11 +25,11 @@
 	</div>
 	
 	<h3>Candidatos</h3>
-	<button type="submit" class="btn btn-primary" ng-click="apply()" >
+	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#applyModal" ng-hide="applied">
 		<span class="glyphicon glyphicon-plus"></span>
 		Candidata-te
 	</button>
-	<button type="submit" class="btn btn-primary" ng-click="reloadCandidates()" ng-show="debug">Reload Candidates</button>
+	<button class="btn btn-primary" ng-click="reloadCandidates()" ng-show="debug">Reload Candidates</button>
 	<div class="panel panel-default">
 		<div class="panel-heading">Name</div>
 		<table class="table">
@@ -40,9 +40,57 @@
 				<td>
 					<strong>{{candidato.name}}</strong>
 					<small>{{candidato.username}}</small>
-					<button class="pull-right" ng-show="candidato.username == credentials.username">testing</button><!-- debug -->
+					<button type="button" class="pull-right close" ng-show="candidato.username == credentials.username" ng-click="unapply()"></button><!-- missing correct canvas element -->
 				</td>
 			</tr>
 		</table>
+	</div>
+	
+	<div id="applyModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>
+						<strong>Confirmação de Candidatura</strong>
+						<p>
+							<small>This is a short helper text to undestand what they're doing</small>
+						</p>
+					</h3>
+				    <button type="button" class="close" data-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+	        		<table class="table">
+	        			<tr>
+							<th class="col-md-6">Candidato</th>
+							<td class="col-md-12 col-md-12-offset-4">{{credentials.name}}</td> <!--  needs to be fixed to search for roles with type student -->
+						</tr>
+						<tr>
+							<th>Curso</th>
+							<td>{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
+						</tr>
+						<tr>
+							<th>Ano Lectivo</th>
+							<td>2014/2015</td>
+						</tr>
+						<tr>
+							<th>Ano Curricular</th>
+							<td>1</td>
+						</tr>
+						<tr>
+							<th>Candidaturas</th>
+							<td>{{candidatos.length}}</td>
+						</tr>
+						<tr>
+							<th>Período de votação</th>
+							<td>23/04/2015 - 25/04/2015</td>
+						</tr>
+					</table>
+	      		</div>
+	      		<div class="modal-footer">
+	        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+	        			<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="apply()">Confirmar</button>
+	      		</div>
+			</div>
+		</div>
 	</div>
 </div>

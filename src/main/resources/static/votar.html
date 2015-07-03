@@ -30,7 +30,7 @@
 		<div class="panel-heading">Name</div>
 		<div class="table-responsive">
 			<table class="table"> <!-- probably needs to be changed to a table -->
-				<!-- 
+				
 				<thead>
 				<tr>
 					<th class="col-md-1" ng-hide="true">
@@ -43,12 +43,12 @@
 						name
 					</th>
 				</tr>
-				</thead>-->
+				</thead>
 				<tr ng-repeat="candidato in candidatos | orderBy:'username'">
-					<td style="width:35px; height:40px" class="text-center">
+					<td>
 						<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
 					</td>
-					<td style="width:35px; height:40px">
+					<td>
 						<img ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="30" width="30"> <!-- using logged user photo, should use candidate photo -->
 					</td>
 					<td>
@@ -57,38 +57,38 @@
 					</td>
 				</tr>
 				<tr>
-					<td style="width:35px; height:40px" class="text-center">
+					<td>
 						<input type="radio" ng-model="selected" value="nil" name="voted">
 					</td>
-					<td style="width:35px; height:40px">
+					<td>
 					</td>
 					<td>
 						<strong>Votar em branco</strong>
 					</td>
 				</tr>
 				<tr>
-					<td style="width:35px; height:40px; border-bottom:none" class="text-center">
+					<td>
 						<input type="radio" ng-model="selected" value="other" name="voted" ng-change="loadStudents()">  
 					</td>
-					<td style="width:35px; height:40px; border-bottom:none">
+					<td>
 					</td>
-					<td style="border-bottom:none">
+					<td>
 						<strong>Outro</strong>
 						<small>Podes dar o teu voto a um aluno que não se candidatou {{search}}</small>
 						<tr ng-show="selected == 'other'">
-							<td style="width:35px; height:40px">
-							</td>
-							<td style="width:35px; height:40px">
+							<td>
 							</td>
 							<td>
-								<span class="glyphicon glyphicon-search"></span>
-								<input type="text" ng-model="query"></input>
+							</td>
+							<td>
+								<!-- <span class="glyphicon glyphicon-search"></span>-->
+								<input type="search" ng-model="query"></input>
 								<table class="table">
 									<tr ng-repeat="student in students | filter:searchFilter | orderBy:'username'"  ng-hide="query==null || query==''">
-										<td style="width:35px; height:40px" class="text-center">
+										<td>
 											<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
 										</td>
-										<td style="width:35px; height:40px">
+										<td>
 											<img ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}" height="30" width="30">
 										</td>	
 										<td>	
@@ -104,6 +104,49 @@
 			</table>
 		</div>
 	</div>
-	<button class="btn btn-primary" ng-click="vote()" ng-hide="voted">Votar</button>
-	{{result}}
+	<button class="btn btn-primary" data-toggle="modal" data-target="#voteModal" ng-hide="voted">Votar</button>
+
+	<div id="voteModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>
+						<strong>Confirmação de Voto</strong>
+						<p>
+							<small>This is a short helper text to undestand what they're doing</small>
+						</p>
+					</h3>
+				    <button type="button" class="close" data-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+	        		<table class="table">
+						<tr>
+							<th class="col-md-6">Curso</th>
+							<td class="col-md-12 col-md-12-offset-4">{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
+						</tr>
+						<tr>
+							<th>Ano Lectivo</th>
+							<td>2014/2015</td>
+						</tr>
+						<tr>
+							<th>Ano Curricular</th>
+							<td>1</td>
+						</tr>
+						<tr>
+							<th>Período de votação</th>
+							<td>23/04/2015 - 25/04/2015</td>
+						</tr>
+					</table>
+					<p>
+						Confirmar o seu voto em {{selected}}({{selected}})?
+					</p>
+	      		</div>
+	      		<div class="modal-footer">
+	        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+	        			<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="vote()">Confirmar</button>
+	      		</div>
+			</div>
+		</div>
+	</div>
 </div>
+

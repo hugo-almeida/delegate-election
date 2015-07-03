@@ -12,8 +12,15 @@ angular.module('delegados').controller('applyCtrl', ['$rootScope', '$scope', '$h
 			.success(function(data) { 
 				sc.applied = true;
 			});
-			sc.candidatos.push({name:rc.credentials.name, username:rc.credentials.username});
+			log.log(rc.credentials.name + 'applied');
+			//sc.candidatos.push({name:rc.credentials.name, username:rc.credentials.username});
 		};
+		
+		sc.unapply = function() {
+			/*http.post('unapply', rc.credentials.username)
+			.success(function(data) { 
+			});*/
+		}
 		
 		sc.reloadCandidates = function() {
 			http.post('get-candidates', rc.credentials.username).success(function(data) { 
