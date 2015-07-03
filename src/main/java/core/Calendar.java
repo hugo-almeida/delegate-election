@@ -48,16 +48,18 @@ public class Calendar {
                 degrees.add(element);
             }
         }
-        degrees.iterator().next().initDegreeYears();
+//        degrees.iterator().next().initDegreeYears();
 //        Degree d = null;
 //        Iterator<Degree> it = degrees.iterator();
 //        do {
 //            d = it.next();
 //        } while (!d.getAcronym().equals("MEIC-A"));
 //        d.initDegreeYears();
-//        for (Degree d : degrees) {
-//            d.initDegreeYears();
-//        }
+        for (Degree d : degrees) {
+            if (d.getAcronym().equals("MEE") || d.getAcronym().equals("MEC")) {
+                d.initDegreeYears();
+            }
+        }
     }
 
     public void setYear(int year) {
