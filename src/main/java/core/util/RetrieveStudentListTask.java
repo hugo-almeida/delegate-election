@@ -6,10 +6,10 @@ import core.DegreeYear;
 
 public class RetrieveStudentListTask extends TimerTask {
 
-    private final DegreeYear courseYear;
+    private final DegreeYear degreeYear;
 
     public RetrieveStudentListTask(DegreeYear year) {
-        courseYear = year;
+        degreeYear = year;
     }
 
     @Override
@@ -17,6 +17,7 @@ public class RetrieveStudentListTask extends TimerTask {
         // Get all eletable students from fenix
         // And put them in the courseyear
         // This should be ran 5/10 minutes before the period becomes active
+        degreeYear.initStudents();
     }
 
 }

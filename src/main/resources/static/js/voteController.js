@@ -17,16 +17,23 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		    var re = new RegExp(sc.query, 'i');
 		}
 		
+		sc.period = function() {
+			http.get('period?istid=' + rc.credentials.username )
+			.success(function(data) { 
+				console.log(data);
+			});
+		}
+		
 		sc.vote = function() {
-			/*http.post('get-candidates', {voter:rc.credentials.username, voted:sc.selected} )
+			http.post('vote', {voter:rc.credentials.username, voted:sc.selected} )
 			.success(function(data) { 
 				
-			});*/
-			if(sc.selected == 'other') {
-				sc.selected = sc.otherSelected;
-			}
-			sc.result = 'user ' + rc.credentials.username + ' voted on ' + sc.selected;
-			sc.voted = true;
+			});
+//			if(sc.selected == 'other') {
+//				sc.selected = sc.otherSelected;
+//			}
+//			sc.result = 'user ' + rc.credentials.username + ' voted on ' + sc.selected;
+//			sc.voted = true;
 		}
 		
 		sc.loadedStudents = false;

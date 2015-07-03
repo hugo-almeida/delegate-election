@@ -2,6 +2,7 @@ package endpoint;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -35,24 +36,33 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
-import services.GetCurrentPeriodService;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import core.ApplicationPeriod;
+import core.Calendar;
+import core.CalendarDAO;
+import core.Degree;
 import core.DegreeYear;
+import core.Period;
 import core.Student;
 import core.StudentAdapter;
 import core.StudentDAO;
+import core.exception.InvalidPeriodException;
 
 @EnableOAuth2Sso
 @RestController
 public class Controller {
 
+    private static final String ACCESS_TOKEN =
+            "ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
     @Autowired
-    StudentDAO st;
+    StudentDAO studentDAO;
+
+    @Autowired
+    CalendarDAO calendarDAO;
 
     @RequestMapping("/user")
     public @ResponseBody String user() {
@@ -73,52 +83,80 @@ public class Controller {
     public @ResponseBody String getUser(@RequestBody String username) {
         RestTemplate t = new RestTemplate();
         t.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-        String url =
-                "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
-        final HttpHeaders headers = new HttpHeaders();
-        headers.set("__username__", username);
-        final HttpEntity entity = new HttpEntity(headers);
-        final HttpEntity<String> response = t.exchange(url, HttpMethod.GET, entity, String.class);
-        final JsonObject res = new JsonParser().parse(response.getBody()).getAsJsonObject();
+
+        String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
+
+        final HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.set("__username__", username);
+        final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
+        final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
+        final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
+
         final Gson gson = new Gson();
-        return gson.toJson(res);
+        return gson.toJson(result);
     }
 
+    //TODO
     @RequestMapping("/period")
-    public @ResponseBody String currentPeriod(@RequestBody String istid) {
-        final GetCurrentPeriodService svc = new GetCurrentPeriodService(istid);
-        return svc.execute();
+    public @ResponseBody String currentPeriod(String istid) {
+        System.out.println(istid);
+        Student student = studentDAO.findByUsername(istid);
+        Period period = student.getDegreeYear().getActivePeriod();
+        System.out.println(period);
+        Gson gson = new Gson();
+        return gson.toJson(period);
     }
 
+    //TODO
     @RequestMapping("/vote")
-    public @ResponseBody String vote(@RequestBody String json) {
-//        final VoteService svc = new VoteService(istid, vote);
-//        return svc.execute();
+    public @ResponseBody String vote(String json) {
+        System.out.println(json);
         final Gson g = new Gson();
         return g.toJson("Ok");
     }
 
+    @RequestMapping("/periodsetup")
+    public String periodSetup() {
+        Calendar testCalendar = calendarDAO.findByYear(2014);
+
+        for (Degree d : testCalendar.getDegrees()) {
+            for (DegreeYear dy : d.getYears()) {
+                try {
+                    if (dy.getDegreeYear() % 2 == 0) {
+                        dy.addPeriod(new ApplicationPeriod(new Date(), new Date(), dy));
+                    } else {
+
+                    }
+                } catch (InvalidPeriodException e) {
+
+                }
+            }
+        }
+
+        return "ok";
+    }
+
     @RequestMapping(value = "/apply", method = RequestMethod.POST)
     public @ResponseBody String apply(@RequestBody String username) {
-        final Student s = st.findByUsername(username);
+        final Student s = studentDAO.findByUsername(username);
         s.apply();
-        st.save(s);
+        studentDAO.save(s);
         final Gson g = new Gson();
         return g.toJson("Ok");
     }
 
     @RequestMapping(value = "/de-apply", method = RequestMethod.POST)
     public @ResponseBody String deapply(@RequestBody String username) {
-        Student s = st.findByUsername(username);
+        Student s = studentDAO.findByUsername(username);
         s.deapply();
-        st.save(s);
+        studentDAO.save(s);
         Gson g = new Gson();
         return g.toJson("Ok");
     }
 
     @RequestMapping(value = "/get-candidates", method = RequestMethod.POST)
     public @ResponseBody String getCandidates(@RequestBody String username) {
-        Student s = st.findByUsername(username);
+        Student s = studentDAO.findByUsername(username);
         DegreeYear dy = s.getDegreeYear();
         GsonBuilder b = new GsonBuilder();
         b.registerTypeHierarchyAdapter(Student.class, new StudentAdapter());
@@ -128,7 +166,7 @@ public class Controller {
 
     @RequestMapping(value = "/get-students", method = RequestMethod.POST)
     public @ResponseBody String getStudents(@RequestBody String username) {
-        Student s = st.findByUsername(username);
+        Student s = studentDAO.findByUsername(username);
         DegreeYear dy = s.getDegreeYear();
         GsonBuilder b = new GsonBuilder();
         b.registerTypeHierarchyAdapter(Student.class, new StudentAdapter());

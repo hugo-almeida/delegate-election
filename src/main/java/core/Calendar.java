@@ -62,6 +62,10 @@ public class Calendar {
         }
     }
 
+    public void addDegree(Degree d) {
+        degrees.add(d);
+    }
+
     public void setYear(int year) {
         this.year = year;
     }

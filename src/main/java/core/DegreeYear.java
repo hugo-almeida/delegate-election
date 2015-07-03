@@ -41,8 +41,6 @@ public class DegreeYear {
                     updatable = false) })
     private Degree degree;
 
-    //private int year;
-
     @OneToOne(mappedBy = "activeDegreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Period activePeriod;
 
@@ -60,40 +58,39 @@ public class DegreeYear {
         this.degreeDegreeYearPK = new DegreeDegreeYearPK(d.getName(), year, d.getYear());
         this.degree = d;
         //this.year = year;
-        //initPeriod();
-        //initStudents();
+        initPeriod();
+        initStudents();
     }
 
     public void initStudents() {
+        final String accessToken =
+                "ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
+
         RestTemplate t = new RestTemplate();
-        //final ApplicationConfiguration config = ApplicationConfiguration.fromPropertyFilename("/fenixedu.properties");
-        //FenixEduClientImpl client = new FenixEduClientImpl(config);
-        Student[] s =
-                t.getForObject(
-                        "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees/"
-                                + degree.getId()
-                                + "/students?curricularYear="
-                                + getDegreeYear()
-                                + "&access_token=ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0",
-                        Student[].class);
-        String url =
-                "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
-        HttpHeaders headers = new HttpHeaders();
-        for (Student st : s) {
-            st.setDegreeYear(this);
-            headers.set("__username__", st.getUsername());
-            HttpEntity entity = new HttpEntity(headers);
-            HttpEntity<String> response = t.exchange(url, HttpMethod.GET, entity, String.class);
-            JsonObject res = new JsonParser().parse(response.getBody()).getAsJsonObject();
-            if (!res.get("email").isJsonNull()) {
-                st.setEmail(res.get("email").toString());
+        Student[] degreeYearStudents =
+                t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees/" + degree.getId()
+                        + "/students?curricularYear=" + getDegreeYear() + "&access_token=" + accessToken, Student[].class);
+
+        String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + accessToken;
+
+        HttpHeaders requestHeaders = new HttpHeaders();
+        for (Student student : degreeYearStudents) {
+            student.setDegreeYear(this);
+
+            requestHeaders.set("__username__", student.getUsername());
+            HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
+
+            HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
+            JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
+            if (!result.get("email").isJsonNull()) {
+                student.setEmail(result.get("email").toString());
             }
-            if (!res.get("photo").isJsonNull()) {
-                st.setPhotoType(res.getAsJsonObject("photo").get("type").toString());
-                st.setPhotoBytes(res.getAsJsonObject("photo").get("data").toString());
+            if (!result.get("photo").isJsonNull()) {
+                student.setPhotoType(result.getAsJsonObject("photo").get("type").toString());
+                student.setPhotoBytes(result.getAsJsonObject("photo").get("data").toString());
             }
         }
-        students.addAll(Arrays.asList(s));
+        students.addAll(Arrays.asList(degreeYearStudents));
 
     }
 
