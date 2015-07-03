@@ -76,6 +76,7 @@ public class Degree {
         }
         for (DegreeYear y : years) {
             y.initStudents();
+            break; // Isto tem de ser retirado!
         }
     }
 

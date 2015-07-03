@@ -2,7 +2,6 @@ package endpoint;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Date;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -41,16 +40,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import core.ApplicationPeriod;
-import core.Calendar;
 import core.CalendarDAO;
-import core.Degree;
 import core.DegreeYear;
 import core.Period;
 import core.Student;
 import core.StudentAdapter;
 import core.StudentDAO;
-import core.exception.InvalidPeriodException;
 
 @EnableOAuth2Sso
 @RestController
@@ -113,27 +108,6 @@ public class Controller {
         System.out.println(json);
         final Gson g = new Gson();
         return g.toJson("Ok");
-    }
-
-    @RequestMapping("/periodsetup")
-    public String periodSetup() {
-        Calendar testCalendar = calendarDAO.findByYear(2014);
-
-        for (Degree d : testCalendar.getDegrees()) {
-            for (DegreeYear dy : d.getYears()) {
-                try {
-                    if (dy.getDegreeYear() % 2 == 0) {
-                        dy.addPeriod(new ApplicationPeriod(new Date(), new Date(), dy));
-                    } else {
-
-                    }
-                } catch (InvalidPeriodException e) {
-
-                }
-            }
-        }
-
-        return "ok";
     }
 
     @RequestMapping(value = "/apply", method = RequestMethod.POST)

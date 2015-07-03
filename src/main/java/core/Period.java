@@ -1,13 +1,15 @@
 package core;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
@@ -15,8 +17,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Inheritance
-@DiscriminatorColumn(name = "period_type")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "period_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "period")
 public abstract class Period {
 
@@ -25,9 +27,9 @@ public abstract class Period {
     private PeriodPK periodPK;
 
     @Column(name = "start")
-    private Date start;
+    private LocalDate start;
     @Column(name = "end")
-    private Date end;
+    private LocalDate end;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
@@ -53,8 +55,8 @@ public abstract class Period {
 
     }
 
-    public Period(Date start, Date end, DegreeYear degreeYear) {
-        if (end.before(start)) {
+    public Period(LocalDate start, LocalDate end, DegreeYear degreeYear) {
+        if (end.isBefore(start)) {
             //Throws a nice exception saying that nothing ends before starting
         }
         this.periodPK = new PeriodPK(degreeYear.getDegreeName(), degreeYear.getDegreeYear(), degreeYear.getCalendarYear());
@@ -64,24 +66,24 @@ public abstract class Period {
         this.activeDegreeYear = degreeYear;
     }
 
-    public Date getStart() {
+    public LocalDate getStart() {
         return start;
     }
 
-    public void setStart(Date start) {
+    public void setStart(LocalDate start) {
         this.start = start;
     }
 
-    public Date getEnd() {
+    public LocalDate getEnd() {
         return end;
     }
 
-    public void setEnd(Date end) {
+    public void setEnd(LocalDate end) {
         this.end = end;
     }
 
     public boolean conflictsWith(Period p) {
-        if (end.before(p.getStart()) || start.after(p.getEnd())) {
+        if (end.isBefore(p.getStart()) || start.isAfter(p.getEnd())) {
             return false;
         }
         return true;

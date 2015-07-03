@@ -1,7 +1,7 @@
 package core;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,7 @@ public class ElectionPeriod extends Period {
 
     private final Map<String, List<Vote>> votes;
 
-    public ElectionPeriod(Date start, Date end, DegreeYear degreeYear) {
+    public ElectionPeriod(LocalDate start, LocalDate end, DegreeYear degreeYear) {
         super(start, end, degreeYear);
         votes = new HashMap<String, List<Vote>>();
     }

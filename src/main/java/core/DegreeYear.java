@@ -1,7 +1,6 @@
 package core;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -146,11 +145,12 @@ public class DegreeYear {
     }
 
     public void addPeriod(Period period) throws InvalidPeriodException {
-        if (period.getStart().before(new Date())) {
-            throw new InvalidPeriodException("The start date should be in the future");
-        }
+        // Allow start dates in the past during debug
+//        if (period.getStart().isBefore(LocalDate.now())) {
+//            throw new InvalidPeriodException("The start date should be in the future");
+//        }
 
-        if (activePeriod != null && period.getStart().before(activePeriod.getEnd())) {
+        if (activePeriod != null && period.getStart().isBefore(activePeriod.getEnd())) {
             throw new InvalidPeriodException("A period can't start before the active period ends");
         }
 

@@ -1,6 +1,6 @@
 package core;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +21,7 @@ public class ApplicationPeriod extends Period {
         super();
     }
 
-    public ApplicationPeriod(Date start, Date end, DegreeYear degreeYear) {
+    public ApplicationPeriod(LocalDate start, LocalDate end, DegreeYear degreeYear) {
         super(start, end, degreeYear);
         candidates = new HashSet<Student>();
     }
