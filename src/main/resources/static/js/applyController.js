@@ -8,7 +8,6 @@ angular.module('delegados').controller('applyCtrl', ['$rootScope', '$scope', '$h
 		
 		sc.applied = false;
 		sc.apply = function() {
-			log.log(rc.credentials.username);
 			http.post('apply', rc.credentials.username)
 			.success(function(data) { 
 				sc.applied = true;

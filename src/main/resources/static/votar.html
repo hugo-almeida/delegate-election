@@ -28,44 +28,81 @@
 	<button type="submit" class="btn btn-primary" ng-click="reloadCandidates()" ng-show="debug">Debug Reload Candidates</button>
 	<div class="panel panel-default">
 		<div class="panel-heading">Name</div>
-		<table class="table"> <!-- probably needs to be changed to a table -->
-			<tr ng-repeat="candidato in candidatos | orderBy:'username'">
-				<td>
-					<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
-				<img ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="42" width="42"> <!-- using logged user photo, should use candidate photo -->
-					<strong>{{candidato.name}}</strong><small>{{candidato.username}}</small>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="radio" ng-model="selected" value="nil" name="voted">
-					<strong>Votar em branco</strong>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="radio" ng-model="selected" value="other" name="voted" ng-change="loadStudents()">  
-					<strong>Outro</strong>
-					<small>Podes dar o teu voto a um aluno que não se candidatou {{search}}</small>
-					<div class="row" ng-show="selected == 'other'">
-						<div class="container">
-							<span class="glyphicon glyphicon-search"></span>
-							<input type="text" ng-model="$parent.query"></input>
-							<table class="table">
-								<tr ng-repeat="student in students | filter:query | orderBy:'username'"  ng-hide="query==null || query==''">
-									<td>
-										<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
-										<img ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}" height="42" width="42">
-										<strong>{{student.name}}</strong>
-										<small>{{student.username}}</small>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</div>
-				</td>
-			</tr>
-		</table>
+		<div class="table-responsive">
+			<table class="table"> <!-- probably needs to be changed to a table -->
+				<!-- 
+				<thead>
+				<tr>
+					<th class="col-md-1" ng-hide="true">
+						button
+					</th>
+					<th class="col-md-1" ng-hide="true">
+						pic
+					</th>
+					<th ng-hide="true">
+						name
+					</th>
+				</tr>
+				</thead>-->
+				<tr ng-repeat="candidato in candidatos | orderBy:'username'">
+					<td style="width:35px; height:40px" class="text-center">
+						<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
+					</td>
+					<td style="width:35px; height:40px">
+						<img ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="30" width="30"> <!-- using logged user photo, should use candidate photo -->
+					</td>
+					<td>
+						<strong>{{candidato.name}}</strong>
+						<small>{{candidato.username}}</small>
+					</td>
+				</tr>
+				<tr>
+					<td style="width:35px; height:40px" class="text-center">
+						<input type="radio" ng-model="selected" value="nil" name="voted">
+					</td>
+					<td style="width:35px; height:40px">
+					</td>
+					<td>
+						<strong>Votar em branco</strong>
+					</td>
+				</tr>
+				<tr>
+					<td style="width:35px; height:40px; border-bottom:none" class="text-center">
+						<input type="radio" ng-model="selected" value="other" name="voted" ng-change="loadStudents()">  
+					</td>
+					<td style="width:35px; height:40px; border-bottom:none">
+					</td>
+					<td style="border-bottom:none">
+						<strong>Outro</strong>
+						<small>Podes dar o teu voto a um aluno que não se candidatou {{search}}</small>
+						<tr ng-show="selected == 'other'">
+							<td style="width:35px; height:40px">
+							</td>
+							<td style="width:35px; height:40px">
+							</td>
+							<td>
+								<span class="glyphicon glyphicon-search"></span>
+								<input type="text" ng-model="query"></input>
+								<table class="table">
+									<tr ng-repeat="student in students | filter:searchFilter | orderBy:'username'"  ng-hide="query==null || query==''">
+										<td style="width:35px; height:40px" class="text-center">
+											<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
+										</td>
+										<td style="width:35px; height:40px">
+											<img ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}" height="30" width="30">
+										</td>	
+										<td>	
+											<strong>{{student.name}}</strong>
+											<small>{{student.username}}</small>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</td>
+				</tr>
+			</table>
+		</div>
 	</div>
 	<button class="btn btn-primary" ng-click="vote()" ng-hide="voted">Votar</button>
 	{{result}}

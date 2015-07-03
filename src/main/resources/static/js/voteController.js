@@ -14,6 +14,7 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 			http.post('get-candidates', rc.credentials.username).success(function(data) { 
 							sc.candidatos = data;
 			});
+		    var re = new RegExp(sc.query, 'i');
 		}
 		
 		sc.vote = function() {
@@ -32,7 +33,6 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		
 		sc.loadStudents = function() {
 			if(!sc.loadedStudents){
-				log.log('doing stuff');
 				http.post('get-students', rc.credentials.username )
 				.success(function(data) { 
 					sc.students = data;
@@ -40,5 +40,10 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 				});
 			}
 		}
+		
+		sc.searchFilter = function (obj) {
+		    var re = new RegExp(sc.query, 'i');
+		    return !sc.query || re.test(obj.username) || re.test(obj.name);
+		};
 	}
 ]);

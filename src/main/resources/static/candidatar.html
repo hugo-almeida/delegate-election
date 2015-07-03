@@ -6,8 +6,8 @@
 		<!-- Table -->
 		<table class="table">
 			<tr>
-				<th>Curso</th>
-				<td>{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
+				<th class="col-md-2">Curso</th>
+				<td class="col-md-8 col-md-8-offset-4">{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
 			</tr>
 			<tr>
 				<th>Ano Lectivo</th>
@@ -34,7 +34,7 @@
 		<div class="panel-heading">Name</div>
 		<table class="table">
 			<tr ng-repeat="candidato in candidatos | orderBy:'name'">
-				<td class="col-md-1">
+				<td style="width:50px; height:50px">
 					<img class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="42" width="42"></img><!-- using logged user photo, should use candidate photo -->
 				</td>
 				<td>

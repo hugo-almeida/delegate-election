@@ -11,7 +11,9 @@
 <div ng-show="authenticated"> <!-- missing student check -->
 	<!-- <p ng-show="debug">{{credentials}}</p><!-- debug -->
 	<p ng-show="debug">{{degrees}}</p><!-- debug -->
-	<img ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}">{{credentials.username}} {{credentials.name}}</img> 
+	<img ng-show="debug" ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}">
+		<p ng-show="debug">{{credentials.username}} {{credentials.name}}</p>
+	</img> 
 	<p>This is an ordinary paragraph that is long enough to wrap to multiple lines so that  you can see how the line spacing looks. This is an ordinary paragraph that is long enough to wrap to multiple lines so that  you can see how the line spacing looks.</p>
 	
 	<button type="btn btn-primary" ng-click="debugVotePeriod()" ng-show="debug">Debug vote period</button><!-- debug -->
