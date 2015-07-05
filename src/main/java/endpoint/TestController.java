@@ -13,6 +13,7 @@ import core.Calendar;
 import core.CalendarDAO;
 import core.Degree;
 import core.DegreeYear;
+import core.Period;
 import core.Student;
 import core.StudentDAO;
 import core.exception.InvalidPeriodException;
@@ -49,8 +50,10 @@ public class TestController {
                 try {
                     if (dy.getDegreeYear() % 2 == 0) {
                         //add ongoing application period
-                        dy.addPeriod(new ApplicationPeriod(LocalDate.of(2015, Month.JULY, 2), LocalDate.of(2015, Month.JULY, 30),
-                                dy));
+                        Period period =
+                                new ApplicationPeriod(LocalDate.of(2015, Month.JULY, 2), LocalDate.of(2015, Month.JULY, 30), dy);
+                        dy.addPeriod(period);
+                        dy.setActivePeriod(period);
                     } else {
                         // add application period in the past
                         dy.addPeriod(new ApplicationPeriod(LocalDate.of(2015, Month.JUNE, 2), LocalDate.of(2015, Month.JUNE, 30),

@@ -17,8 +17,13 @@ public class StudentAdapter implements JsonSerializer<Student> {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = new JsonObject();
         JsonObject jsonObject2 = new JsonObject();
+//        JsonObject periodJson = new JsonObject();
         jsonObject.addProperty("name", s.getName());
         jsonObject.addProperty("username", s.getUsername());
+//        if (s.getDegreeYear().getActivePeriod() != null) {
+//            periodJson.addProperty("start", s.getDegreeYear().getActivePeriod().getStart().toString());
+//            periodJson.addProperty("end", s.getDegreeYear().getActivePeriod().getEnd().toString());
+//        }
         if (s.getPhotoBytes() == null) {
             jsonObject2.add("data", parser.parse(""));
             jsonObject2.add("type", parser.parse(""));
@@ -27,6 +32,7 @@ public class StudentAdapter implements JsonSerializer<Student> {
             jsonObject2.add("type", parser.parse(s.getPhotoType()));
         }
         jsonObject.add("photo", jsonObject2);
+//        jsonObject.add("currentPeriod", periodJson);
         return jsonObject;
     }
 }

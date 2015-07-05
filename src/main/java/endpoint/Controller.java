@@ -3,6 +3,7 @@ package endpoint;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -26,6 +27,7 @@ import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,6 +43,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import core.CalendarDAO;
+import core.DegreeDAO;
 import core.DegreeYear;
 import core.Period;
 import core.Student;
@@ -57,8 +60,144 @@ public class Controller {
     StudentDAO studentDAO;
 
     @Autowired
+    DegreeDAO degreeDAO;
+
+    @Autowired
     CalendarDAO calendarDAO;
 
+    @RequestMapping(value = "/students/{istId}", method = RequestMethod.GET)
+    public @ResponseBody String getStudent(@PathVariable String istId) {
+        //TODO Retorna a info do estudante
+        // Deve ser chamado no início
+        return null;
+    }
+
+    @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
+    public @ResponseBody String getStudentDegrees(@PathVariable String istId) {
+        //TODO Retorna cursos em que o estudante está, incluindo o nome, id, ano curricular, ano lectivo e periodo de votacao
+        return null;
+    }
+
+    @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.GET)
+    public @ResponseBody String getVote(@PathVariable String istId, @PathVariable String degreeId,
+            HttpServletResponse httpResponse) {
+        //TODO Retorna voto do aluno, ou 404 caso não haja
+        httpResponse.setStatus(404);
+        return new Gson().toJson(null);
+    }
+
+    @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.POST)
+    public @ResponseBody String addVote(@PathVariable String istId, @PathVariable String degreeId, @RequestBody String voteId) {
+        //TODO Adiciona voto
+        return null;
+    }
+
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/votes", method = RequestMethod.GET)
+    public @ResponseBody String getVotes(@PathVariable String degreeId, @PathVariable int year) {
+        //TODO Obtem todos os votos (aluno -> numero de votos)
+        return null;
+    }
+
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.GET)
+    public @ResponseBody String getCandidates(@PathVariable String degreeId, @PathVariable int year) {
+        //TODO Obtem todos os candidatos do ano/curso (nome, id, foto)
+        return null;
+    }
+
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.POST)
+    public @ResponseBody String addCandidate(@PathVariable String degreeId, @PathVariable int year, @RequestBody String istId) {
+        //TODO Adiciona candidatos ao ano/curso (id)
+        return null;
+    }
+
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.GET)
+    public @ResponseBody String getCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId,
+            HttpServletResponse httpResponse) {
+        //TODO retorna o candidato ou 404 caso não haja
+        httpResponse.setStatus(404);
+        return new Gson().toJson(null);
+    }
+
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.DELETE)
+    public @ResponseBody String removeCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId) {
+        //TODO remove candidatura
+        return null;
+    }
+
+    // Este Endpoint pode ser usado para obter todos os estudantes em que se pode votar.
+    // Falta acrescentar os filtros
+    // Para casa estudante, devolve: nome, id e foto
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/students", method = RequestMethod.GET)
+    public @ResponseBody String getDegreeYearStudents(@PathVariable String degreeId, @PathVariable int year) {
+        Set<Student> students = degreeDAO.findById(degreeId).getDegreeYear(year).getStudents();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        return gson.toJson(students);
+    }
+
+    /***************************** Manager API *****************************/
+
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/history", method = RequestMethod.GET)
+    public @ResponseBody String getHistoy(@PathVariable String degreeId, @PathVariable int year) {
+        //TODO Obtem historico do curso/ano
+        return null;
+    }
+
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/periods", method = RequestMethod.GET)
+    public @ResponseBody String getPeriods(@PathVariable String degreeId, @PathVariable int year) {
+        //TODO Obtem info dos periodos do ano actuais. Incluindo info dos candidatos e alunos com votos
+        return null;
+    }
+
+    @RequestMapping(value = "/application-periods", method = RequestMethod.GET)
+    public @ResponseBody String getApplicationPeriods() {
+        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        return null;
+    }
+
+    @RequestMapping(value = "/application-periods", method = RequestMethod.POST)
+    public @ResponseBody String addApplicationPeriods(@RequestBody String periods) {
+        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        return null;
+    }
+
+    @RequestMapping(value = "/application-periods", method = RequestMethod.PUT)
+    public @ResponseBody String updateApplicationPeriods(@RequestBody String periods) {
+        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        return null;
+    }
+
+    @RequestMapping(value = "/application-periods", method = RequestMethod.DELETE)
+    public @ResponseBody String removeApplicationPeriods(@RequestBody String periods) {
+        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        return null;
+    }
+
+    @RequestMapping(value = "/election-periods", method = RequestMethod.GET)
+    public @ResponseBody String getElectionPeriods() {
+        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de votos e info do mais votado, incluindo foto
+        return null;
+    }
+
+    @RequestMapping(value = "/election-periods", method = RequestMethod.POST)
+    public @ResponseBody String addElectionPeriods(@RequestBody String periods) {
+        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        return null;
+    }
+
+    @RequestMapping(value = "/election-periods", method = RequestMethod.PUT)
+    public @ResponseBody String updateElectionPeriods(@RequestBody String periods) {
+        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        return null;
+    }
+
+    @RequestMapping(value = "/election-periods", method = RequestMethod.DELETE)
+    public @ResponseBody String removeElectionPeriods(@RequestBody String periods) {
+        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        return null;
+    }
+
+    /***************************** OLD API *****************************/
     @RequestMapping("/user")
     public @ResponseBody String user() {
 

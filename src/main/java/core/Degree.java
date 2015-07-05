@@ -88,6 +88,15 @@ public class Degree {
         return calendar.getYear();
     }
 
+    public DegreeYear getDegreeYear(int year) {
+        for (DegreeYear d : years) {
+            if (d.getDegreeYear() == year) {
+                return d;
+            }
+        }
+        return null;
+    }
+
     public String getAcronym() {
         return acronym;
     }
