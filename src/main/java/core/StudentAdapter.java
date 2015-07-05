@@ -35,4 +35,5 @@ public class StudentAdapter implements JsonSerializer<Student> {
 //        jsonObject.add("currentPeriod", periodJson);
         return jsonObject;
     }
+
 }

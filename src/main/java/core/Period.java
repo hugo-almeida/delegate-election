@@ -22,6 +22,21 @@ import javax.persistence.Table;
 @Table(name = "period")
 public abstract class Period {
 
+    public enum PeriodType {
+        Application {
+            @Override
+            public String toString() {
+                return "APPLICATION";
+            }
+        },
+        Election {
+            @Override
+            public String toString() {
+                return "ELECTION";
+            }
+        }
+    }
+
     @EmbeddedId
     @Column(name = "period_id")
     private PeriodPK periodPK;
@@ -97,4 +112,6 @@ public abstract class Period {
         this.degreeYear = degreeYear;
         this.activeDegreeYear = degreeYear;
     }
+
+    abstract public PeriodType getType();
 }

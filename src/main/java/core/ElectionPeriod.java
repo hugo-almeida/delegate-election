@@ -27,4 +27,15 @@ public class ElectionPeriod extends Period {
         }
         voter.vote();
     }
+
+    // Get the vote from a given student
+    public Vote getVote(String s) {
+        // Workaround
+        return votes.get(s).get(0);
+    }
+
+    @Override
+    public PeriodType getType() {
+        return PeriodType.Election;
+    }
 }

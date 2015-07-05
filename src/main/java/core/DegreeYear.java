@@ -126,6 +126,10 @@ public class DegreeYear {
         this.students = students;
     }
 
+    public Degree getDegree() {
+        return degree;
+    }
+
     public void setActivePeriod(Period period) {
         if (activePeriod != null) {
             inactivePeriods.add(activePeriod);

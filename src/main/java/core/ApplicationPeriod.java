@@ -30,4 +30,9 @@ public class ApplicationPeriod extends Period {
         candidates.add(s);
         s.apply();
     }
+
+    @Override
+    public PeriodType getType() {
+        return PeriodType.Application;
+    }
 }
