@@ -1,20 +1,20 @@
 angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$http', '$log', function(rc, sc, http,log) {
 		sc.candidatos = [];
 		sc.students = [];
-		http.post('get-candidates', rc.credentials.username)
-					.success(function(data) { 
-						sc.candidatos = data;
-					});
+		http.get('degrees/'+sc.$parent.degree.id+'/years/'+sc.$parent.degree.curricularYear+'/candidates')
+		.success(function(data) { 
+			sc.candidatos = data;
+		});
 		
 		//sc.candidatos = [  {name:'Ricardo Pires', username:'ist167066'}, {name:'Hugo Almeida', username:'ist166997'}, {name:'Fernando Santos', username:'ist123456'} ];
 		
 		sc.voted = false;
 		
 		sc.reloadCandidates = function() {
-			http.post('get-candidates', rc.credentials.username).success(function(data) { 
-							sc.candidatos = data;
+			http.get('degrees/'+sc.$parent.degree.id+'/years/'+sc.$parent.degree.curricularYear+'/candidates')
+			.success(function(data) { 
+				sc.candidatos = data;
 			});
-		    var re = new RegExp(sc.query, 'i');
 		}
 		
 		sc.period = function() {
@@ -25,7 +25,7 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		}
 		
 		sc.vote = function() {
-			http.post('vote', {voter:rc.credentials.username, voted:sc.selected} )
+			http.post('students/'+rc.credentials.username+'/degrees/'+sc.$parent.degree.id+'/votes', sc.selected)
 			.success(function(data) { 
 				
 			});
@@ -40,7 +40,7 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		
 		sc.loadStudents = function() {
 			if(!sc.loadedStudents){
-				http.post('get-students', rc.credentials.username )
+				http.get('degrees/'+sc.$parent.degree.id+'/years/'+sc.$parent.degree.curricularYear+'/students')
 				.success(function(data) { 
 					sc.students = data;
 					sc.loadedStudents = true;

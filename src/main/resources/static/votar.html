@@ -7,11 +7,11 @@
 		<table class="table">
 			<tr>
 				<th class="col-md-2">Curso</th>
-				<td class="col-md-8 col-md-8-offset-4">{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
+				<td class="col-md-8 col-md-8-offset-4">{{degree.name}}</td>
 			</tr>
 			<tr>
 				<th>Ano Lectivo</th>
-				<td>2014/2015</td>
+				<td>{{degree.academicYear}}</td>
 			</tr>
 			<tr>
 				<th>Candidaturas</th>
@@ -25,7 +25,7 @@
 	</div>
 	
 	<h3>Votação</h3>
-	<button class="btn btn-primary" ng-click="period()"></button>
+	<button class="btn btn-primary" ng-click="period()">debug period</button>
 	<button type="submit" class="btn btn-primary" ng-click="reloadCandidates()" ng-show="debug">Debug Reload Candidates</button>
 	<div class="panel panel-default">
 		<div class="panel-heading">Name</div>
@@ -50,7 +50,7 @@
 						<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
 					</td>
 					<td>
-						<img ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="30" width="30"> <!-- using logged user photo, should use candidate photo -->
+						<img ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28">
 					</td>
 					<td>
 						<strong>{{candidato.name}}</strong>
@@ -90,7 +90,7 @@
 											<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
 										</td>
 										<td>
-											<img ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}" height="30" width="30">
+											<img ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}" height="28" width="28">
 										</td>	
 										<td>	
 											<strong>{{student.name}}</strong>
@@ -123,15 +123,15 @@
 	        		<table class="table">
 						<tr>
 							<th class="col-md-6">Curso</th>
-							<td class="col-md-12 col-md-12-offset-4">{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
+							<td class="col-md-12 col-md-12-offset-4">{{degree.registrations[0].name}}</td>
 						</tr>
 						<tr>
 							<th>Ano Lectivo</th>
-							<td>2014/2015</td>
+							<td>{{degree.academicYear}}</td>
 						</tr>
 						<tr>
 							<th>Ano Curricular</th>
-							<td>1</td>
+							<td>{{degree.curricularYear}}</td>
 						</tr>
 						<tr>
 							<th>Período de votação</th>

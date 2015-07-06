@@ -1,14 +1,16 @@
 angular.module('delegados').controller('applyCtrl', ['$rootScope', '$scope', '$http', '$log', function(rc, sc, http, log) {
 		sc.candidatos = [];
-		http.post('get-candidates', rc.credentials.username)
+		http.get('degrees/'+sc.$parent.degree.id+'/years/'+sc.$parent.degree.curricularYear+'/candidates')
 					.success(function(data) { 
 						sc.candidatos = data;
 					});
 		//sc.candidatos = [  {name:'Ricardo Pires', username:'ist167066'}, {name:'Hugo Almeida', username:'ist166997'}, {name:'Fernando Santos', username:'ist123456'} ];
 		
+		log.log(sc.$parent.degrees[0]);
+		
 		sc.applied = false;
 		sc.apply = function() {
-			http.post('apply', rc.credentials.username)
+			http.post('degrees/'+sc.$parent.degree.id+'/years/'+sc.$parent.degree.curricularYear+'/candidates', rc.credentials.username)
 			.success(function(data) { 
 				sc.applied = true;
 			});
@@ -23,8 +25,9 @@ angular.module('delegados').controller('applyCtrl', ['$rootScope', '$scope', '$h
 		}
 		
 		sc.reloadCandidates = function() {
-			http.post('get-candidates', rc.credentials.username).success(function(data) { 
-							sc.candidatos = data;
+			http.get('degrees/'+sc.$parent.degree.id+'/years/'+sc.$parent.degree.curricularYear+'/candidates')
+			.success(function(data) { 
+				sc.candidatos = data;
 			});
 		}
 	}

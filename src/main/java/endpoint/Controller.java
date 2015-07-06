@@ -80,33 +80,39 @@ public class Controller {
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
     public @ResponseBody String getStudentDegrees(@PathVariable String istId) {
-        Set<DegreeYear> studentDegrees = StreamSupport.stream(studentDAO.findAll().spliterator(), false).filter(s -> s.getUsername().equals(istId)).map(Student::getDegreeYear).collect(Collectors.toSet());
 
-        GsonBuilder gsonBuilder = new GsonBuilder();
+        Set<DegreeYear> studentDegrees =
+                StreamSupport.stream(studentDAO.findAll().spliterator(), false).filter(s -> s.getUsername().equals(istId))
+                        .map(Student::getDegreeYear).collect(Collectors.toSet());
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY);
         gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreeAdapter());
-        Gson gson = gsonBuilder.create();
+        final Gson gson = gsonBuilder.create();
         return gson.toJson(studentDegrees);
     }
 
     @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.GET)
     public @ResponseBody String getVote(@PathVariable String istId, @PathVariable String degreeId) {
-        Student student =
-                StreamSupport.stream(studentDAO.findAll().spliterator(), false).filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId)).collect(Collectors.toList()).get(0);
-        String candidate = ((ElectionPeriod) student.getDegreeYear().getActivePeriod()).getVote(istId).getVoted();
 
-//        GsonBuilder gsonBuilder = new GsonBuilder();
-//        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
-        return new Gson().toJson(candidate);
-    }
-
-    @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.POST)
-    public @ResponseBody String addVote(@PathVariable String istId, @PathVariable String degreeId, @RequestBody String vote) {
         Student student =
                 StreamSupport.stream(studentDAO.findAll().spliterator(), false)
                         .filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId))
                         .collect(Collectors.toList()).get(0);
-        Student candidate =
+        //String candidate = ((ElectionPeriod) student.getDegreeYear().getActivePeriod()).getVote(istId).getVoted();
+
+//        GsonBuilder gsonBuilder = new GsonBuilder();
+//        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        return new Gson().toJson(null);
+    }
+
+    @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.POST)
+    public @ResponseBody String addVote(@PathVariable String istId, @PathVariable String degreeId, @RequestBody String vote) {
+        final Student student =
+                StreamSupport.stream(studentDAO.findAll().spliterator(), false)
+                        .filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId))
+                        .collect(Collectors.toList()).get(0);
+        final Student candidate =
                 StreamSupport.stream(studentDAO.findAll().spliterator(), false)
                         .filter(s -> s.getUsername().equals(vote) && s.getDegreeYear().getDegree().getId().equals(degreeId))
                         .collect(Collectors.toList()).get(0);
@@ -128,15 +134,15 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.GET)
     public @ResponseBody String getCandidates(@PathVariable String degreeId, @PathVariable int year) {
-        Set<Student> candidates = degreeDAO.findById(degreeId).getDegreeYear(year).getCandidates();
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        final Set<Student> candidates = degreeDAO.findById(degreeId).getDegreeYear(year).getCandidates();
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
         return gson.toJson(candidates);
     }
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.POST)
     public @ResponseBody String addCandidate(@PathVariable String degreeId, @PathVariable int year, @RequestBody String istId) {
-        Student applicant =
+        final Student applicant =
                 StreamSupport
                         .stream(studentDAO.findAll().spliterator(), false)
                         .filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId)
@@ -160,17 +166,17 @@ public class Controller {
     //Se a resposta for vazia, não se candidatou a este curso. Talvez seja mais simples retornar false ou true?
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.GET)
     public @ResponseBody String getCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId) {
-        Student candidate =
+        final Student candidate =
                 degreeDAO.findById(degreeId).getDegreeYear(year).getCandidates().stream()
                         .filter(c -> c.getUsername().equals(istId)).collect(Collectors.toList()).get(0);
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
         return gson.toJson(candidate);
     }
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.DELETE)
     public @ResponseBody String removeCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId) {
-        Student candidate =
+        final Student candidate =
                 degreeDAO.findById(degreeId).getDegreeYear(year).getCandidates().stream()
                         .filter(c -> c.getUsername().equals(istId)).collect(Collectors.toList()).get(0);
         candidate.deapply();
@@ -185,9 +191,9 @@ public class Controller {
     // Para cada estudante, devolve: nome, id e foto
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/students", method = RequestMethod.GET)
     public @ResponseBody String getDegreeYearStudents(@PathVariable String degreeId, @PathVariable int year) {
-        Set<Student> students = degreeDAO.findById(degreeId).getDegreeYear(year).getStudents();
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        final Set<Student> students = degreeDAO.findById(degreeId).getDegreeYear(year).getStudents();
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
         return gson.toJson(students);
     }
 
@@ -277,10 +283,10 @@ public class Controller {
 
     @RequestMapping(value = "/get-user", method = RequestMethod.POST)
     public @ResponseBody String getUser(@RequestBody String username) {
-        RestTemplate t = new RestTemplate();
+        final RestTemplate t = new RestTemplate();
         t.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
 
-        String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
+        final String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
 
         final HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.set("__username__", username);
@@ -296,10 +302,10 @@ public class Controller {
     @RequestMapping("/period")
     public @ResponseBody String currentPeriod(String istid) {
         System.out.println(istid);
-        Student student = studentDAO.findByUsername(istid);
-        Period period = student.getDegreeYear().getActivePeriod();
+        final Student student = studentDAO.findByUsername(istid);
+        final Period period = student.getDegreeYear().getActivePeriod();
         System.out.println(period);
-        Gson gson = new Gson();
+        final Gson gson = new Gson();
         return gson.toJson(period);
     }
 
@@ -322,30 +328,30 @@ public class Controller {
 
     @RequestMapping(value = "/de-apply", method = RequestMethod.POST)
     public @ResponseBody String deapply(@RequestBody String username) {
-        Student s = studentDAO.findByUsername(username);
+        final Student s = studentDAO.findByUsername(username);
         s.deapply();
         studentDAO.save(s);
-        Gson g = new Gson();
+        final Gson g = new Gson();
         return g.toJson("Ok");
     }
 
     @RequestMapping(value = "/get-candidates", method = RequestMethod.POST)
     public @ResponseBody String getCandidates(@RequestBody String username) {
-        Student s = studentDAO.findByUsername(username);
-        DegreeYear dy = s.getDegreeYear();
-        GsonBuilder b = new GsonBuilder();
+        final Student s = studentDAO.findByUsername(username);
+        final DegreeYear dy = s.getDegreeYear();
+        final GsonBuilder b = new GsonBuilder();
         b.registerTypeHierarchyAdapter(Student.class, new StudentAdapter());
-        Gson g = b.create();
+        final Gson g = b.create();
         return g.toJson(dy.getCandidates());
     }
 
     @RequestMapping(value = "/get-students", method = RequestMethod.POST)
     public @ResponseBody String getStudents(@RequestBody String username) {
-        Student s = studentDAO.findByUsername(username);
-        DegreeYear dy = s.getDegreeYear();
-        GsonBuilder b = new GsonBuilder();
+        final Student s = studentDAO.findByUsername(username);
+        final DegreeYear dy = s.getDegreeYear();
+        final GsonBuilder b = new GsonBuilder();
         b.registerTypeHierarchyAdapter(Student.class, new StudentAdapter());
-        Gson g = b.create();
+        final Gson g = b.create();
         return g.toJson(dy.getStudents());
     }
 

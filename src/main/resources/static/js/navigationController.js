@@ -6,13 +6,16 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 			$rootScope.id = data.name;
 			$rootScope.credentials = data;
 			$rootScope.degrees = [];
-			for (index in data.roles) {
+			/*for (index in data.roles) {
 				//$log.log(data.roles[index]);
 				if(data.roles[index].type=='STUDENT') {
 					$rootScope.degrees.push(data.roles[index]);
 				//	$log.log('pushed');
 				}
-			}
+			}*/
+			$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
+				$rootScope.degrees = data;
+			});
 			$rootScope.appPeriod = false;
 			$rootScope.votePeriod = false;
 			//$log.log($rootScope.degrees[0].registrations[0].name)
@@ -22,8 +25,6 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	}).error(function() {
 		$rootScope.authenticated = false;
 	});
-
-	//$scope.credentials = {};
 	
 	$scope.specialLogin = function(){
 
@@ -45,6 +46,12 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 			$rootScope.authenticated = false;
 		});
 	};
+	
+	$scope.debugReloadDegrees = function() {
+		$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
+			$rootScope.degrees = data;
+		});
+	}
 	
 	$scope.debugApplyPeriod = function() {
 		$rootScope.appPeriod = !$rootScope.appPeriod;

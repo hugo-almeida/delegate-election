@@ -7,15 +7,15 @@
 		<table class="table">
 			<tr>
 				<th class="col-md-2">Curso</th>
-				<td class="col-md-8 col-md-8-offset-4">{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
+				<td class="col-md-8 col-md-8-offset-4">{{degree.name}}</td>
 			</tr>
 			<tr>
 				<th>Ano Lectivo</th>
-				<td>2014/2015</td>
+				<td>{{degree.academicYear}}</td>
 			</tr>
 			<tr>
 				<th>Ano Curricular</th>
-				<td>1</td>
+				<td>{{degree.curricularYear}}</td>
 			</tr>
 			<tr>
 				<th>Período de Candidatura</th>
@@ -26,7 +26,7 @@
 	
 	<h3>Candidatos</h3>
 	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#applyModal" ng-hide="applied">
-		<span class="glyphicon glyphicon-plus"></span>
+		<i class="glyphicon glyphicon-plus"></i>
 		Candidata-te
 	</button>
 	<button class="btn btn-primary" ng-click="reloadCandidates()" ng-show="debug">Reload Candidates</button>
@@ -34,13 +34,13 @@
 		<div class="panel-heading">Name</div>
 		<table class="table">
 			<tr ng-repeat="candidato in candidatos | orderBy:'name'">
-				<td style="width:35px; height:40px">
-					<img class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="30" width="30"></img><!-- using logged user photo, should use candidate photo -->
+				<td class="col-md-1">
+					<img class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28"></img>
 				</td>
 				<td>
 					<strong>{{candidato.name}}</strong>
 					<small>{{candidato.username}}</small>
-					<button type="button" class="pull-right close" ng-show="candidato.username == credentials.username" ng-click="unapply()"></button><!-- missing correct canvas element -->
+					<button type="button" class="pull-right close" ng-show="candidato.username == credentials.username" ng-click="unapply()"></button>
 				</td>
 			</tr>
 		</table>
@@ -52,9 +52,6 @@
 				<div class="modal-header">
 					<h3>
 						<strong>Confirmação de Candidatura</strong>
-						<p>
-							<small>This is a short helper text to undestand what they're doing</small>
-						</p>
 					</h3>
 				    <button type="button" class="close" data-dismiss="modal"></button>
 				</div>
@@ -66,15 +63,15 @@
 						</tr>
 						<tr>
 							<th>Curso</th>
-							<td>{{degree.registrations[0].name}}</td> <!--  needs to be fixed to search for roles with type student -->
+							<td>{{degree.name}}</td> <!--  needs to be fixed to search for roles with type student -->
 						</tr>
 						<tr>
 							<th>Ano Lectivo</th>
-							<td>2014/2015</td>
+							<td>{{degree.academicYear}}</td>
 						</tr>
 						<tr>
 							<th>Ano Curricular</th>
-							<td>1</td>
+							<td>{{degree.curricularYear}}</td>
 						</tr>
 						<tr>
 							<th>Candidaturas</th>

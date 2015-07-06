@@ -74,10 +74,6 @@ public class Degree {
                 years.add(new DegreeYear(i, this));
             }
         }
-//        for (DegreeYear y : years) {
-//            y.initStudents();
-//            break; // Isto tem de ser retirado!
-//        }
     }
 
     public String getName() {
@@ -89,7 +85,7 @@ public class Degree {
     }
 
     public DegreeYear getDegreeYear(int year) {
-        for (DegreeYear d : years) {
+        for (final DegreeYear d : years) {
             if (d.getDegreeYear() == year) {
                 return d;
             }
