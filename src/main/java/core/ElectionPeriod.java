@@ -1,29 +1,39 @@
 package core;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-//@Entity
-//@Table(name = "ElectionPeriod")
+import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+
+@Entity
+@DiscriminatorValue("Election")
 public class ElectionPeriod extends Period {
 
-    private final Map<String, List<Vote>> votes;
+    @OneToMany(mappedBy = "electionPeriod", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    //@MapKey(name = "username")
+    private Map<String, VoteHolder> votes;
+
+    ElectionPeriod() {
+    }
 
     public ElectionPeriod(LocalDate start, LocalDate end, DegreeYear degreeYear) {
         super(start, end, degreeYear);
-        votes = new HashMap<String, List<Vote>>();
+        votes = new HashMap<String, VoteHolder>();
     }
 
     public void vote(Student voter, Student voted) {
-        final Vote v = new Vote(voter.getUsername(), voted.getUsername());
+        //final Vote v = new Vote(voter.getUsername(), voted.getUsername(), this);
         if (votes.containsKey(voted.getUsername())) {
-            votes.get(voted.getUsername()).add(v);
+            votes.get(voted.getUsername()).addVote(voter.getUsername());
         } else {
-            votes.put(voted.getUsername(), new ArrayList<Vote>());
-            votes.get(voted.getUsername()).add(v);
+            VoteHolder vh = new VoteHolder(this, voted.getUsername());
+            votes.put(voted.getUsername(), vh);
+            votes.get(voted.getUsername()).addVote(voter.getUsername());
         }
         voter.vote();
     }
@@ -31,7 +41,7 @@ public class ElectionPeriod extends Period {
     // Get the vote from a given student
     public Vote getVote(String s) {
         // Workaround
-        return votes.get(s).get(0);
+        return null;
     }
 
     @Override

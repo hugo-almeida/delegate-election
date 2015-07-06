@@ -3,6 +3,7 @@ package core;
 import java.time.LocalDate;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.EmbeddedId;
@@ -13,7 +14,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -42,8 +42,11 @@ public abstract class Period {
     private PeriodPK periodPK;
 
     @Column(name = "start")
+    @Convert(converter = LocalDatePersistenceConverter.class)
     private LocalDate start;
+
     @Column(name = "end")
+    @Convert(converter = LocalDatePersistenceConverter.class)
     private LocalDate end;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,15 +59,18 @@ public abstract class Period {
                     updatable = false) })
     private DegreeYear degreeYear;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-            @JoinColumn(name = "active_degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = false,
-                    updatable = false),
-            @JoinColumn(name = "active_degree_year", referencedColumnName = "degree_year_pk_degree_year", insertable = false,
-                    updatable = false),
-            @JoinColumn(name = "active_calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = false,
-                    updatable = false) })
-    private DegreeYear activeDegreeYear;
+    @Column(name = "active")
+    private boolean active;
+
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumns({
+//            @JoinColumn(name = "active_degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = false,
+//                    updatable = false),
+//            @JoinColumn(name = "active_degree_year", referencedColumnName = "degree_year_pk_degree_year", insertable = false,
+//                    updatable = false),
+//            @JoinColumn(name = "active_calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = false,
+//                    updatable = false) })
+//    private DegreeYear activeDegreeYear;
 
     Period() {
 
@@ -78,7 +84,7 @@ public abstract class Period {
         this.start = start;
         this.end = end;
         this.degreeYear = degreeYear;
-        this.activeDegreeYear = degreeYear;
+        this.active = false;
     }
 
     public LocalDate getStart() {
@@ -110,7 +116,18 @@ public abstract class Period {
 
     public void setDegreeYear(DegreeYear degreeYear) {
         this.degreeYear = degreeYear;
-        this.activeDegreeYear = degreeYear;
+    }
+
+    public boolean isActive() {
+        return this.active;
+    }
+
+    public void setActive() {
+        this.active = true;
+    }
+
+    public void setInactive() {
+        this.active = false;
     }
 
     abstract public PeriodType getType();

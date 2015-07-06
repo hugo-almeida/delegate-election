@@ -74,10 +74,10 @@ public class Degree {
                 years.add(new DegreeYear(i, this));
             }
         }
-        for (DegreeYear y : years) {
-            y.initStudents();
-            break; // Isto tem de ser retirado!
-        }
+//        for (DegreeYear y : years) {
+//            y.initStudents();
+//            break; // Isto tem de ser retirado!
+//        }
     }
 
     public String getName() {

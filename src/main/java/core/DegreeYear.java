@@ -12,7 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.springframework.http.HttpEntity;
@@ -40,11 +39,11 @@ public class DegreeYear {
                     updatable = false) })
     private Degree degree;
 
-    @OneToOne(mappedBy = "activeDegreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Period activePeriod;
+//    @OneToOne(mappedBy = "activeDegreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    private Period activePeriod;
 
     @OneToMany(mappedBy = "degreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Period> inactivePeriods;
+    private Set<Period> periods;
 
     @OneToMany(mappedBy = "degreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Student> students = new HashSet<Student>();
@@ -111,11 +110,22 @@ public class DegreeYear {
     }
 
     public Period getActivePeriod() {
-        return activePeriod;
+        for (Period p : periods) {
+            if (p.isActive()) {
+                return p;
+            }
+        }
+        return null;
     }
 
     public Set<Period> getInactivePeriods() {
-        return inactivePeriods;
+        Set<Period> inactive = new HashSet<Period>();
+        for (Period p : periods) {
+            if (!p.isActive()) {
+                inactive.add(p);
+            }
+        }
+        return inactive;
     }
 
     public Set<Student> getStudents() {
@@ -131,11 +141,12 @@ public class DegreeYear {
     }
 
     public void setActivePeriod(Period period) {
-        if (activePeriod != null) {
-            inactivePeriods.add(activePeriod);
+        if (periods.contains(period)) {
+            if (getActivePeriod() != null) {
+                getActivePeriod().setInactive();
+            }
+            period.setActive();
         }
-        inactivePeriods.remove(period);
-        activePeriod = period;
     }
 
     public Set<Student> getCandidates() {
@@ -154,16 +165,16 @@ public class DegreeYear {
 //            throw new InvalidPeriodException("The start date should be in the future");
 //        }
 
-        if (activePeriod != null && period.getStart().isBefore(activePeriod.getEnd())) {
+        if (getActivePeriod() != null && period.getStart().isBefore(getActivePeriod().getEnd())) {
             throw new InvalidPeriodException("A period can't start before the active period ends");
         }
 
-        for (final Period p : inactivePeriods) {
+        for (final Period p : periods) {
             if (period.conflictsWith(p)) {
                 throw new InvalidPeriodException("There should not be overlapping periods");
             }
         }
 
-        inactivePeriods.add(period);
+        periods.add(period);
     }
 }

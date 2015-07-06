@@ -56,7 +56,7 @@ public class Calendar {
 //        } while (!d.getAcronym().equals("MEIC-A"));
 //        d.initDegreeYears();
         for (Degree d : degrees) {
-            if (d.getAcronym().equals("MEE") || d.getAcronym().equals("MEC")) {
+            if (d.getAcronym().equals("MEE")/* || d.getAcronym().equals("MEC")*/) {
                 d.initDegreeYears();
             }
         }
