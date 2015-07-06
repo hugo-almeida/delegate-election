@@ -77,7 +77,7 @@ public class Degree {
     }
 
     public String getName() {
-        return calendarDegreePK.getName();
+        return name;
     }
 
     public int getYear() {

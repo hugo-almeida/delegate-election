@@ -102,7 +102,7 @@ public class DegreeYear {
     }
 
     public String getDegreeName() {
-        return degreeDegreeYearPK.getDegreeName();
+        return degree.getName();
     }
 
     public int getCalendarYear() {
