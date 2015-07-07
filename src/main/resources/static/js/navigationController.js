@@ -1,24 +1,24 @@
 angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope', '$http', '$log',
                                                           function($rootScope, $scope, $http, $log)  {
+	$rootScope.subTitle = 'Início';
+	
 	$http.get('user').success(function(data) {
 		if (data) {
+		
 			$rootScope.authenticated = true;
+			
 			$rootScope.id = data.name;
+			
 			$rootScope.credentials = data;
+			
 			$rootScope.degrees = [];
-			/*for (index in data.roles) {
-				//$log.log(data.roles[index]);
-				if(data.roles[index].type=='STUDENT') {
-					$rootScope.degrees.push(data.roles[index]);
-				//	$log.log('pushed');
-				}
-			}*/
+
 			$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
 				$rootScope.degrees = data;
 			});
-			$rootScope.appPeriod = false;
+
 			$rootScope.votePeriod = false;
-			//$log.log($rootScope.degrees[0].registrations[0].name)
+		
 		} else {
 			$rootScope.authenticated = false;
 		}
@@ -26,13 +26,13 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		$rootScope.authenticated = false;
 	});
 	
-	$scope.specialLogin = function(){
+	$scope.specialLogin = function(){		//debug
 
 		$http.post('get-user', $scope.special_username)
-									.success(function(data) {
-										$rootScope.credentials = data;
-										$rootScope.id = data.name;
-									});
+			.success(function(data) {
+				$rootScope.credentials = data;
+				$rootScope.id = data.name;
+			});
 		$rootScope.authenticated = true;
 	}
 	
@@ -51,10 +51,6 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
 			$rootScope.degrees = data;
 		});
-	}
-	
-	$scope.debugApplyPeriod = function() {
-		$rootScope.appPeriod = !$rootScope.appPeriod;
 	}
 	
 	$scope.debugVotePeriod = function() {

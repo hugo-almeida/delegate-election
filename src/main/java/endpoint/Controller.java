@@ -81,7 +81,7 @@ public class Controller {
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
     public @ResponseBody String getStudentDegrees(@PathVariable String istId) {
 
-        Set<DegreeYear> studentDegrees =
+        final Set<DegreeYear> studentDegrees =
                 StreamSupport.stream(studentDAO.findAll().spliterator(), false).filter(s -> s.getUsername().equals(istId))
                         .map(Student::getDegreeYear).collect(Collectors.toSet());
 
@@ -95,7 +95,7 @@ public class Controller {
     @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.GET)
     public @ResponseBody String getVote(@PathVariable String istId, @PathVariable String degreeId) {
 
-        Student student =
+        final Student student =
                 StreamSupport.stream(studentDAO.findAll().spliterator(), false)
                         .filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId))
                         .collect(Collectors.toList()).get(0);

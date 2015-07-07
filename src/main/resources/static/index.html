@@ -16,16 +16,44 @@
 	<link rel="stylesheet" type="text/css" href="webjars/fenixedu-canvas/css/bootstrap-theme.min.css" />
 </head>
 
-<body ng-app="delegados" ng-cloak>
+<body ng-app="delegados" ng-cloak> <!-- cloak b0rken -->
 	<div ng-controller="navigationCtrl" class="container">
-		<ul class="nav nav-tabs" role="tablist">
+		<ul class="nav nav-tabs pull-right" role="tablist">
 			<li ng-hide="authenticated"><a href="login">login</a></li>
 			<li ng-show="authenticated && debug"><a href="" ng-click="specialLogin()">Change Info</a></li><!-- debug -->
 			<li ng-show="authenticated"><a href="" ng-click="logout()">logout</a></li>
 			<input ng-show="authenticated && debug" ng-model="special_username" type="text" value=""><!-- debug -->
 		</ul>
 		<button class="btn btn-default" ng-click="toggleDebug()">Toggle Debug</button><!-- debug -->
-		<div class="container" ng-include="'estudante.html'">	</div>
+		<div class="container">	
+			<div class="page-header">
+				<h1>Eleição de Delegado de Ano</h1>
+				<h3>{{subTitle}}</h3> <!-- not working -->
+				<!-- <ol class="breadcrumb">
+				  <li><a href="https://fenix.tecnico.ulisboa.pt/student/">Estudante</a></li>
+				  <li><a href="https://fenix.tecnico.ulisboa.pt/student/participate">Participar</a></li>
+				  <li class="active">Eleição de Delegado de Ano</li>
+				</ol> -->
+			</div>
+			
+			<!-- This needs changing to accomodate students with multiple degrees-->
+			
+			<div ng-show="authenticated"> <!-- missing student check -->
+				<p ng-show="debug">{{credentials}}</p><!-- debug -->
+				<p ng-show="debug">{{degrees}}</p><!-- debug -->
+				<img ng-show="debug" ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}"><!-- debug -->
+					<p ng-show="debug">{{credentials.username}} {{credentials.name}}</p><!-- debug -->
+				</img> <!-- debug -->
+				
+				<button type="btn btn-primary" ng-click="debugVotePeriod()" ng-show="debug">Debug vote period</button><!-- debug -->
+				<button type="btn btn-primary" ng-click="debugReloadDegrees()" ng-show="debug">Debug reload degrees</button><!-- debug -->
+				
+				<div ng-repeat="degree in degrees">
+					<div class="container" ng-include="'votar.html'" ng-show="degree.currentPeriod.type=='ELECTION' || votePeriod"></div> <!-- still using debug, remove eventually -->
+					<div class="container" ng-include="'candidatar.html'" ng-show="degree.currentPeriod.type=='APPLICATION'"></div>
+				</div>
+			</div>
+		</div>
 	</div>
 	<script src="webjars/fenixedu-canvas/js/bootstrap.min.js"></script>
 </body>
