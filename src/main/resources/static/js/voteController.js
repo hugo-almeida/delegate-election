@@ -1,21 +1,7 @@
 angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$http', '$log', function(rc, sc, http,log) {
-		sc.candidatos = [];
 		sc.students = [];
-		http.get('degrees/'+sc.$parent.degree.id+'/years/'+sc.$parent.degree.curricularYear+'/candidates')
-		.success(function(data) { 
-			sc.candidatos = data;
-			//sc.voto = sc.candidatos[0];
-			//log.log(sc.voto);
-		});
 		
-		sc.voted = false;	//true; //should be false, true for testing purposes
-		
-		sc.reloadCandidates = function() {
-			http.get('degrees/'+sc.$parent.degree.id+'/years/'+sc.$parent.degree.curricularYear+'/candidates')
-			.success(function(data) { 
-				sc.candidatos = data;
-			});
-		}
+		sc.voted = false;	//change to rootscope on navigation controller
 		
 		sc.selection = function() {
 			if(sc.selected == 'other') {
@@ -41,7 +27,7 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		}
 		
 		sc.vote = function() {
-			http.post('students/'+rc.credentials.username+'/degrees/'+sc.$parent.degree.id+'/votes', sc.selected)
+			http.post('students/'+rc.credentials.username+'/degrees/'+rc.degree.id+'/votes', sc.selected)
 			.success(function(data) { 
 				sc.feedback = true;
 				sc.voted = true;
@@ -52,7 +38,7 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		
 		sc.loadStudents = function() {
 			if(!sc.loadedStudents){
-				http.get('degrees/'+sc.$parent.degree.id+'/years/'+sc.$parent.degree.curricularYear+'/students')
+				http.get('degrees/'+rc.degree.id+'/years/'+rc.degree.curricularYear+'/students')
 				.success(function(data) { 
 					sc.students = data;
 					sc.loadedStudents = true;

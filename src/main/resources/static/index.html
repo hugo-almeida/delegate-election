@@ -28,12 +28,7 @@
 		<div class="container">	
 			<div class="page-header">
 				<h1>Eleição de Delegado de Ano</h1>
-				<h3>{{subTitle}}</h3> <!-- not working -->
-				<!-- <ol class="breadcrumb">
-				  <li><a href="https://fenix.tecnico.ulisboa.pt/student/">Estudante</a></li>
-				  <li><a href="https://fenix.tecnico.ulisboa.pt/student/participate">Participar</a></li>
-				  <li class="active">Eleição de Delegado de Ano</li>
-				</ol> -->
+				<h3>{{subTitle}}</h3>
 			</div>
 			
 			<!-- This needs changing to accomodate students with multiple degrees-->
@@ -46,12 +41,32 @@
 				</img> <!-- debug -->
 				
 				<button type="btn btn-primary" ng-click="debugVotePeriod()" ng-show="debug">Debug vote period</button><!-- debug -->
-				<button type="btn btn-primary" ng-click="debugReloadDegrees()" ng-show="debug">Debug reload degrees</button><!-- debug -->
-				
-				<div ng-repeat="degree in degrees">
-					<div class="container" ng-include="'votar.html'" ng-show="degree.currentPeriod.type=='ELECTION' || votePeriod"></div> <!-- still using debug, remove eventually -->
-					<div class="container" ng-include="'candidatar.html'" ng-show="degree.currentPeriod.type=='APPLICATION'"></div>
+				<button type="btn btn-primary" ng-click="reloadDegrees()" ng-show="debug">Debug reload degrees</button><!-- debug -->
+
+				<div ng-show="degress.length > 1">
+					<div class="panel panel-default">
+						<div class="panel-heading">Name</div>
+						<div class="table-responsive">
+							<table class="table">
+								<tr ng-repeat="deg in degrees">
+									<td class="col-md-1">
+										<input type="radio" ng-model="$parent.selection" value="{{$index}}">
+									</td>
+									<td>
+										<strong>{{deg.name}}</strong>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<button class="btn btn-primary" ng-click="setDegree()">Seleccionar</button> 
 				</div>
+	
+				<div ng-include="'candidatar.html'" ng-show="degree != null && degree.currentPeriod.type=='APPLICATION'">
+				</div>
+				<div ng-include="'votar.html'" ng-show="votePeriod || (degree != null && degree.currentPeriod.type=='ELECTION')">
+				</div>
+
 			</div>
 		</div>
 	</div>

@@ -1,10 +1,14 @@
 angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope', '$http', '$log',
                                                           function($rootScope, $scope, $http, $log)  {
-	$rootScope.subTitle = 'Início';
 	
+	/***
+	 * INIT
+	 */
 	$http.get('user').success(function(data) {
 		if (data) {
 		
+			$rootScope.degree = null;
+			
 			$rootScope.authenticated = true;
 			
 			$rootScope.id = data.name;
@@ -12,11 +16,9 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 			$rootScope.credentials = data;
 			
 			$rootScope.degrees = [];
-
-			$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
-				$rootScope.degrees = data;
-			});
-
+			
+			$rootScope.reloadDegrees();
+			
 			$rootScope.votePeriod = false;
 		
 		} else {
@@ -26,16 +28,17 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		$rootScope.authenticated = false;
 	});
 	
-	$scope.specialLogin = function(){		//debug
-
-		$http.post('get-user', $scope.special_username)
-			.success(function(data) {
-				$rootScope.credentials = data;
-				$rootScope.id = data.name;
-			});
-		$rootScope.authenticated = true;
-	}
+	$scope.subTitle = 'Início'
+		
+	$rootScope.debug = true;
 	
+	$rootScope.voted = false;
+	
+	$rootScope.applied = false;
+
+	/***
+	 * LOGOUT
+	 */
 	$scope.logout = function() {
 		$http.post('logout', {}).success(function() {
 			$rootScope.authenticated = false;
@@ -47,20 +50,76 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		});
 	};
 	
-	$scope.debugReloadDegrees = function() {
+	/***
+	 * DEGREES
+	 */
+	$rootScope.reloadDegrees = function() {
+		$log.log('reloading');
 		$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
 			$rootScope.degrees = data;
+			
+			if($rootScope.degrees.length == 1) {
+				$scope.selection = 0;
+				$scope.setDegree();
+			}
 		});
 	}
 	
+	$rootScope.reloadCandidates = function() {
+		$http.get('degrees/'+$rootScope.degree.id+'/years/'+$rootScope.degree.curricularYear+'/candidates')
+		.success(function(data) { 
+			$rootScope.candidatos = data;
+			/*for(var i = 0; i < $rootScope.candidatos.length; i++) {
+			    if ($rootScope.candidatos[i].username == $rootScope.credentials.username) {
+			        break;
+			    }
+			}*/
+		});
+		
+		$http.get('degrees/'+$rootScope.degree.id+'/years/'+$rootScope.degree.curricularYear+'/candidates/'+$rootScope.credentials.username)
+		.success(function(data) { 
+			if(data != '') {
+				$rootScope.applied = true;
+			}
+		});
+	}
+	
+	$scope.setDegree = function() {
+		$rootScope.degree = $rootScope.degrees[$scope.selection];
+		$rootScope.reloadCandidates();
+		$scope.setSubtitle();
+	}
+	
+	$scope.setSubtitle = function() {
+		if($rootScope.degree.currentPeriod.type == 'APPLICATION') {
+			$scope.subTitle = 'Candidatura - ' + $rootScope.degree.name;
+		}
+		else if($rootScope.degree.currentPeriod.type == 'ELECTION')  {
+			$scope.subTitle = 'Votação  - ' + $rootScope.degree.name;
+		}
+	}
+	
+	/***
+	 * DEBUG
+	 */
 	$scope.debugVotePeriod = function() {
 		$rootScope.votePeriod = !$rootScope.votePeriod;
 	}
 	
-	$rootScope.debug = true;
-	
 	$rootScope.toggleDebug = function() {
 		$rootScope.debug = !$rootScope.debug;
 	}
+	
+	
+	$scope.specialLogin = function(){		//debug
+
+		$http.post('get-user', $scope.special_username)
+			.success(function(data) {
+				$rootScope.credentials = data;
+				$rootScope.id = data.name;
+			});
+		$rootScope.authenticated = true;
+	}
+	
 }]);
 
