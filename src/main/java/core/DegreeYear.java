@@ -43,7 +43,7 @@ public class DegreeYear {
 //    private Period activePeriod;
 
     @OneToMany(mappedBy = "degreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Period> periods;
+    private final Set<Period> periods = new HashSet<Period>();
 
     @OneToMany(mappedBy = "degreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Student> students = new HashSet<Student>();
@@ -150,13 +150,7 @@ public class DegreeYear {
     }
 
     public Set<Student> getCandidates() {
-        Set<Student> candidates = new HashSet<Student>();
-        for (Student st : students) {
-            if (st.hasApplied()) {
-                candidates.add(st);
-            }
-        }
-        return candidates;
+        return getActivePeriod().getCandidates();
     }
 
     public void addPeriod(Period period) throws InvalidPeriodException {

@@ -35,7 +35,7 @@ public class ElectionPeriod extends Period {
             votes.put(voted.getUsername(), vh);
             votes.get(voted.getUsername()).addVote(voter.getUsername());
         }
-        voter.vote();
+        //voter.vote();
     }
 
     // Get the vote from a given student

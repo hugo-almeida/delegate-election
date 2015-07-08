@@ -9,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -18,10 +17,7 @@ public class VoteHolder implements Serializable {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({ @JoinColumn(name = "degree_name", referencedColumnName = "degree_name", insertable = true, updatable = false),
-            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year", insertable = true, updatable = false),
-            @JoinColumn(name = "calendar_year", referencedColumnName = "calendar_year", insertable = true, updatable = false),
-            @JoinColumn(name = "period_pk_id", referencedColumnName = "period_pk_id", insertable = true, updatable = false) })
+    @JoinColumn(name = "period_id", referencedColumnName = "period_id", insertable = true, updatable = false)
     private ElectionPeriod electionPeriod;
 
     @Id

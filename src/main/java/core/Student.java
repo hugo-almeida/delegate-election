@@ -1,11 +1,16 @@
 package core;
 
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -16,12 +21,11 @@ public class Student {
     @Id
     private String username;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({ @JoinColumn(name = "PeriodPK_DegreeName", insertable = false, updatable = false),
-            @JoinColumn(name = "PeriodPK_DegreeYear", insertable = false, updatable = false),
-            @JoinColumn(name = "PeriodPK_Id", insertable = false, updatable = false),
-            @JoinColumn(name = "PeriodPK_CalendarYear", insertable = false, updatable = false) })
-    private Period applicationPeriod;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    //@JoinColumn(name = "period_id", insertable = false, updatable = false)
+    @JoinTable(name = "student_period", joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username") },
+            inverseJoinColumns = { @JoinColumn(name = "period_id", referencedColumnName = "period_id") })
+    private Set<Period> applicationPeriod;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
@@ -35,8 +39,8 @@ public class Student {
 
     private String name;
     private String email;
-    private boolean applied;
-    private boolean voted;
+    //private boolean applied;
+    //private boolean voted;
     private String photoType = null;
     @Column(length = 100000)
     private String photoBytes = null;
@@ -49,21 +53,21 @@ public class Student {
         this.name = name;
         this.username = username;
         this.email = email;
-        this.applied = false;
+        //this.applied = false;
         this.photoType = photoType;
         this.photoBytes = photoBytes;
     }
 
-    public Student(String name, String username, String email, String photoType, String photoBytes, Period p, DegreeYear d) {
-        this.name = name;
-        this.username = username;
-        this.email = email;
-        this.applied = false;
-        this.photoType = photoType;
-        this.photoBytes = photoBytes;
-        this.applicationPeriod = p;
-        this.degreeYear = d;
-    }
+//    public Student(String name, String username, String email, String photoType, String photoBytes, Period p, DegreeYear d) {
+//        this.name = name;
+//        this.username = username;
+//        this.email = email;
+//        //this.applied = false;
+//        this.photoType = photoType;
+//        this.photoBytes = photoBytes;
+//        this.applicationPeriod = p;
+//        this.degreeYear = d;
+//    }
 
     public String getName() {
         return name;
@@ -93,17 +97,27 @@ public class Student {
         this.degreeYear = degreeYear;
     }
 
-    public boolean hasApplied() {
-        return applied;
+    public void addPeriod(Period p) {
+        this.applicationPeriod.add(p);
     }
 
-    public void apply() {
-        applied = true;
+    public void removePeriod(Period p) {
+        if (this.applicationPeriod.contains(p)) {
+            this.applicationPeriod.remove(p);
+        }
     }
 
-    public void deapply() {
-        applied = false;
-    }
+//    public boolean hasApplied() {
+//        return applied;
+//    }
+//
+//    public void apply() {
+//        applied = true;
+//    }
+//
+//    public void deapply() {
+//        applied = false;
+//    }
 
     public void setEmail(String e) {
         email = e;
@@ -117,12 +131,12 @@ public class Student {
         photoBytes = bytes;
     }
 
-    public boolean hasVoted() {
-        return voted;
-    }
-
-    public void vote() {
-        voted = true;
-    }
+//    public boolean hasVoted() {
+//        return voted;
+//    }
+//
+//    public void vote() {
+//        voted = true;
+//    }
 
 }

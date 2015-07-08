@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.SequenceGenerator;
 
 @Embeddable
 public class PeriodPK implements Serializable {
@@ -20,7 +21,8 @@ public class PeriodPK implements Serializable {
     private int calendarYear;
 
     @Column(name = "period_pk_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "periodSeq", sequenceName = "PERIOD_SEQ", allocationSize = 1, initialValue = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "periodSeq")
     private int id;
 
     PeriodPK() {
@@ -42,5 +44,9 @@ public class PeriodPK implements Serializable {
 
     public int getCalendarYear() {
         return calendarYear;
+    }
+
+    public int getId() {
+        return id;
     }
 }

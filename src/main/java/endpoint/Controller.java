@@ -179,7 +179,7 @@ public class Controller {
         final Student candidate =
                 degreeDAO.findById(degreeId).getDegreeYear(year).getCandidates().stream()
                         .filter(c -> c.getUsername().equals(istId)).collect(Collectors.toList()).get(0);
-        candidate.deapply();
+        //candidate.deapply();
         studentDAO.save(candidate);
         final Gson g = new Gson();
         //TODO smarter Responses
@@ -320,7 +320,7 @@ public class Controller {
     @RequestMapping(value = "/apply", method = RequestMethod.POST)
     public @ResponseBody String apply(@RequestBody String username) {
         final Student s = studentDAO.findByUsername(username);
-        s.apply();
+        //s.apply();
         studentDAO.save(s);
         final Gson g = new Gson();
         return g.toJson("Ok");
@@ -329,7 +329,7 @@ public class Controller {
     @RequestMapping(value = "/de-apply", method = RequestMethod.POST)
     public @ResponseBody String deapply(@RequestBody String username) {
         final Student s = studentDAO.findByUsername(username);
-        s.deapply();
+        //s.deapply();
         studentDAO.save(s);
         final Gson g = new Gson();
         return g.toJson("Ok");

@@ -13,6 +13,7 @@ import core.Calendar;
 import core.CalendarDAO;
 import core.Degree;
 import core.DegreeYear;
+import core.ElectionPeriod;
 import core.Period;
 import core.Student;
 import core.StudentDAO;
@@ -41,38 +42,53 @@ public class TestController {
         return "Done";
     }
 
-    @RequestMapping("/test-periods")
-    public String periodSetup() {
+    @RequestMapping("/make-application")
+    public String makeApplication() {
         Calendar testCalendar = cd.findByYear(2014);
-
         for (Degree d : testCalendar.getDegrees()) {
             for (DegreeYear dy : d.getYears()) {
-                try {
-                    if (dy.getDegreeYear() % 2 == 0) {
-                        //add ongoing application period
-                        Period period =
-                                new ApplicationPeriod(LocalDate.of(2015, Month.JULY, 2), LocalDate.of(2015, Month.JULY, 30), dy);
-                        dy.addPeriod(period);
-                        dy.setActivePeriod(period);
-                    } else {
-                        // add application period in the past
-                        dy.addPeriod(new ApplicationPeriod(LocalDate.of(2015, Month.JUNE, 2), LocalDate.of(2015, Month.JUNE, 30),
-                                dy));
-
-                        // add candiLocalDates
-                        int i = 0;
-                        for (Student s : dy.getStudents()) {
-                            s.apply();
-                            if (i++ > 2) {
-                                break;
-                            }
-                        }
-
-                        // add ongoing election period
-//                        dy.addPeriod(new ElectionPeriod(LocalDate.of(2015, Month.JULY, 2), LocalDate.of(2015, Month.JULY, 30), dy));
+                if (dy.getDegreeYear() == 1) {
+                    ApplicationPeriod p =
+                            new ApplicationPeriod(LocalDate.of(2015, Month.NOVEMBER, 14), LocalDate.of(2015, Month.NOVEMBER, 15),
+                                    dy);
+                    try {
+                        dy.addPeriod(p);
+                    } catch (InvalidPeriodException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
-                } catch (InvalidPeriodException e) {
-                    System.out.println("You're dumb " + e);
+                    dy.setActivePeriod(p);
+                    Student s2 = null;
+                    for (Student s : dy.getStudents()) {
+                        p.addCandidate(s);
+                        s2 = s;
+                    }
+                    cd.save(testCalendar);
+                    p.removeCandidates(s2);
+                    cd.save(testCalendar);
+                    return "ok";
+                }
+            }
+        }
+        cd.save(testCalendar);
+        return "ok";
+    }
+
+    @RequestMapping("/make-election")
+    public String stuff() {
+        Calendar testCalendar = cd.findByYear(2014);
+        for (Degree d : testCalendar.getDegrees()) {
+            for (DegreeYear dy : d.getYears()) {
+                if (dy.getDegreeYear() == 1) {
+                    Period p =
+                            new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 12), LocalDate.of(2015, Month.NOVEMBER, 13), dy);
+                    try {
+                        dy.addPeriod(p);
+                    } catch (InvalidPeriodException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    dy.setActivePeriod(p);
                 }
             }
         }
