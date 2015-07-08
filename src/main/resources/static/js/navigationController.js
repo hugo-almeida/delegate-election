@@ -54,7 +54,6 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	 * DEGREES
 	 */
 	$rootScope.reloadDegrees = function() {
-		$log.log('reloading');
 		$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
 			$rootScope.degrees = data;
 			
@@ -92,10 +91,10 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	
 	$scope.setSubtitle = function() {
 		if($rootScope.degree.currentPeriod.type == 'APPLICATION') {
-			$scope.subTitle = 'Candidatura - ' + $rootScope.degree.name;
+			$scope.subTitle = 'Candidatura';
 		}
 		else if($rootScope.degree.currentPeriod.type == 'ELECTION')  {
-			$scope.subTitle = 'Votação  - ' + $rootScope.degree.name;
+			$scope.subTitle = 'Votação';
 		}
 	}
 	

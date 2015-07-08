@@ -115,7 +115,7 @@ public class TestController {
         final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
         final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
         if (l.contains(userDetails.get("username"))) {
-            return new ModelAndView("redirect:/home.html");
+            return new ModelAndView("redirect:/pedagogico.html");
         } else {
             return new ModelAndView();
         }
