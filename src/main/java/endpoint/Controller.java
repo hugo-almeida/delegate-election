@@ -55,6 +55,7 @@ import core.CalendarDAO;
 import core.Degree;
 import core.DegreeAdapter;
 import core.DegreeDAO;
+import core.DegreePeriodAdapter;
 import core.DegreeYear;
 import core.ElectionPeriod;
 import core.ElectionPeriodAdapter;
@@ -65,6 +66,7 @@ import core.Student;
 import core.StudentAdapter;
 import core.StudentDAO;
 import core.Vote;
+import core.VoteHolderAdapter;
 import core.exception.InvalidPeriodException;
 import endpoint.exception.UnauthorizedException;
 
@@ -244,8 +246,8 @@ public class Controller {
         //Obtem todos os votos (aluno -> numero de votos)
         Set<Vote> votes = degreeDAO.findById(degreeId).getDegreeYear(year).getCurrentElectionPeriod().getVotes();
         final GsonBuilder gsonBuilder = new GsonBuilder();
-//        final Gson gson = gsonBuilder.registerTypeAdapter(Vote.class, new VoteHolderAdapter()).create();
-        Gson gson = new Gson();
+        final Gson gson = gsonBuilder.registerTypeAdapter(Vote.class, new VoteHolderAdapter()).create();
+//        Gson gson = new Gson();
         return gson.toJson(votes);
     }
 
@@ -258,7 +260,10 @@ public class Controller {
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/periods", method = RequestMethod.GET)
     public @ResponseBody String getPeriods(@PathVariable String degreeId, @PathVariable int year) {
         //TODO Obtem info dos periodos do ano actuais. Incluindo info dos candidatos e alunos com votos
-        return null;
+        DegreeYear degreeYear = degreeDAO.findById(degreeId).getDegreeYear(year);
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreePeriodAdapter()).create();
+        return gson.toJson(degreeYear);
     }
 
     @RequestMapping(value = "/application-periods", method = RequestMethod.GET)
@@ -300,9 +305,9 @@ public class Controller {
         final Gson gson = gsonBuilder.registerTypeAdapter(ApplicationPeriod.class, new ApplicationPeriodAdapter()).create();
         ApplicationPeriod[] periods = gson.fromJson(periodsJson, ApplicationPeriod[].class);
         for (ApplicationPeriod p : periods) {
-            Period period = periodDAO.findById(p.getId());
-            period.setStart(p.getStart());
-            period.setEnd(p.getEnd());
+//            Period period = periodDAO.findById(p.getId());
+//            period.setStart(p.getStart());
+//            period.setEnd(p.getEnd());
         }
         return new Gson().toJson("ok");
     }
@@ -314,7 +319,7 @@ public class Controller {
         final Gson gson = gsonBuilder.registerTypeAdapter(ApplicationPeriod.class, new ApplicationPeriodAdapter()).create();
         ApplicationPeriod[] periods = gson.fromJson(periodsJson, ApplicationPeriod[].class);
         for (ApplicationPeriod p : periods) {
-            periodDAO.delete(periodDAO.findById(p.getId()));
+//            periodDAO.delete(periodDAO.findById(p.getId()));
         }
         return new Gson().toJson("ok");
     }
@@ -358,9 +363,9 @@ public class Controller {
         final Gson gson = gsonBuilder.registerTypeAdapter(ElectionPeriod.class, new ElectionPeriodAdapter()).create();
         ElectionPeriod[] periods = gson.fromJson(periodsJson, ElectionPeriod[].class);
         for (ElectionPeriod p : periods) {
-            Period period = periodDAO.findById(p.getId());
-            period.setStart(p.getStart());
-            period.setEnd(p.getEnd());
+//            Period period = periodDAO.findById(p.getId());
+//            period.setStart(p.getStart());
+//            period.setEnd(p.getEnd());
         }
         return new Gson().toJson("ok");
     }
@@ -372,7 +377,7 @@ public class Controller {
         final Gson gson = gsonBuilder.registerTypeAdapter(ElectionPeriod.class, new ElectionPeriodAdapter()).create();
         ElectionPeriod[] periods = gson.fromJson(periodsJson, ElectionPeriod[].class);
         for (ElectionPeriod p : periods) {
-            periodDAO.delete(periodDAO.findById(p.getId()));
+//            periodDAO.delete(periodDAO.findById(p.getId()));
         }
         return new Gson().toJson("ok");
     }

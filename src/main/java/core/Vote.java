@@ -37,6 +37,18 @@ public class Vote implements Serializable {
         return votepk;
     }
 
+    public VotePK getVotepk() {
+        return votepk;
+    }
+
+    public void setVotepk(VotePK votepk) {
+        this.votepk = votepk;
+    }
+
+    public Period getPeriod() {
+        return period;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
