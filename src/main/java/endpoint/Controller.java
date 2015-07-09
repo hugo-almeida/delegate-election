@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.WebUtils;
 
 import com.google.gson.Gson;
@@ -61,6 +63,7 @@ import core.StudentAdapter;
 import core.StudentDAO;
 import core.VoteHolder;
 import core.VoteHolderAdapter;
+import endpoint.exception.UnauthorizedException;
 
 @EnableOAuth2Sso
 @RestController
@@ -108,7 +111,8 @@ public class Controller {
 
         // TODO Melhorar a forma de detectar se o periodo é de eleicao
         // talvez com getCurrentElectionPeriod()
-        String candidate = ((ElectionPeriod) student.getDegreeYear().getActivePeriod()).getVote(istId).getVoteHolder().getVoted();
+        final String candidate =
+                ((ElectionPeriod) student.getDegreeYear().getActivePeriod()).getVote(istId).getVoteHolder().getVoted();
 
 //        GsonBuilder gsonBuilder = new GsonBuilder();
 //        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
@@ -224,7 +228,8 @@ public class Controller {
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/votes", method = RequestMethod.GET)
     public @ResponseBody String getVotes(@PathVariable String degreeId, @PathVariable int year) {
         //TODO Obtem todos os votos (aluno -> numero de votos)
-        Set<VoteHolder> votes = ((ElectionPeriod) degreeDAO.findById(degreeId).getDegreeYear(year).getActivePeriod()).getVotes();
+        final Set<VoteHolder> votes =
+                ((ElectionPeriod) degreeDAO.findById(degreeId).getDegreeYear(year).getActivePeriod()).getVotes();
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(VoteHolder.class, new VoteHolderAdapter()).create();
         return gson.toJson(votes);
@@ -252,11 +257,11 @@ public class Controller {
 //                        .map(DegreeYear::getCurrentApplicationPeriod).filter(s -> s.getType().equals(PeriodType.Application))
 //                        .collect(Collectors.toSet());
 
-        Set<ApplicationPeriod> periods = new HashSet<ApplicationPeriod>();
+        final Set<ApplicationPeriod> periods = new HashSet<ApplicationPeriod>();
 
-        Iterable<Degree> degrees = degreeDAO.findAll();
-        for (Degree d : degrees) {
-            for (DegreeYear dy : d.getYears()) {
+        final Iterable<Degree> degrees = degreeDAO.findAll();
+        for (final Degree d : degrees) {
+            for (final DegreeYear dy : d.getYears()) {
                 periods.add(dy.getCurrentApplicationPeriod());
             }
         }
@@ -398,6 +403,35 @@ public class Controller {
         return g.toJson(dy.getStudents());
     }
 
+    /************************************* MVC ***************************************/
+    @RequestMapping("/admin")
+    public ModelAndView testpedagogico() throws UnauthorizedException {
+        final Properties prop = new Properties();
+        try {
+            prop.load(getClass().getResourceAsStream("/pedagogico.properties"));
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        String userarray[];
+
+        final String list = prop.getProperty("users");
+        userarray = list.split(",");
+
+        final Set<String> userset = new HashSet<String>();
+
+        for (final String s : userarray) {
+            userset.add(s);
+        }
+
+        final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
+        final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
+        if (userset.contains(userDetails.get("username"))) {
+            return new ModelAndView("redirect:/pedagogico.html");
+        } else {
+            throw new UnauthorizedException();
+        }
+    }
+
     @Configuration
     protected static class SecurityConfiguration extends OAuth2SsoConfigurerAdapter {
 
@@ -413,8 +447,8 @@ public class Controller {
                     .antMatcher("/**")
                     .authorizeRequests()
                     .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user", "/get-candidates", "/apply",
-                            "/deapply", "get-students").authenticated().and().csrf().csrfTokenRepository(csrfTokenRepository())
-                    .and().addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
+                            "/deapply", "get-students", "/students/**", "/degrees/**", "/admin").authenticated().and().csrf()
+                    .csrfTokenRepository(csrfTokenRepository()).and().addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
         }
 
         private Filter csrfHeaderFilter() {

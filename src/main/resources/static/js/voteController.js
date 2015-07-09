@@ -38,8 +38,6 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 			});
 		}
 		
-		//sc.loadedStudents = false;
-		
 		sc.loadStudents = function(query) {
 			if(query != null && query != '' && query.length >= 2){
 				http.get('degrees/'+rc.degree.id+'/years/'+rc.degree.curricularYear+'/students?begins='+query)
@@ -48,10 +46,5 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 				});
 			}
 		}
-		
-		sc.searchFilter = function (obj) {					//not the right way to do this, should query server on key press 
-		    var re = new RegExp(sc.query, 'i');				//every x seconds, with at least 2 characters
-		    return !sc.query || re.test(obj.username) || re.test(obj.name);
-		};
 	}
 ]);

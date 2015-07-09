@@ -1,20 +1,12 @@
 package endpoint;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import core.ApplicationPeriod;
 import core.Calendar;
@@ -26,7 +18,6 @@ import core.Period;
 import core.Student;
 import core.StudentDAO;
 import core.exception.InvalidPeriodException;
-import endpoint.exception.UnauthorizedException;
 
 @RestController
 public class TestController {
@@ -120,34 +111,5 @@ public class TestController {
         }
         cd.save(c);
         return "Ok";
-    }
-
-    @RequestMapping("/test-pedagogico")
-    public ModelAndView testpedagogico() throws UnauthorizedException {
-        final Properties prop = new Properties();
-        try {
-            prop.load(getClass().getResourceAsStream("/pedagogico.properties"));
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        String userarray[];
-
-        final String list = prop.getProperty("users");
-        userarray = list.split(",");
-
-        final Set<String> userset = new HashSet<String>();
-
-        for (final String s : userarray) {
-            userset.add(s);
-        }
-
-        final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
-        final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
-        if (userset.contains(userDetails.get("username"))) {
-            return new ModelAndView("redirect:/pedagogico.html");
-        } else {
-            throw new UnauthorizedException();
-        }
-
     }
 }
