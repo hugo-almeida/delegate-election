@@ -27,7 +27,11 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		}
 		
 		sc.vote = function() {
-			http.post('students/'+rc.credentials.username+'/degrees/'+rc.degree.id+'/votes', sc.selected)
+			var username = sc.selected;
+			if (sc.selected == 'other') {
+				username = sc.otherSelected;
+			}
+			http.post('students/'+rc.credentials.username+'/degrees/'+rc.degree.id+'/votes', username)
 			.success(function(data) { 
 				sc.feedback = true;
 				sc.voted = true;
