@@ -38,14 +38,13 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 			});
 		}
 		
-		sc.loadedStudents = false;
+		//sc.loadedStudents = false;
 		
-		sc.loadStudents = function() {
-			if(!sc.loadedStudents){
-				http.get('degrees/'+rc.degree.id+'/years/'+rc.degree.curricularYear+'/students')
+		sc.loadStudents = function(query) {
+			if(query != null && query != '' && query.length >= 2){
+				http.get('degrees/'+rc.degree.id+'/years/'+rc.degree.curricularYear+'/students?begins='+query)
 				.success(function(data) { 
 					sc.students = data;
-					sc.loadedStudents = true;
 				});
 			}
 		}
