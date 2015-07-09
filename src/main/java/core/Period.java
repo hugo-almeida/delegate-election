@@ -85,6 +85,13 @@ public abstract class Period implements Serializable {
 
     }
 
+    // This constructor is only for temporary Periods.
+    public Period(LocalDate start, LocalDate end, String id) {
+        this.start = start;
+        this.end = end;
+//        this.id = id;
+    }
+
     public Period(LocalDate start, LocalDate end, DegreeYear degreeYear) {
         if (end.isBefore(start)) {
             //Throws a nice exception saying that nothing ends before starting
