@@ -27,6 +27,7 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		}
 		
 		sc.vote = function() {
+			log.log(sc.selected);
 			http.post('students/'+rc.credentials.username+'/degrees/'+rc.degree.id+'/votes', sc.selected)
 			.success(function(data) { 
 				sc.feedback = true;
