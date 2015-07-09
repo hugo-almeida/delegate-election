@@ -47,6 +47,10 @@ public class VoteHolder implements Serializable {
         return votes;
     }
 
+    public String getVoted() {
+        return voted;
+    }
+
     public void addVote(String voter) {
         Vote v = new Vote(voter, this);
         votes.add(v);

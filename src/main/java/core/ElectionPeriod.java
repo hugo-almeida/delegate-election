@@ -2,7 +2,9 @@ package core;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
@@ -27,7 +29,6 @@ public class ElectionPeriod extends Period {
     }
 
     public void vote(Student voter, Student voted) {
-        //final Vote v = new Vote(voter.getUsername(), voted.getUsername(), this);
         if (votes.containsKey(voted.getUsername())) {
             votes.get(voted.getUsername()).addVote(voter.getUsername());
         } else {
@@ -42,6 +43,10 @@ public class ElectionPeriod extends Period {
     public Vote getVote(String s) {
         // Workaround
         return null;
+    }
+
+    public Set<VoteHolder> getVotes() {
+        return new HashSet<VoteHolder>(votes.values());
     }
 
     @Override

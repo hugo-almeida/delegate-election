@@ -31,6 +31,10 @@ public class ApplicationPeriod extends Period {
         s.apply();
     }
 
+    public int getCandidateCount() {
+        return candidates.size();
+    }
+
     @Override
     public PeriodType getType() {
         return PeriodType.Application;

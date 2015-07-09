@@ -20,7 +20,7 @@ public class PeriodPK implements Serializable {
     private int calendarYear;
 
     @Column(name = "period_pk_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     PeriodPK() {

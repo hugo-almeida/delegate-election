@@ -46,8 +46,8 @@ public class Vote implements Serializable {
 //        return votePK.getVoted();
 //    }
 //
-//    public VoteHolder getVoteHolder() {
-//        return voteHolder;
-//    }
+    public VoteHolder getVoteHolder() {
+        return voteHolder;
+    }
 
 }

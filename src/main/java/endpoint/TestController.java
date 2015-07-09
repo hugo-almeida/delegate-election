@@ -21,6 +21,7 @@ import core.Calendar;
 import core.CalendarDAO;
 import core.Degree;
 import core.DegreeYear;
+import core.ElectionPeriod;
 import core.Period;
 import core.Student;
 import core.StudentDAO;
@@ -64,21 +65,31 @@ public class TestController {
                         dy.addPeriod(period);
                         dy.setActivePeriod(period);
                     } else {
+//                    try {
                         // add application period in the past
-                        dy.addPeriod(new ApplicationPeriod(LocalDate.of(2015, Month.JUNE, 2), LocalDate.of(2015, Month.JUNE, 30),
-                                dy));
+//                        dy.addPeriod(new ApplicationPeriod(LocalDate.of(2015, Month.JUNE, 2), LocalDate.of(2015, Month.JUNE, 30), dy));
 
                         // add candiLocalDates
-                        int i = 0;
-                        for (final Student s : dy.getStudents()) {
-                            s.apply();
-                            if (i++ > 2) {
-                                break;
-                            }
-                        }
-
+//                        int i = 0;
+//                        for (final Student s : dy.getStudents()) {
+//                            s.apply();
+//                            if (i++ > 2) {
+//                                break;
+//                            }
+//                        }
+//                    } catch (final InvalidPeriodException e) {
+//                        System.out.println("You're dumb " + e);
+//                    }
+//                    try {
                         // add ongoing election period
-//                        dy.addPeriod(new ElectionPeriod(LocalDate.of(2015, Month.JULY, 2), LocalDate.of(2015, Month.JULY, 30), dy));
+                        final Period period =
+                                new ElectionPeriod(LocalDate.of(2015, Month.JULY, 2), LocalDate.of(2015, Month.JULY, 30), dy);
+                        dy.addPeriod(period);
+                        dy.setActivePeriod(period);
+//                    } catch (final InvalidPeriodException e) {
+//                        System.out.println("You're dumb " + e);
+//                    }
+
                     }
                 } catch (final InvalidPeriodException e) {
                     System.out.println("You're dumb " + e);
