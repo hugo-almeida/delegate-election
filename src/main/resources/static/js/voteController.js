@@ -1,8 +1,6 @@
 angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$http', '$log', function(rc, sc, http,log) {
 		sc.students = [];
 		
-		sc.voted = false;	//change to rootscope on navigation controller
-		
 		sc.selection = function() {
 			if(sc.selected == 'other') {
 				for(var i = 0; i < sc.students.length; i++) {
@@ -34,7 +32,8 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 			http.post('students/'+rc.credentials.username+'/degrees/'+rc.degree.id+'/votes', username)
 			.success(function(data) { 
 				sc.feedback = true;
-				sc.voted = true;
+				rc.voted = true;
+				rc.voto = data;
 			});
 		}
 		

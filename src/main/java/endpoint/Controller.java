@@ -3,6 +3,7 @@ package endpoint;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -61,8 +62,6 @@ import core.Period;
 import core.Student;
 import core.StudentAdapter;
 import core.StudentDAO;
-import core.VoteHolder;
-import core.VoteHolderAdapter;
 import endpoint.exception.UnauthorizedException;
 
 @EnableOAuth2Sso
@@ -111,12 +110,15 @@ public class Controller {
 
         // TODO Melhorar a forma de detectar se o periodo é de eleicao
         // talvez com getCurrentElectionPeriod()
-        final String candidate =
-                ((ElectionPeriod) student.getDegreeYear().getActivePeriod()).getVote(istId).getVoteHolder().getVoted();
+        final String voted = ((ElectionPeriod) student.getDegreeYear().getActivePeriod()).getVote(istId);
+        if (voted == null) {
+            return new Gson().toJson("");
+        }
+        if (voted.isEmpty()) {
+            return new Gson().toJson("null");
+        }
 
-//        GsonBuilder gsonBuilder = new GsonBuilder();
-//        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
-        return new Gson().toJson(candidate);
+        return getUser(voted);
     }
 
     @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.POST)
@@ -143,11 +145,11 @@ public class Controller {
         } catch (final ClassCastException e) {
             // Se o cast não foi possivel, o periodo actual nao e de eleicao
             final Gson gson = new Gson();
-            return gson.toJson("fail");
+            return gson.toJson("");
         }
         studentDAO.save(student);
         final Gson gson = new Gson();
-        return gson.toJson("success");
+        return getUser(vote);
     }
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.GET)
@@ -184,11 +186,16 @@ public class Controller {
     //Se a resposta for vazia, não se candidatou a este curso. Talvez seja mais simples retornar false ou true?
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.GET)
     public @ResponseBody String getCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId) {
-        final Student candidate =
-                degreeDAO.findById(degreeId).getDegreeYear(year).getCandidates().stream()
-                        .filter(c -> c.getUsername().equals(istId)).collect(Collectors.toList()).get(0);
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        List<Student> s =
+                degreeDAO.findById(degreeId).getDegreeYear(year).getCandidates().stream()
+                        .filter(c -> c.getUsername().equals(istId)).collect(Collectors.toList());
+        if (s.isEmpty()) {
+            return gson.toJson("");
+        }
+        final Student candidate = s.get(0);
+
         return gson.toJson(candidate);
     }
 
@@ -197,7 +204,7 @@ public class Controller {
         final Student candidate =
                 degreeDAO.findById(degreeId).getDegreeYear(year).getCandidates().stream()
                         .filter(c -> c.getUsername().equals(istId)).collect(Collectors.toList()).get(0);
-        candidate.deapply();
+        ((ApplicationPeriod) candidate.getDegreeYear().getActivePeriod()).removeCandidates(candidate);
         studentDAO.save(candidate);
         final Gson g = new Gson();
         //TODO smarter Responses
@@ -225,15 +232,15 @@ public class Controller {
 
     /***************************** Manager API *****************************/
     // This is for the manager interface
-    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/votes", method = RequestMethod.GET)
-    public @ResponseBody String getVotes(@PathVariable String degreeId, @PathVariable int year) {
-        //TODO Obtem todos os votos (aluno -> numero de votos)
-        final Set<VoteHolder> votes =
-                ((ElectionPeriod) degreeDAO.findById(degreeId).getDegreeYear(year).getActivePeriod()).getVotes();
-        final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.registerTypeAdapter(VoteHolder.class, new VoteHolderAdapter()).create();
-        return gson.toJson(votes);
-    }
+//    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/votes", method = RequestMethod.GET)
+//    public @ResponseBody String getVotes(@PathVariable String degreeId, @PathVariable int year) {
+//        //TODO Obtem todos os votos (aluno -> numero de votos)
+//        final Set<VoteHolder> votes =
+//                ((ElectionPeriod) degreeDAO.findById(degreeId).getDegreeYear(year).getActivePeriod()).getVotes();
+//        final GsonBuilder gsonBuilder = new GsonBuilder();
+//        final Gson gson = gsonBuilder.registerTypeAdapter(VoteHolder.class, new VoteHolderAdapter()).create();
+//        return gson.toJson(votes);
+//    }
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/history", method = RequestMethod.GET)
     public @ResponseBody String getHistoy(@PathVariable String degreeId, @PathVariable int year) {
@@ -368,7 +375,7 @@ public class Controller {
     @RequestMapping(value = "/apply", method = RequestMethod.POST)
     public @ResponseBody String apply(@RequestBody String username) {
         final Student s = studentDAO.findByUsername(username);
-        s.apply();
+        //s.apply();
         studentDAO.save(s);
         final Gson g = new Gson();
         return g.toJson("Ok");
@@ -377,7 +384,7 @@ public class Controller {
     @RequestMapping(value = "/de-apply", method = RequestMethod.POST)
     public @ResponseBody String deapply(@RequestBody String username) {
         final Student s = studentDAO.findByUsername(username);
-        s.deapply();
+        //s.deapply();
         studentDAO.save(s);
         final Gson g = new Gson();
         return g.toJson("Ok");

@@ -40,11 +40,8 @@ public class DegreeYear {
                     updatable = false) })
     private Degree degree;
 
-//    @OneToOne(mappedBy = "activeDegreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    private Period activePeriod;
-
     @OneToMany(mappedBy = "degreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Period> periods;
+    private final Set<Period> periods = new HashSet<Period>();
 
     @OneToMany(mappedBy = "degreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Student> students = new HashSet<Student>();
@@ -171,21 +168,10 @@ public class DegreeYear {
     }
 
     public Set<Student> getCandidates() {
-        Set<Student> candidates = new HashSet<Student>();
-        for (Student st : students) {
-            if (st.hasApplied()) {
-                candidates.add(st);
-            }
-        }
-        return candidates;
+        return getActivePeriod().getCandidates();
     }
 
     public void addPeriod(Period period) throws InvalidPeriodException {
-        // Allow start dates in the past during debug
-//        if (period.getStart().isBefore(LocalDate.now())) {
-//            throw new InvalidPeriodException("The start date should be in the future");
-//        }
-
         if (getActivePeriod() != null && period.getStart().isBefore(getActivePeriod().getEnd())) {
             throw new InvalidPeriodException("A period can't start before the active period ends");
         }

@@ -2,11 +2,11 @@ package core;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -14,40 +14,58 @@ import javax.persistence.Table;
 @Table(name = "vote")
 public class Vote implements Serializable {
 
-    @Id
-    private String voter;
+    @EmbeddedId
+    private VotePK votepk;
 
-//    @Id
-//    @JoinColumn(name = "voted", referencedColumnName = "username")
-//    private String voted;
-
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({ @JoinColumn(name = "degree_name", referencedColumnName = "degree_name", insertable = true, updatable = false),
-            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year", insertable = true, updatable = false),
-            @JoinColumn(name = "calendar_year", referencedColumnName = "calendar_year", insertable = true, updatable = false),
-            @JoinColumn(name = "period_pk_id", referencedColumnName = "period_pk_id", insertable = true, updatable = false),
-            @JoinColumn(name = "voted", referencedColumnName = "voted", insertable = true, updatable = false) })
-    private VoteHolder voteHolder;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "period_id", referencedColumnName = "period_id", insertable = false, updatable = false)
+    private Period period;
 
     Vote() {
     }
 
-    public Vote(String voter, VoteHolder vh) {
-        this.voter = voter;
-        this.voteHolder = vh;
+    public Vote(String voter, String voted, Period p) {
+        this.votepk = new VotePK(voter, voted, p.getId());
+        this.period = p;
     }
 
-//    public String getVoter() {
-//        return votePK.getVoter();
-//    }
-//
-//    public String getVoted() {
-//        return votePK.getVoted();
-//    }
-//
-    public VoteHolder getVoteHolder() {
-        return voteHolder;
+    public void setPeriod(Period p) {
+        this.period = p;
+    }
+
+    public VotePK getVotePK() {
+        return votepk;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Vote)) {
+            return false;
+        }
+        Vote v = (Vote) o;
+        if (this.votepk.getVoted().equals(v.votepk.getVoted()) && this.period.getId() == v.period.getId()
+                && this.votepk.getVoter().equals(v.votepk.getVoter())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        //Forcing equals
+        return 1;
+    }
+
+    public String getVoter() {
+        return votepk.getVoter();
+    }
+
+    public String getVoted() {
+        return votepk.getVoted();
     }
 
 }

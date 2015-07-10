@@ -1,9 +1,7 @@
 package core;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -16,37 +14,45 @@ import javax.persistence.OneToMany;
 @DiscriminatorValue("Election")
 public class ElectionPeriod extends Period {
 
-    @OneToMany(mappedBy = "electionPeriod", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    //@MapKey(name = "username")
-    private Map<String, VoteHolder> votes;
+    @OneToMany(mappedBy = "period", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    protected Set<Vote> votes;
 
     ElectionPeriod() {
     }
 
     public ElectionPeriod(LocalDate start, LocalDate end, DegreeYear degreeYear) {
         super(start, end, degreeYear);
-        votes = new HashMap<String, VoteHolder>();
-    }
-
-    public void vote(Student voter, Student voted) {
-        if (votes.containsKey(voted.getUsername())) {
-            votes.get(voted.getUsername()).addVote(voter.getUsername());
-        } else {
-            VoteHolder vh = new VoteHolder(this, voted.getUsername());
-            votes.put(voted.getUsername(), vh);
-            votes.get(voted.getUsername()).addVote(voter.getUsername());
+        votes = new HashSet<Vote>();
+        if (degreeYear.getActivePeriod() != null) {
+            if (degreeYear.getActivePeriod().getCandidates() != null) {
+                super.setCandidates(degreeYear.getActivePeriod().getCandidates());
+            }
         }
-        voter.vote();
     }
 
     // Get the vote from a given student
-    public Vote getVote(String s) {
-        // Workaround
+    public String getVote(String s) {
+        for (Vote v : votes) {
+            if (v.getVoter().equals(s)) {
+                return v.getVoted();
+            }
+        }
         return null;
     }
 
-    public Set<VoteHolder> getVotes() {
-        return new HashSet<VoteHolder>(votes.values());
+    public Set<Vote> getVotes() {
+        return votes;
+    }
+
+    public void vote(Student voter, Student voted) {
+        Vote v = new Vote(voter.getUsername(), voted.getUsername(), this);
+        votes.add(v);
+        v.setPeriod(this);
+    }
+
+    public void vote(Vote v) {
+        votes.add(v);
+        v.setPeriod(this);
     }
 
     @Override

@@ -19,7 +19,7 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 			
 			$rootScope.reloadDegrees();
 			
-			$rootScope.votePeriod = false;
+			$rootScope.votePeriod = false; //debug
 		
 		} else {
 			$rootScope.authenticated = false;
@@ -35,7 +35,7 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	$rootScope.voted = false;
 	
 	$rootScope.applied = false;
-
+	
 	/***
 	 * LOGOUT
 	 */
@@ -79,6 +79,14 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		.success(function(data) { 
 			if(data != '') {
 				$rootScope.applied = true;
+			}
+		});
+		
+		$http.get('students/'+$rootScope.credentials.username+'/degrees/'+$rootScope.degree.id+'/votes')
+		.success(function(data) { 
+			if(data != '') {
+				$rootScope.voted = true;
+				$rootScope.voto = data;
 			}
 		});
 	}

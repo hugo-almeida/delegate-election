@@ -38,11 +38,12 @@
 			<!-- This needs changing to accomodate students with multiple degrees-->
 			
 			<div ng-show="authenticated"> <!-- missing student check -->
-				<p ng-show="debug">{{credentials}}</p><!-- debug -->
-				<p ng-show="debug">{{degrees}}</p><!-- debug -->
-				<img ng-show="debug" ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}"><!-- debug -->
-					<p ng-show="debug">{{credentials.username}} {{credentials.name}}</p><!-- debug -->
-				</img> <!-- debug -->
+				<!-- <p ng-show="debug">{{credentials}}</p><!-- debug 
+				<p ng-show="debug">{{degrees}}</p><!-- debug 
+				<img ng-show="debug" ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}"><!-- debug 
+					<p ng-show="debug">{{credentials.username}} {{credentials.name}}</p><!-- debug 
+				</img> <!-- debug 
+				-->
 				
 				<button type="btn btn-primary" ng-click="debugVotePeriod()" ng-show="debug">Debug vote period</button><!-- debug -->
 				<button type="btn btn-primary" ng-click="reloadDegrees()" ng-show="debug">Debug reload degrees</button><!-- debug -->
