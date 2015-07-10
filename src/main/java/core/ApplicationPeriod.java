@@ -15,7 +15,6 @@ public class ApplicationPeriod extends Period {
 
     public ApplicationPeriod(LocalDate start, LocalDate end, DegreeYear degreeYear) {
         super(start, end, degreeYear);
-        //candidates = new HashSet<Student>();
     }
 
     public void addCandidate(Student s) {
@@ -23,7 +22,6 @@ public class ApplicationPeriod extends Period {
         s.addPeriod(this);
     }
 
-    //@PreRemove
     public void removeCandidates(Student s) {
         if (super.getCandidates().contains(s)) {
             super.getCandidates().remove(s);
@@ -36,8 +34,4 @@ public class ApplicationPeriod extends Period {
         return PeriodType.Application;
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        return super.equals(o);
-//    }
 }

@@ -43,10 +43,6 @@ public abstract class Period implements Serializable {
         }
     }
 
-//    @EmbeddedId
-//    @Column(name = "period_id")
-//    private PeriodPK periodPK;
-
     @Id
     @GeneratedValue
     @Column(name = "period_id")
@@ -84,16 +80,6 @@ public abstract class Period implements Serializable {
 
     @Column(name = "active")
     private boolean active;
-
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumns({
-//            @JoinColumn(name = "active_degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = false,
-//                    updatable = false),
-//            @JoinColumn(name = "active_degree_year", referencedColumnName = "degree_year_pk_degree_year", insertable = false,
-//                    updatable = false),
-//            @JoinColumn(name = "active_calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = false,
-//                    updatable = false) })
-//    private DegreeYear activeDegreeYear;
 
     Period() {
 

@@ -2,6 +2,7 @@ package endpoint;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +15,6 @@ import core.CalendarDAO;
 import core.Degree;
 import core.DegreeYear;
 import core.ElectionPeriod;
-import core.Period;
 import core.Student;
 import core.StudentDAO;
 import core.exception.InvalidPeriodException;
@@ -80,8 +80,8 @@ public class TestController {
         for (Degree d : testCalendar.getDegrees()) {
             for (DegreeYear dy : d.getYears()) {
                 if (dy.getDegreeYear() == 1) {
-                    Period p =
-                            new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 12), LocalDate.of(2015, Month.NOVEMBER, 13), dy);
+                    ElectionPeriod p =
+                            new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 5), LocalDate.of(2015, Month.NOVEMBER, 6), dy);
                     try {
                         dy.addPeriod(p);
                     } catch (InvalidPeriodException e) {
@@ -89,11 +89,40 @@ public class TestController {
                         e.printStackTrace();
                     }
                     dy.setActivePeriod(p);
+                    cd.save(testCalendar);
+                    Iterator<Student> it = dy.getStudents().iterator();
+                    Student s = it.next();
+                    Student s2 = it.next();
+                    Student s3 = it.next();
+                    //Vote v1 = new Vote(s.getUsername(), s.getUsername(), dy.getActivePeriod());
+                    //vd.save(v1);
+                    ElectionPeriod p2 = (ElectionPeriod) dy.getActivePeriod();
+                    p2.vote(s, s);
+                    cd.save(testCalendar);
+                    p2.vote(s2, s);
+                    cd.save(testCalendar);
+                    p2.vote(s3, s2);
+                    cd.save(testCalendar);
+                    return "Oki";
                 }
             }
         }
         cd.save(testCalendar);
         return "ok";
+    }
+
+    @RequestMapping("/votes")
+    public int votes() {
+        Calendar testCalendar = cd.findByYear(2014);
+        for (Degree d : testCalendar.getDegrees()) {
+            for (DegreeYear dy : d.getYears()) {
+                if (dy.getDegreeYear() == 1) {
+                    ElectionPeriod p = (ElectionPeriod) dy.getActivePeriod();
+                    return p.getVotes().size();
+                }
+            }
+        }
+        return 999;
     }
 
     @RequestMapping("/find-student")

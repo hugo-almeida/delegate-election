@@ -22,7 +22,6 @@ public class Student {
     private String username;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    //@JoinColumn(name = "period_id", insertable = false, updatable = false)
     @JoinTable(name = "student_period", joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username") },
             inverseJoinColumns = { @JoinColumn(name = "period_id", referencedColumnName = "period_id") })
     private Set<Period> applicationPeriod;
@@ -39,8 +38,7 @@ public class Student {
 
     private String name;
     private String email;
-    //private boolean applied;
-    //private boolean voted;
+
     private String photoType = null;
     @Column(length = 100000)
     private String photoBytes = null;
@@ -53,21 +51,9 @@ public class Student {
         this.name = name;
         this.username = username;
         this.email = email;
-        //this.applied = false;
         this.photoType = photoType;
         this.photoBytes = photoBytes;
     }
-
-//    public Student(String name, String username, String email, String photoType, String photoBytes, Period p, DegreeYear d) {
-//        this.name = name;
-//        this.username = username;
-//        this.email = email;
-//        //this.applied = false;
-//        this.photoType = photoType;
-//        this.photoBytes = photoBytes;
-//        this.applicationPeriod = p;
-//        this.degreeYear = d;
-//    }
 
     public String getName() {
         return name;
@@ -107,18 +93,6 @@ public class Student {
         }
     }
 
-//    public boolean hasApplied() {
-//        return applied;
-//    }
-//
-//    public void apply() {
-//        applied = true;
-//    }
-//
-//    public void deapply() {
-//        applied = false;
-//    }
-
     public void setEmail(String e) {
         email = e;
     }
@@ -130,13 +104,5 @@ public class Student {
     public void setPhotoBytes(String bytes) {
         photoBytes = bytes;
     }
-
-//    public boolean hasVoted() {
-//        return voted;
-//    }
-//
-//    public void vote() {
-//        voted = true;
-//    }
 
 }
