@@ -11,9 +11,15 @@
 		Editar
 	</button>
 	
-	<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		Download <i class="caret"></i>
-	</button>
+	<div class="btn-group">
+		<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			Download <i class="caret"></i>
+		</button>
+		
+		<ul class="dropdown-menu">
+	      <li><a href="#">Excel</a></li>
+	    </ul>
+	</div>
 	
 	<p></p>
 	
@@ -41,5 +47,13 @@
 				</th>
 			</tr>
 		</thead>
+		<tbody>
+			<tr ng-repeat="degree in degrees">
+				<td>
+					<input type="checkbox">
+					{{degree.name}}
+				</td>
+			</tr>
+		</tbody>
 	</table>
 </div>
