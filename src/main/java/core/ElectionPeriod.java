@@ -23,11 +23,20 @@ public class ElectionPeriod extends Period {
     public ElectionPeriod(LocalDate start, LocalDate end, DegreeYear degreeYear) {
         super(start, end, degreeYear);
         votes = new HashSet<Vote>();
+        if (degreeYear.getActivePeriod() != null) {
+            if (degreeYear.getActivePeriod().getCandidates() != null) {
+                super.setCandidates(degreeYear.getActivePeriod().getCandidates());
+            }
+        }
     }
 
     // Get the vote from a given student
-    public Vote getVote(String s) {
-        // Workaround
+    public String getVote(String s) {
+        for (Vote v : votes) {
+            if (v.getVoter().equals(s)) {
+                return v.getVoted();
+            }
+        }
         return null;
     }
 

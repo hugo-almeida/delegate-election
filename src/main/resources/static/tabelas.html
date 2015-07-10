@@ -1,0 +1,45 @@
+<div>
+	<ul class="nav nav-tabs" role="tablist">
+		<li ng-class="{ active: activeTab('Candidaturas') }"><a href="#" ng-click="setActiveTab('Candidaturas')">Candidaturas</a></li>
+		<li ng-class="{ active: activeTab('Votações') }"><a href="#" ng-click="setActiveTab('Votações')">Votações</a></li>
+	</ul>
+	
+	<br></br>
+	
+	<button class="btn btn-primary">
+		<i class="glyphicon glyphicon-pencil"></i>
+		Editar
+	</button>
+	
+	<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		Download <i class="caret"></i>
+	</button>
+	
+	<p></p>
+	
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					<input type="checkbox">
+					<strong>Curso</strong>
+				</th>
+				<th>
+					<strong>1º ano</strong>
+				</th>
+				<th>
+					<strong>2º ano</strong>
+				</th>
+				<th>
+					<strong>3º ano</strong>
+				</th>
+				<th>
+					<strong>4º ano</strong>
+				</th>
+				<th>
+					<strong>5º ano</strong>
+				</th>
+			</tr>
+		</thead>
+	</table>
+</div>

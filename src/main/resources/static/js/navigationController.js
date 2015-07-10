@@ -1,24 +1,26 @@
 angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope', '$http', '$log',
                                                           function($rootScope, $scope, $http, $log)  {
+	
+	/***
+	 * INIT
+	 */
 	$http.get('user').success(function(data) {
 		if (data) {
+		
+			$rootScope.degree = null;
+			
 			$rootScope.authenticated = true;
+			
 			$rootScope.id = data.name;
+			
 			$rootScope.credentials = data;
+			
 			$rootScope.degrees = [];
-			/*for (index in data.roles) {
-				//$log.log(data.roles[index]);
-				if(data.roles[index].type=='STUDENT') {
-					$rootScope.degrees.push(data.roles[index]);
-				//	$log.log('pushed');
-				}
-			}*/
-			$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
-				$rootScope.degrees = data;
-			});
-			$rootScope.appPeriod = false;
-			$rootScope.votePeriod = false;
-			//$log.log($rootScope.degrees[0].registrations[0].name)
+			
+			$rootScope.reloadDegrees();
+			
+			$rootScope.votePeriod = false; //debug
+		
 		} else {
 			$rootScope.authenticated = false;
 		}
@@ -26,16 +28,17 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		$rootScope.authenticated = false;
 	});
 	
-	$scope.specialLogin = function(){
-
-		$http.post('get-user', $scope.special_username)
-									.success(function(data) {
-										$rootScope.credentials = data;
-										$rootScope.id = data.name;
-									});
-		$rootScope.authenticated = true;
-	}
+	$scope.subTitle = 'Início'
+		
+	$rootScope.debug = true;
 	
+	$rootScope.voted = false;
+	
+	$rootScope.applied = false;
+	
+	/***
+	 * LOGOUT
+	 */
 	$scope.logout = function() {
 		$http.post('logout', {}).success(function() {
 			$rootScope.authenticated = false;
@@ -47,24 +50,83 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		});
 	};
 	
-	$scope.debugReloadDegrees = function() {
+	/***
+	 * DEGREES
+	 */
+	$rootScope.reloadDegrees = function() {
 		$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
 			$rootScope.degrees = data;
+			
+			if($rootScope.degrees.length == 1) {
+				$scope.selection = 0;
+				$scope.setDegree();
+			}
 		});
 	}
 	
-	$scope.debugApplyPeriod = function() {
-		$rootScope.appPeriod = !$rootScope.appPeriod;
+	$rootScope.reloadCandidates = function() {
+		$http.get('degrees/'+$rootScope.degree.id+'/years/'+$rootScope.degree.curricularYear+'/candidates')
+		.success(function(data) { 
+			$rootScope.candidatos = data;
+			/*for(var i = 0; i < $rootScope.candidatos.length; i++) {
+			    if ($rootScope.candidatos[i].username == $rootScope.credentials.username) {
+			        break;
+			    }
+			}*/
+		});
+		
+		$http.get('degrees/'+$rootScope.degree.id+'/years/'+$rootScope.degree.curricularYear+'/candidates/'+$rootScope.credentials.username)
+		.success(function(data) { 
+			if(data != '') {
+				$rootScope.applied = true;
+			}
+		});
+		
+		$http.get('students/'+$rootScope.credentials.username+'/degrees/'+$rootScope.degree.id+'/votes')
+		.success(function(data) { 
+			if(data != '') {
+				$rootScope.voted = true;
+				$rootScope.voto = data;
+			}
+		});
 	}
 	
+	$scope.setDegree = function() {
+		$rootScope.degree = $rootScope.degrees[$scope.selection];
+		$rootScope.reloadCandidates();
+		$scope.setSubtitle();
+	}
+	
+	$scope.setSubtitle = function() {
+		if($rootScope.degree.currentPeriod.type == 'APPLICATION') {
+			$scope.subTitle = 'Candidatura';
+		}
+		else if($rootScope.degree.currentPeriod.type == 'ELECTION')  {
+			$scope.subTitle = 'Votação';
+		}
+	}
+	
+	/***
+	 * DEBUG
+	 */
 	$scope.debugVotePeriod = function() {
 		$rootScope.votePeriod = !$rootScope.votePeriod;
 	}
 	
-	$rootScope.debug = true;
-	
 	$rootScope.toggleDebug = function() {
 		$rootScope.debug = !$rootScope.debug;
 	}
+	
+	
+	$scope.specialLogin = function(){		//debug
+
+		$http.post('get-user', $scope.special_username)
+			.success(function(data) {
+				$rootScope.credentials = data;
+				$rootScope.id = data.name;
+			});
+		$rootScope.authenticated = true;
+	}
+	
 }]);
 

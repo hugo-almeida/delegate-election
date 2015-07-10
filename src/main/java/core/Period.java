@@ -66,7 +66,7 @@ public abstract class Period implements Serializable {
     private LocalDate end;
 
     @ManyToMany(mappedBy = "applicationPeriod", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Student> candidates;
+    protected Set<Student> candidates;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumns({
@@ -145,6 +145,13 @@ public abstract class Period implements Serializable {
 
     public Set<Student> getCandidates() {
         return this.candidates;
+    }
+
+    public void setCandidates(Set<Student> candidates) {
+        this.candidates = candidates;
+        for (Student s : candidates) {
+            s.addPeriod(this);
+        }
     }
 
     @Override

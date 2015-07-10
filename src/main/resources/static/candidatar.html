@@ -1,4 +1,5 @@
-<div ng-controller="applyCtrl as apply">
+<div ng-controller="applyCtrl as apply" ng-cloak>
+
 	<div>
 		<!-- Default panel contents -->
 		<h3>Detalhes</h3>
@@ -19,13 +20,13 @@
 			</tr>
 			<tr>
 				<th>Período de Candidatura</th>
-				<td>23/04/2015 - 25/04/2015</td>
+				<td>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</td>
 			</tr>
 		</table>
 	</div>
 	
 	<h3>Candidatos</h3>
-	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#applyModal" ng-hide="applied">
+	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#applyModal" ng-show="!applied">
 		<i class="glyphicon glyphicon-plus"></i>
 		Candidata-te
 	</button>
@@ -45,7 +46,7 @@
 			</tr>
 		</table>
 	</div>
-	
+
 	<div id="applyModal" class="modal fade" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -59,11 +60,11 @@
 	        		<table class="table">
 	        			<tr>
 							<th class="col-md-6">Candidato</th>
-							<td class="col-md-12 col-md-12-offset-4">{{credentials.name}}</td> <!--  needs to be fixed to search for roles with type student -->
+							<td class="col-md-12 col-md-12-offset-4">{{credentials.name}}</td>
 						</tr>
 						<tr>
 							<th>Curso</th>
-							<td>{{degree.name}}</td> <!--  needs to be fixed to search for roles with type student -->
+							<td>{{degree.name}}</td>
 						</tr>
 						<tr>
 							<th>Ano Lectivo</th>
@@ -79,7 +80,7 @@
 						</tr>
 						<tr>
 							<th>Período de votação</th>
-							<td>23/04/2015 - 25/04/2015</td>
+							<td>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</td><!-- need election period date -->
 						</tr>
 					</table>
 	      		</div>
@@ -90,4 +91,11 @@
 			</div>
 		</div>
 	</div>
+	
+	<div class="alert alert-success alert-dismissible alert-floating" style="position:absolute; top:60px; right:30px" role="alert" ng-show="feedback">
+		<button type="button" class="close" ng-click="feedback = false;"><span class="sr-only">Close</span></button>
+		<i class="icon icon-check"></i><strong>Submetido!</strong> A tua candidatura foi submetida com sucesso.
+	</div>
+	
+	
 </div>

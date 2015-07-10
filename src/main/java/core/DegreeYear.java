@@ -22,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import core.Period.PeriodType;
 import core.exception.InvalidPeriodException;
 
 @Entity
@@ -113,6 +114,26 @@ public class DegreeYear {
             }
         }
         return null;
+    }
+
+    public ApplicationPeriod getCurrentApplicationPeriod() {
+        ApplicationPeriod period = null;
+        for (Period p : periods) {
+            if (p.getType().equals(PeriodType.Application) && (period == null || p.getStart().isAfter(period.getStart()))) {
+                period = (ApplicationPeriod) p;
+            }
+        }
+        return period;
+    }
+
+    public ElectionPeriod getCurrentElectionPeriod() {
+        ElectionPeriod period = null;
+        for (Period p : periods) {
+            if (p.getType().equals(PeriodType.Election) && (period == null || p.getStart().isAfter(period.getStart()))) {
+                period = (ElectionPeriod) p;
+            }
+        }
+        return period;
     }
 
     public Set<Period> getInactivePeriods() {

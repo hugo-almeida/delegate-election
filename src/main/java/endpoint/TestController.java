@@ -33,13 +33,60 @@ public class TestController {
 
     @RequestMapping("/test-calendar")
     public String testCalendar() {
-        Calendar c = new Calendar(2014);
+        final Calendar c = new Calendar(2014);
         c.init();
 //        Calendar c2 = new Calendar(2015);
 //        c2.init();
         cd.save(c);
 //        cd.save(c2);
         return "Done";
+    }
+
+    @RequestMapping("/application")
+    public String application() {
+        Calendar testCalendar = cd.findByYear(2014);
+        for (Degree d : testCalendar.getDegrees()) {
+            for (DegreeYear dy : d.getYears()) {
+                if (dy.getDegreeYear() == 1) {
+                    ApplicationPeriod p =
+                            new ApplicationPeriod(LocalDate.of(2015, Month.NOVEMBER, 14), LocalDate.of(2015, Month.NOVEMBER, 15),
+                                    dy);
+                    try {
+                        dy.addPeriod(p);
+                    } catch (InvalidPeriodException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    dy.setActivePeriod(p);
+                    cd.save(testCalendar);
+                    return "Ok";
+                }
+            }
+        }
+        return "No ok";
+    }
+
+    @RequestMapping("/election")
+    public String election() {
+        Calendar testCalendar = cd.findByYear(2014);
+        for (Degree d : testCalendar.getDegrees()) {
+            for (DegreeYear dy : d.getYears()) {
+                if (dy.getDegreeYear() == 1) {
+                    ElectionPeriod p =
+                            new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 16), LocalDate.of(2015, Month.NOVEMBER, 17), dy);
+                    try {
+                        dy.addPeriod(p);
+                    } catch (InvalidPeriodException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    dy.setActivePeriod(p);
+                    cd.save(testCalendar);
+                    return "Ok";
+                }
+            }
+        }
+        return "No ok";
     }
 
     @RequestMapping("/make-application")
@@ -127,20 +174,20 @@ public class TestController {
 
     @RequestMapping("/find-student")
     public String findStudent(@RequestParam(value = "username", required = true) String username) {
-        Student s = st.findByUsername(username);
+        final Student s = st.findByUsername(username);
         return s.getName();
     }
 
     @RequestMapping("/test-calendar2")
     public int testCalendar2() {
-        Calendar c = cd.findByYear(2014);
+        final Calendar c = cd.findByYear(2014);
         return c.getDegrees().size();
     }
 
     @RequestMapping("/add-years")
     public String year() {
-        Calendar c = cd.findByYear(2015);
-        for (Degree d : c.getDegrees()) {
+        final Calendar c = cd.findByYear(2015);
+        for (final Degree d : c.getDegrees()) {
             d.initDegreeYears();
         }
         cd.save(c);

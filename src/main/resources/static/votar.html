@@ -1,4 +1,4 @@
-<div  ng-controller="voteCtrl as vote">
+<div  ng-controller="voteCtrl">
 	<div>
 		<!-- Default panel contents -->
 		<h3>Detalhes</h3>
@@ -19,37 +19,23 @@
 			</tr>
 			<tr>
 				<th>Período de votação</th>
-				<td>23/04/2015 - 25/04/2015</td>
+				<td>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</td>
 			</tr>
 		</table>
 	</div>
 	
 	<h3>Votação</h3>
-	<button class="btn btn-primary" ng-click="period()">debug period</button>
+	<button class="btn btn-primary" ng-click="period()" ng-show="debug">debug period</button>
 	<button type="submit" class="btn btn-primary" ng-click="reloadCandidates()" ng-show="debug">Debug Reload Candidates</button>
-	<div class="panel panel-default">
+	<div class="panel panel-default" ng-hide="voted"> <!-- table of candidates, shown if the user hasn't voted yet -->
 		<div class="panel-heading">Name</div>
 		<div class="table-responsive">
-			<table class="table"> <!-- probably needs to be changed to a table -->
-				
-				<thead>
-				<tr>
-					<th class="col-md-1" ng-hide="true">
-						button
-					</th>
-					<th class="col-md-1" ng-hide="true">
-						pic
-					</th>
-					<th ng-hide="true">
-						name
-					</th>
-				</tr>
-				</thead>
+			<table class="table"> 
 				<tr ng-repeat="candidato in candidatos | orderBy:'username'">
-					<td>
+					<td class="col-md-1">
 						<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
 					</td>
-					<td>
+					<td class="col-md-1">
 						<img ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28">
 					</td>
 					<td>
@@ -83,13 +69,13 @@
 							</td>
 							<td>
 								<!-- <span class="glyphicon glyphicon-search"></span>-->
-								<input type="search" ng-model="query"></input>
+								<input type="search" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"></input>
 								<table class="table">
-									<tr ng-repeat="student in students | filter:searchFilter | orderBy:'username'"  ng-hide="query==null || query==''">
-										<td>
+									<tr ng-repeat="student in students | orderBy:'username'"  ng-hide="query==null || query==''">
+										<td class="col-md-1">
 											<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
 										</td>
-										<td>
+										<td class="col-md-1">
 											<img ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}" height="28" width="28">
 										</td>	
 										<td>	
@@ -105,17 +91,36 @@
 			</table>
 		</div>
 	</div>
-	<button class="btn btn-primary" data-toggle="modal" data-target="#voteModal" ng-hide="voted">Votar</button>
+	<button class="btn btn-primary" data-toggle="modal" data-target="#voteModal" ng-hide="voted" ng-click="selection()"
+		ng-disabled="selected == '' || (selected == 'other' && (otherSelected == '' || otherSelected == null)) || selected == null">Votar</button>
 
+	<div class="container" ng-show="voted">
+		<div class="alert alert-info alert-dismissible alert-floating" role="alert">
+			<button type="button" class="close" data-dismiss="alert"><span class="sr-only">Close</span></button>
+			<i class="icon icon-info"></i><strong>???</strong> O teu voto já foi submetido.
+		</div>
+		<div class="panel panel-default" >
+			<div class="panel-heading">Name</div>
+			<div class="table-responsive">
+				<table class="table">
+					<td class="col-md-1">
+						<img ng-src="data:{{voto.photo.type}};base64,{{voto.photo.data}}" height="28" width="28">
+					</td>
+					<td>
+						<strong>{{voto.name}}</strong>
+						<small>{{voto.username}}</small>
+					</td>
+				</table>
+			</div>
+		</div>
+	</div>
+	
 	<div id="voteModal" class="modal fade" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h3>
 						<strong>Confirmação de Voto</strong>
-						<p>
-							<small>This is a short helper text to undestand what they're doing</small>
-						</p>
 					</h3>
 				    <button type="button" class="close" data-dismiss="modal"></button>
 				</div>
@@ -123,7 +128,7 @@
 	        		<table class="table">
 						<tr>
 							<th class="col-md-6">Curso</th>
-							<td class="col-md-12 col-md-12-offset-4">{{degree.registrations[0].name}}</td>
+							<td class="col-md-12 col-md-12-offset-4">{{degree.name}}</td>
 						</tr>
 						<tr>
 							<th>Ano Lectivo</th>
@@ -135,11 +140,11 @@
 						</tr>
 						<tr>
 							<th>Período de votação</th>
-							<td>23/04/2015 - 25/04/2015</td>
+							<td>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</td>
 						</tr>
 					</table>
 					<p>
-						Confirmar o seu voto em {{selected}}({{selected}})?
+						Confirmar o seu voto em {{selectionResult}}?
 					</p>
 	      		</div>
 	      		<div class="modal-footer">
@@ -148,6 +153,11 @@
 	      		</div>
 			</div>
 		</div>
+	</div>
+	
+	<div class="alert alert-success alert-dismissible alert-floating" style="position:absolute; top:60px; right:30px" role="alert" ng-show="feedback">
+		<button type="button" class="close" data-dismiss="alert"><span class="sr-only">Close</span></button>
+		<i class="icon icon-check"></i><strong>Submetido!</strong> O teu voto foi submetido com sucesso.
 	</div>
 </div>
 

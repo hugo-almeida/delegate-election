@@ -1,6 +1,7 @@
 package core;
 
 import java.lang.reflect.Type;
+import java.time.format.DateTimeFormatter;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -11,6 +12,7 @@ public class DegreeAdapter implements JsonSerializer<DegreeYear> {
 
     @Override
     public JsonElement serialize(DegreeYear degree, Type arg1, JsonSerializationContext arg2) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         JsonObject degreeJson = new JsonObject();
         JsonObject periodJson = new JsonObject();
 
@@ -21,8 +23,8 @@ public class DegreeAdapter implements JsonSerializer<DegreeYear> {
 
         if (degree.getActivePeriod() != null) {
             periodJson.addProperty("type", degree.getActivePeriod().getType().toString());
-            periodJson.addProperty("start", degree.getActivePeriod().getStart().toString());
-            periodJson.addProperty("end", degree.getActivePeriod().getEnd().toString());
+            periodJson.addProperty("start", degree.getActivePeriod().getStart().format(dtf));
+            periodJson.addProperty("end", degree.getActivePeriod().getEnd().format(dtf));
         }
         degreeJson.add("currentPeriod", periodJson);
 
