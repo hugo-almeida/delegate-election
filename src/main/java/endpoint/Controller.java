@@ -55,13 +55,18 @@ import core.CalendarDAO;
 import core.Degree;
 import core.DegreeAdapter;
 import core.DegreeDAO;
+import core.DegreePeriodAdapter;
 import core.DegreeYear;
+import core.DegreeYearAdapter;
 import core.ElectionPeriod;
+import core.ElectionPeriodAdapter;
 import core.HibernateProxyTypeAdapter;
 import core.Period;
+import core.PeriodDAO;
 import core.Student;
 import core.StudentAdapter;
 import core.StudentDAO;
+import core.exception.InvalidPeriodException;
 import endpoint.exception.UnauthorizedException;
 
 @EnableOAuth2Sso
@@ -78,6 +83,9 @@ public class Controller {
 
     @Autowired
     CalendarDAO calendarDAO;
+
+    @Autowired
+    PeriodDAO periodDAO;
 
     @RequestMapping(value = "/students/{istId}", method = RequestMethod.GET)
     public @ResponseBody String getStudent(@PathVariable String istId) {
@@ -232,15 +240,16 @@ public class Controller {
 
     /***************************** Manager API *****************************/
     // This is for the manager interface
-//    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/votes", method = RequestMethod.GET)
-//    public @ResponseBody String getVotes(@PathVariable String degreeId, @PathVariable int year) {
-//        //TODO Obtem todos os votos (aluno -> numero de votos)
-//        final Set<VoteHolder> votes =
-//                ((ElectionPeriod) degreeDAO.findById(degreeId).getDegreeYear(year).getActivePeriod()).getVotes();
-//        final GsonBuilder gsonBuilder = new GsonBuilder();
-//        final Gson gson = gsonBuilder.registerTypeAdapter(VoteHolder.class, new VoteHolderAdapter()).create();
-//        return gson.toJson(votes);
-//    }
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/votes", method = RequestMethod.GET)
+    public @ResponseBody String getVotes(@PathVariable String degreeId, @PathVariable int year) {
+        //Obtem todos os votos (aluno -> numero de votos)
+        Map<String, Long> voteCount =
+                degreeDAO.findById(degreeId).getDegreeYear(year).getCurrentElectionPeriod().getVotes().stream()
+                        .collect(Collectors.groupingBy(v -> v.getVoted(), Collectors.counting()));
+
+        Gson gson = new Gson();
+        return gson.toJson(voteCount);
+    }
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/history", method = RequestMethod.GET)
     public @ResponseBody String getHistoy(@PathVariable String degreeId, @PathVariable int year) {
@@ -251,73 +260,144 @@ public class Controller {
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/periods", method = RequestMethod.GET)
     public @ResponseBody String getPeriods(@PathVariable String degreeId, @PathVariable int year) {
         //TODO Obtem info dos periodos do ano actuais. Incluindo info dos candidatos e alunos com votos
-        return null;
+        DegreeYear degreeYear = degreeDAO.findById(degreeId).getDegreeYear(year);
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreePeriodAdapter()).create();
+        return gson.toJson(degreeYear);
     }
 
-    @RequestMapping(value = "/application-periods", method = RequestMethod.GET)
-    public @ResponseBody String getApplicationPeriods() {
-        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
-
-//        degreeDAO.findAll().forEach(s -> if (s.getType().equals(PeriodType.Application)) periods.add((Appl)s));
-//        Set<ApplicationPeriod> periods =
-//                StreamSupport.stream(degreeDAO.findAll().spliterator(), false).map(Degree::getYears).stream()
-//                        .map(DegreeYear::getCurrentApplicationPeriod).filter(s -> s.getType().equals(PeriodType.Application))
-//                        .collect(Collectors.toSet());
-
-        final Set<ApplicationPeriod> periods = new HashSet<ApplicationPeriod>();
-
-        final Iterable<Degree> degrees = degreeDAO.findAll();
-        for (final Degree d : degrees) {
-            for (final DegreeYear dy : d.getYears()) {
-                periods.add(dy.getCurrentApplicationPeriod());
-            }
-        }
+    @RequestMapping(value = "/periods", method = RequestMethod.GET)
+    public @ResponseBody String getPeriods() {
+        //Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        final Set<Degree> degrees = StreamSupport.stream(degreeDAO.findAll().spliterator(), false).collect(Collectors.toSet());
 
         final GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Degree.class, new DegreeYearAdapter()).create();
+        Gson gson = gsonBuilder.create();
+        return gson.toJson(degrees);
+    }
+
+    @RequestMapping(value = "/periods", method = RequestMethod.POST)
+    public @ResponseBody String addPeriods(@RequestBody String periodsJson) throws InvalidPeriodException {
+        //Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(ApplicationPeriod.class, new ApplicationPeriodAdapter()).create();
-        return gson.toJson(periods);
+        ApplicationPeriod[] periods = gson.fromJson(periodsJson, ApplicationPeriod[].class);
+        for (ApplicationPeriod p : periods) {
+            DegreeYear degreeYear =
+                    degreeDAO.findById(p.getDegreeYear().getDegree().getId()).getDegreeYear(p.getDegreeYear().getDegreeYear());
+            Period period = new ApplicationPeriod(p.getStart(), p.getEnd(), degreeYear);
+            degreeYear.addPeriod(period);
+        }
+        return new Gson().toJson("ok");
+    }
+
+    @RequestMapping(value = "/periods", method = RequestMethod.PUT)
+    public @ResponseBody String updatePeriods(@RequestBody String periodsJson) {
+        //Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(ApplicationPeriod.class, new ApplicationPeriodAdapter()).create();
+        ApplicationPeriod[] periods = gson.fromJson(periodsJson, ApplicationPeriod[].class);
+        for (ApplicationPeriod p : periods) {
+            Period period = periodDAO.findById(p.getId());
+            period.setStart(p.getStart());
+            period.setEnd(p.getEnd());
+        }
+        return new Gson().toJson("ok");
+    }
+
+    @RequestMapping(value = "/periods", method = RequestMethod.DELETE)
+    public @ResponseBody String removePeriods(@RequestBody String periodsJson) {
+        //Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(ApplicationPeriod.class, new ApplicationPeriodAdapter()).create();
+        ApplicationPeriod[] periods = gson.fromJson(periodsJson, ApplicationPeriod[].class);
+        for (ApplicationPeriod p : periods) {
+            periodDAO.delete(periodDAO.findById(p.getId()));
+        }
+        return new Gson().toJson("ok");
     }
 
     @RequestMapping(value = "/application-periods", method = RequestMethod.POST)
-    public @ResponseBody String addApplicationPeriods(@RequestBody String periods) {
-        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
-        return null;
+    public @ResponseBody String addApplicationPeriods(@RequestBody String periodsJson) throws InvalidPeriodException {
+        //Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(ApplicationPeriod.class, new ApplicationPeriodAdapter()).create();
+        ApplicationPeriod[] periods = gson.fromJson(periodsJson, ApplicationPeriod[].class);
+        for (ApplicationPeriod p : periods) {
+            DegreeYear degreeYear =
+                    degreeDAO.findById(p.getDegreeYear().getDegree().getId()).getDegreeYear(p.getDegreeYear().getDegreeYear());
+            Period period = new ApplicationPeriod(p.getStart(), p.getEnd(), degreeYear);
+            degreeYear.addPeriod(period);
+        }
+        return new Gson().toJson("ok");
     }
 
     @RequestMapping(value = "/application-periods", method = RequestMethod.PUT)
-    public @ResponseBody String updateApplicationPeriods(@RequestBody String periods) {
-        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
-        return null;
+    public @ResponseBody String updateApplicationPeriods(@RequestBody String periodsJson) {
+        //Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(ApplicationPeriod.class, new ApplicationPeriodAdapter()).create();
+        ApplicationPeriod[] periods = gson.fromJson(periodsJson, ApplicationPeriod[].class);
+        for (ApplicationPeriod p : periods) {
+            Period period = periodDAO.findById(p.getId());
+            period.setStart(p.getStart());
+            period.setEnd(p.getEnd());
+        }
+        return new Gson().toJson("ok");
     }
 
     @RequestMapping(value = "/application-periods", method = RequestMethod.DELETE)
-    public @ResponseBody String removeApplicationPeriods(@RequestBody String periods) {
-        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
-        return null;
-    }
-
-    @RequestMapping(value = "/election-periods", method = RequestMethod.GET)
-    public @ResponseBody String getElectionPeriods() {
-        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de votos e info do mais votado, incluindo foto
-        return null;
+    public @ResponseBody String removeApplicationPeriods(@RequestBody String periodsJson) {
+        //Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(ApplicationPeriod.class, new ApplicationPeriodAdapter()).create();
+        ApplicationPeriod[] periods = gson.fromJson(periodsJson, ApplicationPeriod[].class);
+        for (ApplicationPeriod p : periods) {
+            periodDAO.delete(periodDAO.findById(p.getId()));
+        }
+        return new Gson().toJson("ok");
     }
 
     @RequestMapping(value = "/election-periods", method = RequestMethod.POST)
-    public @ResponseBody String addElectionPeriods(@RequestBody String periods) {
-        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
-        return null;
+    public @ResponseBody String addElectionPeriods(@RequestBody String periodsJson) throws InvalidPeriodException {
+        //Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(ElectionPeriod.class, new ElectionPeriodAdapter()).create();
+        ElectionPeriod[] periods = gson.fromJson(periodsJson, ElectionPeriod[].class);
+        for (ElectionPeriod p : periods) {
+            DegreeYear degreeYear =
+                    degreeDAO.findById(p.getDegreeYear().getDegree().getId()).getDegreeYear(p.getDegreeYear().getDegreeYear());
+            Period period = new ApplicationPeriod(p.getStart(), p.getEnd(), degreeYear);
+            degreeYear.addPeriod(period);
+        }
+        return new Gson().toJson("ok");
     }
 
     @RequestMapping(value = "/election-periods", method = RequestMethod.PUT)
-    public @ResponseBody String updateElectionPeriods(@RequestBody String periods) {
-        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
-        return null;
+    public @ResponseBody String updateElectionPeriods(@RequestBody String periodsJson) {
+        //Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(ElectionPeriod.class, new ElectionPeriodAdapter()).create();
+        ElectionPeriod[] periods = gson.fromJson(periodsJson, ElectionPeriod[].class);
+        for (ElectionPeriod p : periods) {
+            Period period = periodDAO.findById(p.getId());
+            period.setStart(p.getStart());
+            period.setEnd(p.getEnd());
+        }
+        return new Gson().toJson("ok");
     }
 
     @RequestMapping(value = "/election-periods", method = RequestMethod.DELETE)
-    public @ResponseBody String removeElectionPeriods(@RequestBody String periods) {
-        //TODO Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
-        return null;
+    public @ResponseBody String removeElectionPeriods(@RequestBody String periodsJson) {
+        //Obtem os periodos de candidatura actuais para cada ano/curso, incluindo numero de candidatos
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(ElectionPeriod.class, new ElectionPeriodAdapter()).create();
+        ElectionPeriod[] periods = gson.fromJson(periodsJson, ElectionPeriod[].class);
+        for (ElectionPeriod p : periods) {
+            periodDAO.delete(periodDAO.findById(p.getId()));
+        }
+        return new Gson().toJson("ok");
     }
 
     /***************************** OLD API *****************************/
@@ -354,15 +434,15 @@ public class Controller {
     }
 
     //TODO
-    @RequestMapping("/period")
-    public @ResponseBody String currentPeriod(String istid) {
-        System.out.println(istid);
-        final Student student = studentDAO.findByUsername(istid);
-        final Period period = student.getDegreeYear().getActivePeriod();
-        System.out.println(period);
-        final Gson gson = new Gson();
-        return gson.toJson(period);
-    }
+//    @RequestMapping("/period")
+//    public @ResponseBody String currentPeriod(String istid) {
+//        System.out.println(istid);
+//        final Student student = studentDAO.findByUsername(istid);
+//        final Period period = student.getDegreeYear().getActivePeriod();
+//        System.out.println(period);
+//        final Gson gson = new Gson();
+//        return gson.toJson(period);
+//    }
 
     //TODO
     @RequestMapping("/vote")
