@@ -19,8 +19,6 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 			
 			$rootScope.reloadDegrees();
 			
-			$rootScope.votePeriod = false; //debug
-		
 		} else {
 			$rootScope.authenticated = false;
 		}
@@ -35,6 +33,8 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	$rootScope.voted = false;
 	
 	$rootScope.applied = false;
+	
+	$rootScope.loaded = false;
 	
 	/***
 	 * LOGOUT
@@ -68,27 +68,26 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		$http.get('degrees/'+$rootScope.degree.id+'/years/'+$rootScope.degree.curricularYear+'/candidates')
 		.success(function(data) { 
 			$rootScope.candidatos = data;
-			/*for(var i = 0; i < $rootScope.candidatos.length; i++) {
-			    if ($rootScope.candidatos[i].username == $rootScope.credentials.username) {
-			        break;
-			    }
-			}*/
 		});
-		
+		$log.log('got candidates');
 		$http.get('degrees/'+$rootScope.degree.id+'/years/'+$rootScope.degree.curricularYear+'/candidates/'+$rootScope.credentials.username)
 		.success(function(data) { 
 			if(data != '') {
 				$rootScope.applied = true;
 			}
 		});
-		
+		$log.log('checked application');
 		$http.get('students/'+$rootScope.credentials.username+'/degrees/'+$rootScope.degree.id+'/votes')
 		.success(function(data) { 
 			if(data != '') {
 				$rootScope.voted = true;
 				$rootScope.voto = data;
 			}
-		});
+			$rootScope.loaded = true;	//
+		}).error(function(data) {		//	Dirty hack, should probably be done with angularjs promises instead
+			$rootScope.loaded = true;	//
+		});						
+		$log.log('checked voted');
 	}
 	
 	$scope.setDegree = function() {
@@ -119,7 +118,7 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	
 	
 	$scope.specialLogin = function(){		//debug
-
+		$rootScope.loaded = false;
 		$http.post('get-user', $scope.special_username)
 			.success(function(data) {
 				$rootScope.credentials = data;
