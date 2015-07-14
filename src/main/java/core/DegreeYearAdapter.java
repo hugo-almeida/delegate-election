@@ -13,6 +13,9 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import core.Period.PeriodType;
+import core.exception.InvalidPeriodException;
+
 public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializer<Degree> {
 
     @Override
@@ -60,13 +63,87 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
     public Degree deserialize(JsonElement periodElement, Type arg1, JsonDeserializationContext arg2) throws JsonParseException {
         JsonObject periodObject = periodElement.getAsJsonObject();
 
-        String id = periodObject.get("id").getAsString();
-        LocalDate start = LocalDate.parse(periodObject.get("start").getAsString());
-        LocalDate end = LocalDate.parse(periodObject.get("end").getAsString());
-        int year = periodObject.get("degreeYear").getAsInt();
         String degreeId = periodObject.get("degreeId").getAsString();
+        Degree degree = new Degree(null, null, degreeId, null, null);
 
-//        return new ElectionPeriod(start, end, new DegreeYear(year, new Degree(null, null, degreeId, null, null)));
-        return null;
+        JsonArray years = periodObject.get("years").getAsJsonArray();
+
+        for (JsonElement yearElement : years) {
+            JsonObject yearObject = yearElement.getAsJsonObject();
+
+            int year = yearObject.get("degreeYear").getAsInt();
+
+            degree.addYear(year);
+
+            if (yearObject.has("applicationPeriodStart") && yearObject.has("applicationPeriodEnd")) {
+                int id = Integer.MIN_VALUE;
+                if (yearObject.has("applicationPeriodId")) {
+                    id = yearObject.get("applicationPeriodId").getAsInt();
+                }
+                LocalDate start = LocalDate.parse(yearObject.get("applicationPeriodStart").getAsString());
+                LocalDate end = LocalDate.parse(yearObject.get("applicationPeriodEnd").getAsString());
+                PeriodChange applicationPeriod = new PeriodChange(PeriodType.Application, id, start, end);
+                try {
+                    degree.getDegreeYear(year).addPeriod(applicationPeriod);
+                } catch (InvalidPeriodException e) {
+                    // Wut r u doing!??!
+                }
+            }
+
+            if (yearObject.has("electionPeriodStart") && yearObject.has("electionPeriodEnd")) {
+                int id = Integer.MIN_VALUE;
+                if (yearObject.has("electionPeriodId")) {
+                    id = yearObject.get("electionPeriodId").getAsInt();
+                }
+                LocalDate start = LocalDate.parse(yearObject.get("electionPeriodStart").getAsString());
+                LocalDate end = LocalDate.parse(yearObject.get("electionPeriodEnd").getAsString());
+                PeriodChange electionPeriod = new PeriodChange(PeriodType.Election, id, start, end);
+                try {
+                    degree.getDegreeYear(year).addPeriod(electionPeriod);
+                } catch (InvalidPeriodException e) {
+                    // Wut r u doing!??!
+                }
+            }
+
+        }
+
+        return degree;
+
+    }
+
+    public class PeriodChange extends Period {
+
+        PeriodType periodType;
+
+        int periodId;
+
+        public PeriodChange(PeriodType periodType, int periodId, LocalDate start, LocalDate end) {
+            super(start, end);
+
+            this.periodType = periodType;
+            this.periodId = periodId;
+        }
+
+        @Override
+        public PeriodType getType() {
+            return periodType;
+        }
+
+        public PeriodType getPeriodType() {
+            return periodType;
+        }
+
+        public void setPeriodType(PeriodType periodType) {
+            this.periodType = periodType;
+        }
+
+        public int getPeriodId() {
+            return periodId;
+        }
+
+        public void setPeriodId(int periodId) {
+            this.periodId = periodId;
+        }
+
     }
 }
