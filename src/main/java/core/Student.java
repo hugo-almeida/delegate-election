@@ -4,37 +4,42 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "student")
 public class Student {
 
-    @Id
+    @Transient
     private String username;
 
+    @EmbeddedId
+    private StudentPK studentpk = null;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "student_period", joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username") },
-            inverseJoinColumns = { @JoinColumn(name = "period_id", referencedColumnName = "period_id") })
+    @JoinTable(name = "student_period", joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username"),
+            @JoinColumn(name = "degree_name", referencedColumnName = "degree_name"),
+            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year"),
+            @JoinColumn(name = "calendar_year", referencedColumnName = "calendar_year") }, inverseJoinColumns = { @JoinColumn(
+            name = "period_id", referencedColumnName = "period_id") })
     private Set<Period> applicationPeriod;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-            @JoinColumn(name = "degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = true,
-                    updatable = false),
-            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year_pk_degree_year", insertable = true,
-                    updatable = false),
-            @JoinColumn(name = "calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = true,
-                    updatable = false) })
-    private DegreeYear degreeYear;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumns({
+//            @JoinColumn(name = "degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = true,
+//                    updatable = false),
+//            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year_pk_degree_year", insertable = true,
+//                    updatable = false),
+//            @JoinColumn(name = "calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = true,
+//                    updatable = false) })
+//    private DegreeYear degreeYear;
 
     private String name;
     private String email;
@@ -50,6 +55,7 @@ public class Student {
     public Student(String name, String username, String email, String photoType, String photoBytes) {
         this.name = name;
         this.username = username;
+        this.studentpk = new StudentPK(username);
         this.email = email;
         this.photoType = photoType;
         this.photoBytes = photoBytes;
@@ -60,7 +66,7 @@ public class Student {
     }
 
     public String getUsername() {
-        return username;
+        return studentpk.getUsername();
     }
 
     public String getEmail() {
@@ -76,11 +82,14 @@ public class Student {
     }
 
     public DegreeYear getDegreeYear() {
-        return degreeYear;
+        return studentpk.getDegreeYear();
     }
 
     public void setDegreeYear(DegreeYear degreeYear) {
-        this.degreeYear = degreeYear;
+        if (studentpk == null) {
+            this.studentpk = new StudentPK(username);
+        }
+        studentpk.setDegreeYear(degreeYear);
     }
 
     public void addPeriod(Period p) {

@@ -45,7 +45,12 @@ public class ElectionPeriod extends Period {
     }
 
     public void vote(Student voter, Student voted) {
-        Vote v = new Vote(voter.getUsername(), voted.getUsername(), this);
+        Vote v;
+        if (voted == null) {
+            v = new Vote(voter.getUsername(), "", this);
+        } else {
+            v = new Vote(voter.getUsername(), voted.getUsername(), this);
+        }
         votes.add(v);
         v.setPeriod(this);
     }
