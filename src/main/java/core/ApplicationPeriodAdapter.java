@@ -39,7 +39,9 @@ public class ApplicationPeriodAdapter implements JsonSerializer<ApplicationPerio
 //      String id = periodObject.get("id");
         LocalDate start = LocalDate.parse(periodObject.get("start").getAsString());
         LocalDate end = LocalDate.parse(periodObject.get("end").getAsString());
+        int year = periodObject.get("degreeYear").getAsInt();
+        String degreeId = periodObject.get("degreeId").getAsString();
 
-        return new ApplicationPeriod(start, end, null);
+        return new ApplicationPeriod(start, end, new DegreeYear(year, new Degree(null, null, degreeId, null, null)));
     }
 }

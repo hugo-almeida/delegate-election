@@ -38,7 +38,7 @@ public class TestController {
 
     @RequestMapping("/test-calendar")
     public String testCalendar() {
-        final Calendar c = new Calendar(2015);
+        final Calendar c = new Calendar(2014);
         c.init();
 //        Calendar c2 = new Calendar(2015);
 //        c2.init();
@@ -199,8 +199,7 @@ public class TestController {
 
     @RequestMapping("/test-calendar2")
     public int testCalendar2() {
-        final Calendar c = cd.findByYear(2014);
-        return c.getDegrees().size();
+        return cd.findFirstByOrderByYearDesc().getYear();
     }
 
     @RequestMapping("/add-years")

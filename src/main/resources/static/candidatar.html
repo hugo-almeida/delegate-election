@@ -26,76 +26,75 @@
 	</div>
 	
 	<h3>Candidatos</h3>
-	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#applyModal" ng-show="!applied">
-		<i class="glyphicon glyphicon-plus"></i>
-		Candidata-te
-	</button>
-	<button class="btn btn-primary" ng-click="reloadCandidates()" ng-show="debug">Reload Candidates</button>
-	<div class="panel panel-default">
-		<div class="panel-heading">Name</div>
-		<table class="table">
-			<tr ng-repeat="candidato in candidatos | orderBy:'name'">
-				<td class="col-md-1">
-					<img class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28"></img>
-				</td>
-				<td>
-					<strong>{{candidato.name}}</strong>
-					<small>{{candidato.username}}</small>
-					<button type="button" class="pull-right close" ng-show="candidato.username == credentials.username" ng-click="unapply()"></button>
-				</td>
-			</tr>
-		</table>
-	</div>
-
-	<div id="applyModal" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h3>
-						<strong>Confirmação de Candidatura</strong>
-					</h3>
-				    <button type="button" class="close" data-dismiss="modal"></button>
+	<div ng-show="loaded==true">
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#applyModal" ng-show="!applied">
+			<i class="glyphicon glyphicon-plus"></i>
+			Candidata-te
+		</button>
+		<div class="panel panel-default">
+			<div class="panel-heading">Nome</div>
+			<table class="table">
+				<tr ng-repeat="candidato in candidatos | orderBy:'name'">
+					<td class="col-md-1">
+						<img class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28"></img>
+					</td>
+					<td>
+						<strong>{{candidato.name}}</strong>
+						<small>{{candidato.username}}</small>
+						<button type="button" class="pull-right close" ng-show="candidato.username == credentials.username" ng-click="unapply()"></button>
+					</td>
+				</tr>
+			</table>
+		</div>
+	
+		<div id="applyModal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3>
+							<strong>Confirmação de Candidatura</strong>
+						</h3>
+					    <button type="button" class="close" data-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+		        		<table class="table">
+		        			<tr>
+								<th class="col-md-6">Candidato</th>
+								<td class="col-md-12 col-md-12-offset-4">{{credentials.name}}</td>
+							</tr>
+							<tr>
+								<th>Curso</th>
+								<td>{{degree.name}}</td>
+							</tr>
+							<tr>
+								<th>Ano Lectivo</th>
+								<td>{{degree.academicYear}}</td>
+							</tr>
+							<tr>
+								<th>Ano Curricular</th>
+								<td>{{degree.curricularYear}}</td>
+							</tr>
+							<tr>
+								<th>Candidaturas</th>
+								<td>{{candidatos.length}}</td>
+							</tr>
+							<tr>
+								<th>Período de votação</th>
+								<td>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</td><!-- need election period date -->
+							</tr>
+						</table>
+		      		</div>
+		      		<div class="modal-footer">
+		        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+		        			<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="apply()">Confirmar</button>
+		      		</div>
 				</div>
-				<div class="modal-body">
-	        		<table class="table">
-	        			<tr>
-							<th class="col-md-6">Candidato</th>
-							<td class="col-md-12 col-md-12-offset-4">{{credentials.name}}</td>
-						</tr>
-						<tr>
-							<th>Curso</th>
-							<td>{{degree.name}}</td>
-						</tr>
-						<tr>
-							<th>Ano Lectivo</th>
-							<td>{{degree.academicYear}}</td>
-						</tr>
-						<tr>
-							<th>Ano Curricular</th>
-							<td>{{degree.curricularYear}}</td>
-						</tr>
-						<tr>
-							<th>Candidaturas</th>
-							<td>{{candidatos.length}}</td>
-						</tr>
-						<tr>
-							<th>Período de votação</th>
-							<td>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</td><!-- need election period date -->
-						</tr>
-					</table>
-	      		</div>
-	      		<div class="modal-footer">
-	        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-	        			<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="apply()">Confirmar</button>
-	      		</div>
 			</div>
 		</div>
+		
+		<div class="alert alert-success alert-dismissible alert-floating" style="position:absolute; top:60px; right:30px" role="alert" ng-show="feedback">
+			<button type="button" class="close" ng-click="feedback = false;"><span class="sr-only">Close</span></button>
+			<i class="icon icon-check"></i><strong>Submetido!</strong> A tua candidatura foi submetida com sucesso.
+		</div>
 	</div>
-	
-	<div class="alert alert-success alert-dismissible alert-floating" style="position:absolute; top:60px; right:30px" role="alert" ng-show="feedback">
-		<button type="button" class="close" ng-click="feedback = false;"><span class="sr-only">Close</span></button>
-		<i class="icon icon-check"></i><strong>Submetido!</strong> A tua candidatura foi submetida com sucesso.
-	</div>
-	
-	
 </div>

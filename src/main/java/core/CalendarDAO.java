@@ -11,4 +11,6 @@ public interface CalendarDAO extends CrudRepository<Calendar, Integer> {
     @Override
     public Iterable<Calendar> findAll();
 
+    public Calendar findFirstByOrderByYearDesc();
+
 }

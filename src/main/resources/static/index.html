@@ -18,13 +18,16 @@
 
 <body ng-app="delegados" ng-cloak> <!-- cloak b0rken -->
 	<div ng-controller="navigationCtrl" class="container">
+	
 		<ul class="nav nav-tabs pull-right" role="tablist">
 			<li ng-hide="authenticated"><a href="login">login</a></li>
 			<li ng-show="authenticated && debug"><a href="" ng-click="specialLogin()">Change Info</a></li><!-- debug -->
 			<li ng-show="authenticated"><a href="" ng-click="logout()">logout</a></li>
 			<input ng-show="authenticated && debug" ng-model="special_username" type="text" value=""><!-- debug -->
 		</ul>
+		
 		<button class="btn btn-default" ng-click="toggleDebug()">Toggle Debug</button><!-- debug -->
+		
 		<div class="container">	
 			<div class="page-header">
 				<h1>Eleição de Delegado de Ano</h1>
@@ -38,19 +41,12 @@
 			<!-- This needs changing to accomodate students with multiple degrees-->
 			
 			<div ng-show="authenticated"> <!-- missing student check -->
-				<!-- <p ng-show="debug">{{credentials}}</p><!-- debug 
-				<p ng-show="debug">{{degrees}}</p><!-- debug 
-				<img ng-show="debug" ng-src="data:{{credentials.photo.type}};base64,{{credentials.photo.data}}"><!-- debug 
-					<p ng-show="debug">{{credentials.username}} {{credentials.name}}</p><!-- debug 
-				</img> <!-- debug 
-				-->
 				
-				<button type="btn btn-primary" ng-click="debugVotePeriod()" ng-show="debug">Debug vote period</button><!-- debug -->
 				<button type="btn btn-primary" ng-click="reloadDegrees()" ng-show="debug">Debug reload degrees</button><!-- debug -->
 
 				<div ng-show="degress.length > 1">
 					<div class="panel panel-default">
-						<div class="panel-heading">Name</div>
+						<div class="panel-heading">Nome</div>
 						<div class="table-responsive">
 							<table class="table">
 								<tr ng-repeat="deg in degrees">
@@ -66,12 +62,22 @@
 					</div>
 					<button class="btn btn-primary" ng-click="setDegree()">Seleccionar</button> 
 				</div>
-	
+
 				<div ng-include="'candidatar.html'" ng-show="degree != null && degree.currentPeriod.type=='APPLICATION'">
 				</div>
-				<div ng-include="'votar.html'" ng-show="votePeriod || (degree != null && degree.currentPeriod.type=='ELECTION')">
+
+				<div ng-include="'votar.html'" ng-show="degree != null && degree.currentPeriod.type=='ELECTION'">
 				</div>
 
+				<div class="empty" ng-show="degree.currentPeriod.type!='APPLICATION' && degree.currentPeriod.type!='ELECTION'">
+					<p>
+						<span>
+							<i class="glyphicon glyphicon-calendar"></i>
+							Não está a decorrer nenhuma eleição.
+						</span>
+						O próximo período de candidatura ocorre de {{}} a {{}}
+					</p>
+				</div>
 			</div>
 		</div>
 	</div>
