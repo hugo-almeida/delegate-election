@@ -13,6 +13,7 @@ import core.ApplicationPeriod;
 import core.Calendar;
 import core.CalendarDAO;
 import core.Degree;
+import core.DegreeDAO;
 import core.DegreeYear;
 import core.ElectionPeriod;
 import core.Student;
@@ -23,8 +24,12 @@ import core.exception.InvalidPeriodException;
 public class TestController {
     @Autowired
     CalendarDAO cd;
+
     @Autowired
     StudentDAO st;
+
+    @Autowired
+    DegreeDAO dd;
 
     @RequestMapping("/sanity")
     public String test() {
@@ -33,7 +38,7 @@ public class TestController {
 
     @RequestMapping("/test-calendar")
     public String testCalendar() {
-        final Calendar c = new Calendar(2014);
+        final Calendar c = new Calendar(2015);
         c.init();
 //        Calendar c2 = new Calendar(2015);
 //        c2.init();
@@ -174,7 +179,21 @@ public class TestController {
 
     @RequestMapping("/find-student")
     public String findStudent(@RequestParam(value = "username", required = true) String username) {
-        final Student s = st.findByUsername(username);
+//        Degree d = dd.findById("2761663971606");
+//        DegreeYear degreeYear = null;
+//        for (DegreeYear dy : d.getYears()) {
+//            for (Student s : dy.getStudents()) {
+//                if (s.getUsername().equals(username)) {
+//                    degreeYear = dy;
+//                    break;
+//                }
+//
+//            }
+//            if (degreeYear != null) {
+//                break;
+//            }
+//        }
+        final Student s = st.findByUsernameAndDegreeAndCalendarYear(username, "2761663971606", 2014);
         return s.getName();
     }
 
