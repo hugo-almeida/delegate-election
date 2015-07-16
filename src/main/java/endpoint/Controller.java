@@ -53,6 +53,7 @@ import core.ApplicationPeriod;
 import core.CalendarDAO;
 import core.Degree;
 import core.DegreeAdapter;
+import core.DegreeChange;
 import core.DegreeDAO;
 import core.DegreePeriodAdapter;
 import core.DegreeYear;
@@ -60,6 +61,8 @@ import core.DegreeYearAdapter;
 import core.ElectionPeriod;
 import core.HibernateProxyTypeAdapter;
 import core.Period;
+import core.Period.PeriodType;
+import core.PeriodChange;
 import core.PeriodDAO;
 import core.Student;
 import core.StudentAdapter;
@@ -112,6 +115,7 @@ public class Controller {
                                 && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
                         .collect(Collectors.toList()).get(0);
 
+        // Desta forma é possível obter o voto do último periodo também.
         final String voted = student.getDegreeYear().getCurrentElectionPeriod().getVote(istId);
         if (voted == null) {
             return new Gson().toJson("");
@@ -266,8 +270,14 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/history", method = RequestMethod.GET)
     public @ResponseBody String getHistoy(@PathVariable String degreeId, @PathVariable int year) {
+        Set<DegreeYear> degreeYears =
+                StreamSupport.stream(calendarDAO.findAll().spliterator(), false)
+                        .map(c -> degreeDAO.findByIdAndYear(degreeId, c.getYear()).getDegreeYear(year))
+                        .collect(Collectors.toSet());
         //TODO Obtem historico do curso/ano
-        return null;
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreePeriodAdapter()).create();
+        return gson.toJson(degreeYears);
     }
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/periods", method = RequestMethod.GET)
@@ -291,80 +301,64 @@ public class Controller {
         return gson.toJson(degrees);
     }
 
-    //TODO
     @RequestMapping(value = "/periods", method = RequestMethod.POST)
     public @ResponseBody String addPeriods(@RequestBody String periodsJson) throws InvalidPeriodException {
         final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.registerTypeAdapter(Degree.class, new DegreeYearAdapter()).create();
-        Degree[] degrees = gson.fromJson(periodsJson, Degree[].class);
-        for (Degree d : degrees) {
-            for (DegreeYear dy : d.getYears()) {
-                DegreeYear degreeYear = degreeDAO.findByIdAndYear(d.getId(), d.getYear()).getDegreeYear(dy.getDegreeYear());
-                Period applicationPeriod = dy.getCurrentApplicationPeriod();
-                if (applicationPeriod != null) {
-                    Period period = new ApplicationPeriod(applicationPeriod.getStart(), applicationPeriod.getEnd(), degreeYear);
-                    degreeYear.addPeriod(period);
-                }
-
-                Period electionPeriod = dy.getCurrentElectionPeriod();
-                if (electionPeriod != null) {
-                    Period period = new ElectionPeriod(electionPeriod.getStart(), electionPeriod.getEnd(), degreeYear);
-                    degreeYear.addPeriod(period);
+        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
+        DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
+        for (DegreeChange degreeChange : degrees) {
+            for (Integer year : degreeChange.getPeriods().keySet()) {
+                DegreeYear degreeYear =
+                        degreeDAO.findByIdAndYear(degreeChange.getDegreeId(), calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .getDegreeYear(year);
+                for (PeriodChange change : degreeChange.getPeriods().get(year)) {
+                    if (change.getPeriodType().equals(PeriodType.Application)) {
+                        Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
+                        degreeYear.addPeriod(period);
+                    } else if (change.getPeriodType().equals(PeriodType.Election)) {
+                        Period period = new ElectionPeriod(change.getStart(), change.getEnd(), degreeYear);
+                        degreeYear.addPeriod(period);
+                    }
                 }
             }
         }
+        calendarDAO.save(calendarDAO.findFirstByOrderByYearDesc());
         return new Gson().toJson("ok");
     }
 
-    //TODO
     @RequestMapping(value = "/periods", method = RequestMethod.PUT)
     public @ResponseBody String updatePeriods(@RequestBody String periodsJson) {
         final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.registerTypeAdapter(Degree.class, new DegreeYearAdapter()).create();
-        Degree[] degrees = gson.fromJson(periodsJson, Degree[].class);
-        for (Degree d : degrees) {
-            for (DegreeYear dy : d.getYears()) {
-
-                Period applicationPeriod = dy.getCurrentApplicationPeriod();
-                if (applicationPeriod != null) {
-                    Period period = periodDAO.findById(applicationPeriod.getId());
-                    period.setStart(applicationPeriod.getStart());
-                    period.setEnd(applicationPeriod.getEnd());
-                }
-
-                Period electionPeriod = dy.getCurrentElectionPeriod();
-                if (electionPeriod != null) {
-                    Period period = periodDAO.findById(electionPeriod.getId());
-                    period.setStart(electionPeriod.getStart());
-                    period.setEnd(electionPeriod.getEnd());
+        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
+        DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
+        for (DegreeChange degreeChange : degrees) {
+            for (Integer year : degreeChange.getPeriods().keySet()) {
+                for (PeriodChange change : degreeChange.getPeriods().get(year)) {
+                    Period period = periodDAO.findById(change.getPeriodId());
+                    period.setStart(change.getStart());
+                    period.setEnd(change.getEnd());
                 }
             }
         }
+        calendarDAO.save(calendarDAO.findFirstByOrderByYearDesc());
         return new Gson().toJson("ok");
     }
 
-    //TODO
-    @RequestMapping(value = "/periods", method = RequestMethod.DELETE)
-    public @ResponseBody String removePeriods(@RequestBody String periodsJson) {
-        final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.registerTypeAdapter(Degree.class, new DegreeYearAdapter()).create();
-        Degree[] degrees = gson.fromJson(periodsJson, Degree[].class);
-        for (Degree d : degrees) {
-            for (DegreeYear dy : d.getYears()) {
-
-                Period applicationPeriod = dy.getCurrentApplicationPeriod();
-                if (applicationPeriod != null) {
-                    periodDAO.delete(periodDAO.findById(applicationPeriod.getId()));
-                }
-
-                Period electionPeriod = dy.getCurrentElectionPeriod();
-                if (electionPeriod != null) {
-                    periodDAO.delete(periodDAO.findById(electionPeriod.getId()));
-                }
-            }
-        }
-        return new Gson().toJson("ok");
-    }
+    // Isto supostamente não é possivel fazer.
+//    @RequestMapping(value = "/periods", method = RequestMethod.DELETE)
+//    public @ResponseBody String removePeriods(@RequestBody String periodsJson) {
+//        final GsonBuilder gsonBuilder = new GsonBuilder();
+//        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
+//        DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
+//        for (DegreeChange degreeChange : degrees) {
+//            for (Integer year : degreeChange.getPeriods().keySet()) {
+//                for (PeriodChange change : degreeChange.getPeriods().get(year)) {
+//                    periodDAO.delete(change.getPeriodId());
+//                }
+//            }
+//        }
+//        return new Gson().toJson("ok");
+//    }
 
     /***************************** OLD API *****************************/
     @RequestMapping("/user")
