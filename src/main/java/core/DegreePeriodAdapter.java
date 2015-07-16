@@ -1,6 +1,7 @@
 package core;
 
 import java.lang.reflect.Type;
+import java.time.format.DateTimeFormatter;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -11,19 +12,22 @@ public class DegreePeriodAdapter implements JsonSerializer<DegreeYear> {
 
     @Override
     public JsonElement serialize(DegreeYear degree, Type arg1, JsonSerializationContext arg2) {
-        JsonObject degreeJson = new JsonObject();
-        ApplicationPeriod applicationPeriod = degree.getCurrentApplicationPeriod();
-        ElectionPeriod electionPeriod = degree.getCurrentElectionPeriod();
+        final JsonObject degreeJson = new JsonObject();
+
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        final ApplicationPeriod applicationPeriod = degree.getCurrentApplicationPeriod();
+        final ElectionPeriod electionPeriod = degree.getCurrentElectionPeriod();
         if (applicationPeriod != null) {
-            degreeJson.addProperty("applicationStart", applicationPeriod.getStart().toString());
-            degreeJson.addProperty("applicationEnd", applicationPeriod.getEnd().toString());
+            degreeJson.addProperty("applicationStart", applicationPeriod.getStart().format(dtf));
+            degreeJson.addProperty("applicationEnd", applicationPeriod.getEnd().format(dtf));
         } else {
             degreeJson.addProperty("applicationStart", "");
             degreeJson.addProperty("applicationEnd", "");
         }
         if (electionPeriod != null) {
-            degreeJson.addProperty("electionStart", electionPeriod.getStart().toString());
-            degreeJson.addProperty("electionEnd", electionPeriod.getEnd().toString());
+            degreeJson.addProperty("electionStart", electionPeriod.getStart().format(dtf));
+            degreeJson.addProperty("electionEnd", electionPeriod.getEnd().format(dtf));
         } else {
             degreeJson.addProperty("electionStart", "");
             degreeJson.addProperty("electionEnd", "");

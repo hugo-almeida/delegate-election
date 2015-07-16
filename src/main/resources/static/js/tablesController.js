@@ -5,6 +5,8 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	
 	sc.allSelected = false;
 	
+	sc.active = 'Gerir';
+	
 	sc.loadDegrees = function() {
 		http.get('periods').success(function(data){
 			sc.degrees = data;
@@ -56,4 +58,6 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 			sc.allSelected = false;
 		}
 	}
+	
+	
 }]);

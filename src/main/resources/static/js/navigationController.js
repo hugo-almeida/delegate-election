@@ -36,6 +36,7 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	
 	$rootScope.loaded = false;
 	
+	$rootScope.nextPeriod = false;
 	/***
 	 * LOGOUT
 	 */
@@ -61,6 +62,8 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 				$scope.selection = 0;
 				$scope.setDegree();
 			}
+			
+			$scope.checkNextPeriod();
 		});
 	}
 	
@@ -102,6 +105,22 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		}
 		else if($rootScope.degree.currentPeriod.type == 'ELECTION')  {
 			$scope.subTitle = 'Votação';
+		}
+	}
+	
+	$scope.checkNextPeriod = function() {
+		$log.log('checking next period')
+		if($rootScope.degree != null) {
+			$http.get('/degrees/' + $rootScope.degree.id + '/years/' + $rootScope.degree.curricularYear + '/periods')
+				.success(function(data) {
+					if (data.applicationStart != '' && data.applicationEnd != '') {
+						$log.log('exists');
+						$scope.start = data.applicationStart;
+						$scope.end = data.applicationEnd;
+						$log.log('start: ' + $scope.start + ' end: ' + $scope.end);
+						$rootScope.nextPeriod = true;
+					}
+				});
 		}
 	}
 	

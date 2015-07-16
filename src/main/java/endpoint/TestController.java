@@ -2,7 +2,6 @@ package endpoint;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,16 +48,16 @@ public class TestController {
 
     @RequestMapping("/application")
     public String application() {
-        Calendar testCalendar = cd.findByYear(2014);
-        for (Degree d : testCalendar.getDegrees()) {
-            for (DegreeYear dy : d.getYears()) {
+        final Calendar testCalendar = cd.findByYear(2014);
+        for (final Degree d : testCalendar.getDegrees()) {
+            for (final DegreeYear dy : d.getYears()) {
                 if (dy.getDegreeYear() == 1) {
-                    ApplicationPeriod p =
+                    final ApplicationPeriod p =
                             new ApplicationPeriod(LocalDate.of(2015, Month.NOVEMBER, 14), LocalDate.of(2015, Month.NOVEMBER, 15),
                                     dy);
                     try {
                         dy.addPeriod(p);
-                    } catch (InvalidPeriodException e) {
+                    } catch (final InvalidPeriodException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
@@ -73,15 +72,15 @@ public class TestController {
 
     @RequestMapping("/election")
     public String election() {
-        Calendar testCalendar = cd.findByYear(2014);
-        for (Degree d : testCalendar.getDegrees()) {
-            for (DegreeYear dy : d.getYears()) {
+        final Calendar testCalendar = cd.findByYear(2014);
+        for (final Degree d : testCalendar.getDegrees()) {
+            for (final DegreeYear dy : d.getYears()) {
                 if (dy.getDegreeYear() == 1) {
-                    ElectionPeriod p =
+                    final ElectionPeriod p =
                             new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 16), LocalDate.of(2015, Month.NOVEMBER, 17), dy);
                     try {
                         dy.addPeriod(p);
-                    } catch (InvalidPeriodException e) {
+                    } catch (final InvalidPeriodException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
@@ -94,82 +93,82 @@ public class TestController {
         return "No ok";
     }
 
-    @RequestMapping("/make-application")
-    public String makeApplication() {
-        Calendar testCalendar = cd.findByYear(2014);
-        for (Degree d : testCalendar.getDegrees()) {
-            for (DegreeYear dy : d.getYears()) {
-                if (dy.getDegreeYear() == 1) {
-                    ApplicationPeriod p =
-                            new ApplicationPeriod(LocalDate.of(2015, Month.NOVEMBER, 14), LocalDate.of(2015, Month.NOVEMBER, 15),
-                                    dy);
-                    try {
-                        dy.addPeriod(p);
-                    } catch (InvalidPeriodException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    dy.setActivePeriod(p);
-                    Student s2 = null;
-                    for (Student s : dy.getStudents()) {
-                        p.addCandidate(s);
-                        s2 = s;
-                    }
-                    cd.save(testCalendar);
-                    p.removeCandidates(s2);
-                    cd.save(testCalendar);
-                    return "ok";
-                }
-            }
-        }
-        cd.save(testCalendar);
-        return "ok";
-    }
+    /* @RequestMapping("/make-application")
+     public String makeApplication() {
+         Calendar testCalendar = cd.findByYear(2014);
+         for (Degree d : testCalendar.getDegrees()) {
+             for (DegreeYear dy : d.getYears()) {
+                 if (dy.getDegreeYear() == 1) {
+                     ApplicationPeriod p =
+                             new ApplicationPeriod(LocalDate.of(2015, Month.NOVEMBER, 14), LocalDate.of(2015, Month.NOVEMBER, 15),
+                                     dy);
+                     try {
+                         dy.addPeriod(p);
+                     } catch (InvalidPeriodException e) {
+                         // TODO Auto-generated catch block
+                         e.printStackTrace();
+                     }
+                     dy.setActivePeriod(p);
+                     Student s2 = null;
+                     for (Student s : dy.getStudents()) {
+                         p.addCandidate(s);
+                         s2 = s;
+                     }
+                     cd.save(testCalendar);
+                     p.removeCandidates(s2);
+                     cd.save(testCalendar);
+                     return "ok";
+                 }
+             }
+         }
+         cd.save(testCalendar);
+         return "ok";
+     }
 
-    @RequestMapping("/make-election")
-    public String stuff() {
-        Calendar testCalendar = cd.findByYear(2014);
-        for (Degree d : testCalendar.getDegrees()) {
-            for (DegreeYear dy : d.getYears()) {
-                if (dy.getDegreeYear() == 1) {
-                    ElectionPeriod p =
-                            new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 5), LocalDate.of(2015, Month.NOVEMBER, 6), dy);
-                    try {
-                        dy.addPeriod(p);
-                    } catch (InvalidPeriodException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    dy.setActivePeriod(p);
-                    cd.save(testCalendar);
-                    Iterator<Student> it = dy.getStudents().iterator();
-                    Student s = it.next();
-                    Student s2 = it.next();
-                    Student s3 = it.next();
-                    //Vote v1 = new Vote(s.getUsername(), s.getUsername(), dy.getActivePeriod());
-                    //vd.save(v1);
-                    ElectionPeriod p2 = (ElectionPeriod) dy.getActivePeriod();
-                    p2.vote(s, s);
-                    cd.save(testCalendar);
-                    p2.vote(s2, s);
-                    cd.save(testCalendar);
-                    p2.vote(s3, s2);
-                    cd.save(testCalendar);
-                    return "Oki";
-                }
-            }
-        }
-        cd.save(testCalendar);
-        return "ok";
-    }
+     @RequestMapping("/make-election")
+     public String stuff() {
+         Calendar testCalendar = cd.findByYear(2014);
+         for (Degree d : testCalendar.getDegrees()) {
+             for (DegreeYear dy : d.getYears()) {
+                 if (dy.getDegreeYear() == 1) {
+                     ElectionPeriod p =
+                             new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 5), LocalDate.of(2015, Month.NOVEMBER, 6), dy);
+                     try {
+                         dy.addPeriod(p);
+                     } catch (InvalidPeriodException e) {
+                         // TODO Auto-generated catch block
+                         e.printStackTrace();
+                     }
+                     dy.setActivePeriod(p);
+                     cd.save(testCalendar);
+                     Iterator<Student> it = dy.getStudents().iterator();
+                     Student s = it.next();
+                     Student s2 = it.next();
+                     Student s3 = it.next();
+                     //Vote v1 = new Vote(s.getUsername(), s.getUsername(), dy.getActivePeriod());
+                     //vd.save(v1);
+                     ElectionPeriod p2 = (ElectionPeriod) dy.getActivePeriod();
+                     p2.vote(s, s);
+                     cd.save(testCalendar);
+                     p2.vote(s2, s);
+                     cd.save(testCalendar);
+                     p2.vote(s3, s2);
+                     cd.save(testCalendar);
+                     return "Oki";
+                 }
+             }
+         }
+         cd.save(testCalendar);
+         return "ok";
+     }*/
 
     @RequestMapping("/votes")
     public int votes() {
-        Calendar testCalendar = cd.findByYear(2014);
-        for (Degree d : testCalendar.getDegrees()) {
-            for (DegreeYear dy : d.getYears()) {
+        final Calendar testCalendar = cd.findByYear(2014);
+        for (final Degree d : testCalendar.getDegrees()) {
+            for (final DegreeYear dy : d.getYears()) {
                 if (dy.getDegreeYear() == 1) {
-                    ElectionPeriod p = (ElectionPeriod) dy.getActivePeriod();
+                    final ElectionPeriod p = (ElectionPeriod) dy.getActivePeriod();
                     return p.getVotes().size();
                 }
             }

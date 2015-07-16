@@ -13,8 +13,7 @@
 		</button>
 
 		<ul class="dropdown-menu">
-			<li><a target="_self" href="http://localhost:8080/home.html"
-				download="home.html">Excel</a></li>
+			<li><a target="_blank" href="http://localhost:8080/whatevs.xls">Excel</a></li>
 			<!-- test, currently download home.html file -->
 		</ul>
 	</div>
@@ -38,20 +37,45 @@
 				<td><input id="{{degree.degree}}" type="checkbox"
 					value="{{degree.degree}}"
 					ng-checked="selection.indexOf(degree.degree) > -1"
-					ng-click="toggleSelection(degree.degree)" /> {{degree.degree}}</td>
-				<td>
-					cand
-					vot
-					<div class="btn-group pull-right text-left">
-						<button class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+					ng-click="toggleSelection(degree.degree)" /> <strong>{{degree.degree}}</strong></td>
+				<td ng-repeat="year in degree.years">
+					<div class="col-xs-10">
+						<span>
+							<strong>C:</strong>
+							<span ng-if="!year.applicationPeriod"><small></small></span>
+							<span ng-if="year.applicationPeriod.state == 'pending'">{{year.applicationPeriod.PeriodStart}} - {{year.applicationPeriod.PeriodEnd}}</span>
+							<span ng-if="year.applicationPeriod.state == 'ongoing' || year.applicationPeriod.state == 'over'">
+								<strong>{{year.applicationPeriod.candidateCount}} candidatos</strong>
+								<p>
+									<h6 ng-show="year.applicationPeriod.state == 'ongoing'">{{year.applicationPeriod.PeriodStart}} - {{year.applicationPeriod.PeriodEnd}}</h6>
+									<h6 ng-show="year.applicationPeriod.state == 'over'">Terminado</h6>
+								</p>
+							</span>
+						</span>
+						<br>
+						<span>
+							<strong>V:</strong>
+							<span ng-if="!year.electionPeriod"><small></small></span>
+							<span ng-if="year.electionPeriod.state == 'pending'">{{year.applicationPeriod.PeriodStart}} - {{year.applicationPeriod.PeriodEnd}}</span>
+							<span ng-if="year.electionPeriod.state == 'ongoing' || year.electionPeriod.state == 'over'">
+								<strong>{{year.electionPeriod.voteCount}} votos</strong>
+								<p>
+									<h6 ng-show="year.electionPeriod.state == 'ongoing'">{{year.electionPeriod.PeriodStart}} - {{year.electionPeriod.PeriodEnd}}</h6>
+									<h6 ng-show="year.electionPeriod.state == 'over'">Terminado</h6>
+								</p>
+							</span>
+						</span>
+					</div>
+					<div class="dropdown pull-right text-left">
+						<span class="dropdown-toggle" data-toggle="dropdown"
 							aria-haspopup="true" aria-expanded="false">
-							Download <i class="caret"></i>
-						</button>
+							<i class="glyphicon glyphicon-check"></i> <!-- should use option-vertical icon -->
+						</span>
 				
 						<ul class="dropdown-menu">
-							<li><a target="_self" href="http://localhost:8080/home.html"
-								download="home.html">Excel</a></li>
-							<!-- test, currently download home.html file -->
+							<li><a href="#">Criar</a></li>
+							<li><a href="#">Redefinir</a></li>
+							<li><a href="#">Detalhes</a></li>
 						</ul>
 					</div>
 				</td>
