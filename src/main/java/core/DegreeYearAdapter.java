@@ -4,7 +4,9 @@ import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -16,9 +18,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import core.Period.PeriodType;
-import core.exception.InvalidPeriodException;
 
-public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializer<Degree> {
+public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializer<DegreeChange> {
 
     @Override
     public JsonElement serialize(Degree degree, Type arg1, JsonSerializationContext arg2) {
@@ -43,16 +44,18 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
             yearObject.addProperty("degreeYear", degreeYear.getDegreeYear());
 
             if (degreeYear.getCurrentApplicationPeriod() != null) {
-                applicationObject.addProperty("PeriodId", degreeYear.getCurrentApplicationPeriod().getId());
-                applicationObject.addProperty("PeriodStart", degreeYear.getCurrentApplicationPeriod().getStart().format(dtf));
-                applicationObject.addProperty("PeriodEnd", degreeYear.getCurrentApplicationPeriod().getEnd().format(dtf));
+                applicationObject.addProperty("applicationPeriodId", degreeYear.getCurrentApplicationPeriod().getId());
+                applicationObject.addProperty("applicationPeriodStart", degreeYear.getCurrentApplicationPeriod().getStart()
+                        .format(dtf));
+                applicationObject.addProperty("applicationPeriodEnd",
+                        degreeYear.getCurrentApplicationPeriod().getEnd().plusDays(3).format(dtf));
                 applicationObject.addProperty("candidateCount", degreeYear.getCurrentApplicationPeriod().getCandidateCount());
             }
 
             if (degreeYear.getCurrentElectionPeriod() != null) {
-                electionObject.addProperty("PeriodId", degreeYear.getCurrentElectionPeriod().getId());
-                electionObject.addProperty("PeriodStart", degreeYear.getCurrentElectionPeriod().getStart().format(dtf));
-                electionObject.addProperty("PeriodEnd", degreeYear.getCurrentElectionPeriod().getEnd().format(dtf));
+                electionObject.addProperty("electionPeriodId", degreeYear.getCurrentElectionPeriod().getId());
+                electionObject.addProperty("electionPeriodStart", degreeYear.getCurrentElectionPeriod().getStart().format(dtf));
+                electionObject.addProperty("electionPeriodEnd", degreeYear.getCurrentElectionPeriod().getEnd().format(dtf));
                 electionObject.addProperty("voteCount", degreeYear.getCurrentElectionPeriod().getVotes().size());
             }
 
@@ -66,90 +69,55 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
     }
 
     @Override
-    public Degree deserialize(JsonElement periodElement, Type arg1, JsonDeserializationContext arg2) throws JsonParseException {
-        JsonObject periodObject = periodElement.getAsJsonObject();
+    public DegreeChange deserialize(JsonElement degreeElement, Type arg1, JsonDeserializationContext arg2)
+            throws JsonParseException {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        JsonObject degreeObject = degreeElement.getAsJsonObject();
 
-        String degreeId = periodObject.get("degreeId").getAsString();
-        Degree degree = new Degree(null, null, degreeId, null, null);
+        String degreeId = degreeObject.get("degreeId").getAsString();
+        DegreeChange degree = new DegreeChange(degreeId);
 
-        JsonArray years = periodObject.get("years").getAsJsonArray();
+        JsonArray years = degreeObject.get("years").getAsJsonArray();
 
         for (JsonElement yearElement : years) {
             JsonObject yearObject = yearElement.getAsJsonObject();
 
             int year = yearObject.get("degreeYear").getAsInt();
 
-            degree.addYear(year);
+            Set<PeriodChange> periods = new HashSet<PeriodChange>();
 
-            if (yearObject.has("applicationPeriodStart") && yearObject.has("applicationPeriodEnd")) {
+            JsonObject applicationPeriodObject = yearObject.getAsJsonObject("applicationPeriod");
+            if (applicationPeriodObject.has("applicationPeriodId")
+                    || (applicationPeriodObject.has("applicationPeriodStart") && applicationPeriodObject
+                            .has("applicationPeriodEnd"))) {
                 int id = Integer.MIN_VALUE;
-                if (yearObject.has("applicationPeriodId")) {
-                    id = yearObject.get("applicationPeriodId").getAsInt();
+                if (applicationPeriodObject.has("applicationPeriodId")) {
+                    id = applicationPeriodObject.get("applicationPeriodId").getAsInt();
                 }
-                LocalDate start = LocalDate.parse(yearObject.get("applicationPeriodStart").getAsString());
-                LocalDate end = LocalDate.parse(yearObject.get("applicationPeriodEnd").getAsString());
+                LocalDate start = LocalDate.parse(applicationPeriodObject.get("applicationPeriodStart").getAsString(), dtf);
+                LocalDate end = LocalDate.parse(applicationPeriodObject.get("applicationPeriodEnd").getAsString(), dtf);
                 PeriodChange applicationPeriod = new PeriodChange(PeriodType.Application, id, start, end);
-                try {
-                    degree.getDegreeYear(year).addPeriod(applicationPeriod);
-                } catch (InvalidPeriodException e) {
-                    // Wut r u doing!??!
-                }
+                periods.add(applicationPeriod);
             }
 
-            if (yearObject.has("electionPeriodStart") && yearObject.has("electionPeriodEnd")) {
+            JsonObject electionPeriodObject = yearObject.getAsJsonObject("electionPeriod");
+            if (electionPeriodObject.has("electionPeriodId")
+                    || (electionPeriodObject.has("electionPeriodStart") && electionPeriodObject.has("electionPeriodEnd"))) {
                 int id = Integer.MIN_VALUE;
-                if (yearObject.has("electionPeriodId")) {
-                    id = yearObject.get("electionPeriodId").getAsInt();
+                if (electionPeriodObject.has("electionPeriodId")) {
+                    id = electionPeriodObject.get("electionPeriodId").getAsInt();
                 }
-                LocalDate start = LocalDate.parse(yearObject.get("electionPeriodStart").getAsString());
-                LocalDate end = LocalDate.parse(yearObject.get("electionPeriodEnd").getAsString());
+                LocalDate start = LocalDate.parse(electionPeriodObject.get("electionPeriodStart").getAsString(), dtf);
+                LocalDate end = LocalDate.parse(electionPeriodObject.get("electionPeriodEnd").getAsString(), dtf);
                 PeriodChange electionPeriod = new PeriodChange(PeriodType.Election, id, start, end);
-                try {
-                    degree.getDegreeYear(year).addPeriod(electionPeriod);
-                } catch (InvalidPeriodException e) {
-                    // Wut r u doing!??!
-                }
+                periods.add(electionPeriod);
             }
+
+            degree.addYear(year, periods);
 
         }
 
         return degree;
-
-    }
-
-    public class PeriodChange extends Period {
-
-        PeriodType periodType;
-
-        int periodId;
-
-        public PeriodChange(PeriodType periodType, int periodId, LocalDate start, LocalDate end) {
-            super(start, end);
-
-            this.periodType = periodType;
-            this.periodId = periodId;
-        }
-
-        @Override
-        public PeriodType getType() {
-            return periodType;
-        }
-
-        public PeriodType getPeriodType() {
-            return periodType;
-        }
-
-        public void setPeriodType(PeriodType periodType) {
-            this.periodType = periodType;
-        }
-
-        public int getPeriodId() {
-            return periodId;
-        }
-
-        public void setPeriodId(int periodId) {
-            this.periodId = periodId;
-        }
 
     }
 }

@@ -53,8 +53,6 @@ public class DegreeYear {
     public DegreeYear(int year, Degree d) {
         this.degreeDegreeYearPK = new DegreeDegreeYearPK(d.getName(), year, d.getYear());
         this.degree = d;
-        //this.year = year;
-        initPeriod();
         initStudents();
     }
 
@@ -90,11 +88,6 @@ public class DegreeYear {
 
     }
 
-    public void initPeriod() {
-        // TODO Auto-generated method stub
-
-    }
-
     public int getDegreeYear() {
         return degreeDegreeYearPK.getDegreeYear();
     }
@@ -105,6 +98,60 @@ public class DegreeYear {
 
     public int getCalendarYear() {
         return degreeDegreeYearPK.getCalendarYear();
+    }
+
+    public Set<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(Set<Student> students) {
+        this.students = students;
+    }
+
+    public Degree getDegree() {
+        return degree;
+    }
+
+    public Set<Student> getCandidates() {
+        Period activePeriod = getActivePeriod();
+        if (activePeriod != null) {
+            return activePeriod.getCandidates();
+        }
+
+        return new HashSet<Student>();
+    }
+
+    public void setActivePeriod(Period period) {
+        if (periods.contains(period)) {
+            if (getActivePeriod() != null) {
+                getActivePeriod().setInactive();
+            }
+            period.setActive();
+        }
+    }
+
+    public void addPeriod(Period period) throws InvalidPeriodException {
+        if (getActivePeriod() != null && period.getStart().isBefore(getActivePeriod().getEnd())) {
+            throw new InvalidPeriodException("A period can't start before the active period ends");
+        }
+
+        for (final Period p : periods) {
+            if (period.conflictsWith(p)) {
+                throw new InvalidPeriodException("There should not be overlapping periods");
+            }
+        }
+
+        periods.add(period);
+    }
+
+    public Set<Period> getInactivePeriods() {
+        Set<Period> inactive = new HashSet<Period>();
+        for (Period p : periods) {
+            if (!p.isActive()) {
+                inactive.add(p);
+            }
+        }
+        return inactive;
     }
 
     public Period getActivePeriod() {
@@ -134,54 +181,5 @@ public class DegreeYear {
             }
         }
         return period;
-    }
-
-    public Set<Period> getInactivePeriods() {
-        Set<Period> inactive = new HashSet<Period>();
-        for (Period p : periods) {
-            if (!p.isActive()) {
-                inactive.add(p);
-            }
-        }
-        return inactive;
-    }
-
-    public Set<Student> getStudents() {
-        return students;
-    }
-
-    public void setStudents(Set<Student> students) {
-        this.students = students;
-    }
-
-    public Degree getDegree() {
-        return degree;
-    }
-
-    public void setActivePeriod(Period period) {
-        if (periods.contains(period)) {
-            if (getActivePeriod() != null) {
-                getActivePeriod().setInactive();
-            }
-            period.setActive();
-        }
-    }
-
-    public Set<Student> getCandidates() {
-        return getActivePeriod().getCandidates();
-    }
-
-    public void addPeriod(Period period) throws InvalidPeriodException {
-        if (getActivePeriod() != null && period.getStart().isBefore(getActivePeriod().getEnd())) {
-            throw new InvalidPeriodException("A period can't start before the active period ends");
-        }
-
-        for (final Period p : periods) {
-            if (period.conflictsWith(p)) {
-                throw new InvalidPeriodException("There should not be overlapping periods");
-            }
-        }
-
-        periods.add(period);
     }
 }
