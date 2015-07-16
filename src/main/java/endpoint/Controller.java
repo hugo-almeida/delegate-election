@@ -112,9 +112,7 @@ public class Controller {
                                 && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
                         .collect(Collectors.toList()).get(0);
 
-        // TODO Melhorar a forma de detectar se o periodo é de eleicao
-        // talvez com getCurrentElectionPeriod()
-        final String voted = ((ElectionPeriod) student.getDegreeYear().getActivePeriod()).getVote(istId);
+        final String voted = student.getDegreeYear().getCurrentElectionPeriod().getVote(istId);
         if (voted == null) {
             return new Gson().toJson("");
         }
