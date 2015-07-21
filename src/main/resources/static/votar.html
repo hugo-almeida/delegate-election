@@ -38,11 +38,11 @@
 						<td class="col-md-1">
 							<img ng-src="data:{{voto.photo.type}};base64,{{voto.photo.data}}" height="28" width="28">
 						</td>
-						<td ng-show="voto">
+						<td ng-show="voto != 'null'">
 							<strong>{{voto.name}}</strong>
 							<small>{{voto.username}}</small>
 						</td>
-						<td ng-show="!voto">
+						<td ng-show="voto == 'null'">
 							<strong>Voto em branco</strong>
 						</td>
 					</table>

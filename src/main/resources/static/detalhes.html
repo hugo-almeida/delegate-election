@@ -1,0 +1,86 @@
+<div>
+	<div>
+		<!-- Default panel contents -->
+		<h3>Detalhes</h3>
+		
+		<!-- Table -->
+		<table class="table">
+			<tr>
+				<th class="col-md-2">Curso</th>
+				<td class="col-md-10">{{inspectDegree.degree}}</td>
+			</tr>
+			<tr>
+				<th>Ano Lectivo</th>
+				<td>{{inspectDegree.academicYear}}</td>
+			</tr>
+			<tr>
+				<th>Ano Curricular</th>
+				<td>{{inspectDegree.years[inspectDegreeYear].degreeYear}}</td>
+			</tr>
+			<tr>
+				<th>Candidaturas</th>
+				<td>{{inspectDegree.years[inspectDegreeYear].applicationPeriod.applicationPeriodStart}} - {{inspectDegree.years[inspectDegreeYear].applicationPeriod.applicationPeriodEnd}}
+					<div ng-show="inspectDegree.years[inspectDegreeYear].applicationPeriod.state == 'ongoing'"> - A decorrer</div>
+					<div ng-show="inspectDegree.years[inspectDegreeYear].applicationPeriod.state == 'over'"> - Terminado</div>
+				</td>
+			</tr>
+			<tr>
+				<th>Período de votação</th>
+				<td>{{inspectDegree.years[inspectDegreeYear].electionPeriod.electionPeriodStart}} - {{inspectDegree.years[inspectDegreeYear].electionPeriod.electionPeriodEnd}}
+					<div ng-show="inspectDegree.years[inspectDegreeYear].electionPeriod.state == 'ongoing'"> - A decorrer</div>
+					<div ng-show="inspectDegree.years[inspectDegreeYear].electionPeriod.state == 'over'"> - Terminado</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<h3>Candidatos</h3>
+	<div>
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th class="col-md-4"><strong>Nome</strong></th>
+				<th class="col-md-2"><strong>Auto-proposto</strong></th>
+				<th><strong>Nº de Votos</strong></th>
+			</tr>
+		</thead>
+			<tbody>
+				<tr ng-repeat="candidate in candidates">
+					<td><i class="glyphicon glyphicon-user"></i><strong>{{candidate.name}}</strong><small>{{candidate.username}}</small></td>
+					<td>sim</td>
+					<td>num votos 
+						<span class="pull-right">
+							<button class="btn btn-default">Atribuir</button>
+							<i class="glyphicon glyphicon-check"></i>
+						</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<button class="btn btn-primary">Adicionar</button>
+	
+	<h3>Histórico</h3>
+	<div>
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th class="col-md-3"><strong>Ano-lectivo</strong></th>
+				<th class="col-md-2"><strong>Período de candidatura</strong></th>
+				<th class="col-md-2"><strong>Período de votação</strong></th>
+				<th><strong>Delegado</strong></th>
+			</tr>
+		</thead>
+			<tbody>
+				<tr>
+					<td>2014/2015</td>
+					<td>22/10/2014 - 14/11/2014</td>
+					<td>14/11/2014 - 18/11/2014</td>
+					<td>John Doe</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<button class="btn btn-default" ng-click="hideDetails()">Voltar</button>
+</div>

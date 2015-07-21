@@ -1,11 +1,19 @@
 angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$http', '$log',
                                                           function(rc, sc, http, log)  {
 	
+	sc.debug = true;
+	
+	sc.details = false;
+	
 	sc.loaded = false;
 	
 	sc.allSelected = false;
 	
-	sc.active = 'Gerir';
+	sc.active = 'Delegados';
+	
+	sc.inspectDegree = {};
+	
+	sc.inspectDegreeYear = 0;
 	
 	sc.loadDegrees = function() {
 		http.get('periods').success(function(data){
@@ -59,5 +67,27 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		}
 	}
 	
+	sc.showDetails = function(degree, year) {
+		sc.inspectDegree = degree;
+		sc.inspectDegreeYear = year;
+		log.log(degree);
+		log.log(year);
+		http.get('degrees/' + sc.inspectDegree.degreeId + '/years/' + sc.inspectDegree.years[sc.inspectDegreeYear].degreeYear + '/candidates')
+		.success(function(data) {
+			sc.candidates = data;
+		});	
+		sc.details = true;
+	}
 	
+	sc.hideDetails = function() {
+		sc.details = false;
+	}
+	
+	/***
+	 * Debug
+	 */
+	
+	sc.toggleDebug = function() {
+		sc.debug = !sc.debug;
+	}
 }]);
