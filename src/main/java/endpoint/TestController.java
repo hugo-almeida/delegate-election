@@ -57,13 +57,15 @@ public class TestController {
                                     dy);
                     try {
                         dy.addPeriod(p);
+                        dy.setActivePeriod(p);
+                        cd.save(testCalendar);
+                        return "Ok";
                     } catch (final InvalidPeriodException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
+                        return e.getMessage();
                     }
-                    dy.setActivePeriod(p);
-                    cd.save(testCalendar);
-                    return "Ok";
+
                 }
             }
         }
@@ -80,13 +82,15 @@ public class TestController {
                             new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 16), LocalDate.of(2015, Month.NOVEMBER, 17), dy);
                     try {
                         dy.addPeriod(p);
+                        dy.setActivePeriod(p);
+                        cd.save(testCalendar);
+                        return "Ok";
                     } catch (final InvalidPeriodException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
+                        return e.getMessage();
                     }
-                    dy.setActivePeriod(p);
-                    cd.save(testCalendar);
-                    return "Ok";
+
                 }
             }
         }
