@@ -36,7 +36,8 @@
 				<div class="table-responsive">
 					<table class="table">
 						<td class="col-md-1">
-							<img ng-src="data:{{voto.photo.type}};base64,{{voto.photo.data}}" height="28" width="28">
+							<i ng-show="isEmpty(voto.photo)" class="glyphicon glyphicon-user"></i>
+							<img ng-show="!isEmpty(voto.photo)" ng-src="data:{{voto.photo.type}};base64,{{voto.photo.data}}" height="28" width="28">
 						</td>
 						<td ng-show="voto != 'null'">
 							<strong>{{voto.name}}</strong>
@@ -59,7 +60,8 @@
 							<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
 						</td>
 						<td class="col-md-1">
-							<img ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28">
+							<i ng-show="isEmpty(candidato.photo)" class="glyphicon glyphicon-user"></i>
+							<img ng-show="!isEmpty(candidato.photo)" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28">
 						</td>
 						<td>
 							<strong>{{candidato.name}}</strong>
@@ -99,7 +101,8 @@
 												<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
 											</td>
 											<td class="col-md-1">
-												<img ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}" height="28" width="28">
+												<i ng-show="isEmpty(student.photo)" class="glyphicon glyphicon-user"></i>
+												<img ng-show="!isEmpty(student.photo)" ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}" height="28" width="28">
 											</td>	
 											<td>	
 												<strong>{{student.name}}</strong>

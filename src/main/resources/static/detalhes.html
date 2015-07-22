@@ -7,15 +7,15 @@
 		<table class="table">
 			<tr>
 				<th class="col-md-2">Curso</th>
-				<td class="col-md-10">{{inspectDegree.degreeName}}</td>
+				<td class="col-md-10">nome curso</td>
 			</tr>
 			<tr>
 				<th>Ano Lectivo</th>
-				<td>{{inspectDegree.academicYear}}</td>
+				<td>2014/2015</td>
 			</tr>
 			<tr>
 				<th>Ano Curricular</th>
-				<td>{{inspectDegree.years[inspectDegreeYear].degreeYear}}</td>
+				<td>1</td>
 			</tr>
 			<tr>
 				<th>Candidaturas</th>
@@ -39,14 +39,16 @@
 		<table class="table table-hover">
 			<thead>
 			<tr>
-				<th class="col-md-4"><strong>Nome</strong></th>
+				<th class="col-md-6"><strong>Nome</strong></th>
 				<th class="col-md-2"><strong>Auto-proposto</strong></th>
 				<th><strong>Nº de Votos</strong></th>
 			</tr>
 		</thead>
 			<tbody>
 				<tr ng-repeat="candidate in candidates">
-					<td><i class="glyphicon glyphicon-user"></i><strong>{{candidate.name}}</strong><small>{{candidate.username}}</small></td>
+					<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user"></i><strong>
+						<img ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}" height="28" width="28">
+						 {{candidate.name}}</strong><small>{{candidate.username}}</small></td>
 					<td>sim</td>
 					<td>num votos 
 						<span class="pull-right">
@@ -66,17 +68,15 @@
 			<thead>
 			<tr>
 				<th class="col-md-3"><strong>Ano-lectivo</strong></th>
-				<th class="col-md-2"><strong>Período de candidatura</strong></th>
-				<th class="col-md-2"><strong>Período de votação</strong></th>
-				<th><strong>Delegado</strong></th>
+				<th class="col-md-2"><strong>Tipo</strong></th>
+				<th><strong>Período</strong></th>
 			</tr>
 		</thead>
 			<tbody>
-				<tr>
+				<tr class="{'active':selectedRow == true">
 					<td>2014/2015</td>
-					<td>22/10/2014 - 14/11/2014</td>
-					<td>14/11/2014 - 18/11/2014</td>
-					<td>John Doe</td>
+					<td>Candidatura</td>
+					<td>14/11/2014 - 18/11/2014 <span><button class="btn btn-default pull-right" ng-click="setSelectedRow(true)">Detalhes</button></span></td>
 				</tr>
 			</tbody>
 		</table>
