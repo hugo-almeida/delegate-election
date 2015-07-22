@@ -58,6 +58,7 @@ import core.DegreeDAO;
 import core.DegreePeriodAdapter;
 import core.DegreeYear;
 import core.DegreeYearAdapter;
+import core.DegreeYearHistoryAdapter;
 import core.ElectionPeriod;
 import core.HibernateProxyTypeAdapter;
 import core.Period;
@@ -275,7 +276,7 @@ public class Controller {
                         .map(c -> degreeDAO.findByIdAndYear(degreeId, c.getYear()).getDegreeYear(year))
                         .collect(Collectors.toSet());
         final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreePeriodAdapter()).create();
+        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreeYearHistoryAdapter()).create();
         return gson.toJson(degreeYears);
     }
 
