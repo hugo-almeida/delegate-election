@@ -2,8 +2,11 @@ package core;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,6 +24,9 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import core.util.ActivatePeriod;
+import core.util.RetrieveStudentListTask;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -200,4 +206,12 @@ public abstract class Period implements Serializable {
     }
 
     abstract public PeriodType getType();
+
+    public void schedulePeriod(PeriodDAO periodDAO, DegreeDAO degreeDAO) {
+        TimerTask retrieveTask = new RetrieveStudentListTask(getDegreeYear(), degreeDAO);
+        TimerTask activateTask = new ActivatePeriod(this, periodDAO);
+        Timer timer = new Timer(true);
+        timer.schedule(retrieveTask, Date.from(getStart().atStartOfDay().minusHours(1).toInstant(null))); //Vai buscar os alunos 1 hora antes
+        timer.schedule(activateTask, Date.from(getStart().atStartOfDay().toInstant(null)));
+    }
 }

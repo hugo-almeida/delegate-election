@@ -274,7 +274,6 @@ public class Controller {
                 StreamSupport.stream(calendarDAO.findAll().spliterator(), false)
                         .map(c -> degreeDAO.findByIdAndYear(degreeId, c.getYear()).getDegreeYear(year))
                         .collect(Collectors.toSet());
-        //TODO Obtem historico do curso/ano
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreePeriodAdapter()).create();
         return gson.toJson(degreeYears);
@@ -301,6 +300,7 @@ public class Controller {
         return gson.toJson(degrees);
     }
 
+    // Permitir criar apenas periodos futuros
     @RequestMapping(value = "/periods", method = RequestMethod.POST)
     public @ResponseBody String addPeriods(@RequestBody String periodsJson) throws InvalidPeriodException {
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -315,9 +315,11 @@ public class Controller {
                     if (change.getPeriodType().equals(PeriodType.Application)) {
                         final Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
                         degreeYear.addPeriod(period);
+                        period.schedulePeriod(periodDAO, degreeDAO);
                     } else if (change.getPeriodType().equals(PeriodType.Election)) {
                         final Period period = new ElectionPeriod(change.getStart(), change.getEnd(), degreeYear);
                         degreeYear.addPeriod(period);
+                        period.schedulePeriod(periodDAO, degreeDAO);
                     }
                 }
             }
@@ -326,6 +328,7 @@ public class Controller {
         return new Gson().toJson("ok");
     }
 
+    // Permitir alterar apenas periodos futuros
     @RequestMapping(value = "/periods", method = RequestMethod.PUT)
     public @ResponseBody String updatePeriods(@RequestBody String periodsJson) {
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -344,21 +347,22 @@ public class Controller {
         return new Gson().toJson("ok");
     }
 
-    // Isto supostamente não é possivel fazer.
-//    @RequestMapping(value = "/periods", method = RequestMethod.DELETE)
-//    public @ResponseBody String removePeriods(@RequestBody String periodsJson) {
-//        final GsonBuilder gsonBuilder = new GsonBuilder();
-//        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
-//        DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
-//        for (DegreeChange degreeChange : degrees) {
-//            for (Integer year : degreeChange.getPeriods().keySet()) {
-//                for (PeriodChange change : degreeChange.getPeriods().get(year)) {
-//                    periodDAO.delete(change.getPeriodId());
-//                }
-//            }
-//        }
-//        return new Gson().toJson("ok");
-//    }
+    //TODO Testar isto.
+    // Permitir apagar apenas periodos futuros
+    @RequestMapping(value = "/periods", method = RequestMethod.DELETE)
+    public @ResponseBody String removePeriods(@RequestBody String periodsJson) {
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
+        DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
+        for (DegreeChange degreeChange : degrees) {
+            for (Integer year : degreeChange.getPeriods().keySet()) {
+                for (PeriodChange change : degreeChange.getPeriods().get(year)) {
+                    periodDAO.delete(change.getPeriodId());
+                }
+            }
+        }
+        return new Gson().toJson("ok");
+    }
 
     /***************************** OLD API *****************************/
     @RequestMapping("/user")

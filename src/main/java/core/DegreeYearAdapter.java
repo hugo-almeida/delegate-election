@@ -28,7 +28,9 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         degreeObject.addProperty("degree", degree.getAcronym());
+        degreeObject.addProperty("degreeName", degree.getName());
         degreeObject.addProperty("degreeId", degree.getId());
+        degreeObject.addProperty("academicYear", degree.getYear() + "/" + (degree.getYear() + 1));
 
         JsonArray years = new JsonArray();
         Map<Integer, DegreeYear> sortedDegrees = new HashMap<Integer, DegreeYear>();
