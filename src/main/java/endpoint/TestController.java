@@ -51,7 +51,7 @@ public class TestController {
         final Calendar testCalendar = cd.findByYear(2014);
         for (final Degree d : testCalendar.getDegrees()) {
             for (final DegreeYear dy : d.getYears()) {
-                if (dy.getDegreeYear() == 1) {
+                if (dy.getDegreeYear() == 2) {
                     final ApplicationPeriod p =
                             new ApplicationPeriod(LocalDate.of(2015, Month.NOVEMBER, 14), LocalDate.of(2015, Month.NOVEMBER, 15),
                                     dy);
@@ -77,7 +77,7 @@ public class TestController {
         final Calendar testCalendar = cd.findByYear(2014);
         for (final Degree d : testCalendar.getDegrees()) {
             for (final DegreeYear dy : d.getYears()) {
-                if (dy.getDegreeYear() == 1) {
+                if (dy.getDegreeYear() == 2) {
                     final ElectionPeriod p =
                             new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 16), LocalDate.of(2015, Month.NOVEMBER, 17), dy);
                     try {
