@@ -48,7 +48,7 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
                 applicationObject.addProperty("applicationPeriodStart", degreeYear.getCurrentApplicationPeriod().getStart()
                         .format(dtf));
                 applicationObject.addProperty("applicationPeriodEnd",
-                        degreeYear.getCurrentApplicationPeriod().getEnd().plusDays(3).format(dtf));
+                        degreeYear.getCurrentApplicationPeriod().getEnd().format(dtf));
                 applicationObject.addProperty("candidateCount", degreeYear.getCurrentApplicationPeriod().getCandidateCount());
             }
 

@@ -2,6 +2,9 @@ package endpoint;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,9 +18,13 @@ import core.Degree;
 import core.DegreeDAO;
 import core.DegreeYear;
 import core.ElectionPeriod;
+import core.Period;
+import core.PeriodDAO;
 import core.Student;
 import core.StudentDAO;
 import core.exception.InvalidPeriodException;
+import core.util.ActivatePeriod;
+import core.util.RetrieveStudentListTask;
 
 @RestController
 public class TestController {
@@ -29,6 +36,9 @@ public class TestController {
 
     @Autowired
     DegreeDAO dd;
+
+    @Autowired
+    PeriodDAO pd;
 
     @RequestMapping("/sanity")
     public String test() {
@@ -44,6 +54,36 @@ public class TestController {
         cd.save(c);
 //        cd.save(c2);
         return "Done";
+    }
+
+    @RequestMapping("/timer-period")
+    public String timerPeriod() {
+//        dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear()).addYear(5);
+        Period p = pd.findById(3);
+//                new ApplicationPeriod(LocalDate.of(2015, 7, 22), LocalDate.of(2015, 7, 23), dd.findByIdAndYear("2761663971465",
+//                        cd.findFirstByOrderByYearDesc().getYear()).getDegreeYear(5));
+        TimerTask timerTask = new ActivatePeriod(p, pd);
+        pd.save(p);
+        Timer timer = new Timer(true);
+        Date today = new Date();
+        Date tomorrow = new Date(today.getTime() + (1000 * 10));
+        timer.schedule(timerTask, tomorrow);
+        System.out.println("Scheduled for time " + tomorrow.toString());
+        return "Ok";
+    }
+
+    @RequestMapping("/timer")
+    public String timer() {
+        dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear()).addYear(5);
+        TimerTask timerTask =
+                new RetrieveStudentListTask(dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear())
+                        .getDegreeYear(5), dd);
+        Timer timer = new Timer(true);
+        Date today = new Date();
+        Date tomorrow = new Date(today.getTime() + (1000 * 10));
+        timer.schedule(timerTask, tomorrow);
+        System.out.println("Scheduled for time " + tomorrow.toString());
+        return "Ok";
     }
 
     @RequestMapping("/application")

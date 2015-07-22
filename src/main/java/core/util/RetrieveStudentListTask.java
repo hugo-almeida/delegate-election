@@ -2,14 +2,18 @@ package core.util;
 
 import java.util.TimerTask;
 
+import core.DegreeDAO;
 import core.DegreeYear;
 
 public class RetrieveStudentListTask extends TimerTask {
 
     private final DegreeYear degreeYear;
 
-    public RetrieveStudentListTask(DegreeYear year) {
+    DegreeDAO degreeDAO;
+
+    public RetrieveStudentListTask(DegreeYear year, DegreeDAO dao) {
         degreeYear = year;
+        degreeDAO = dao;
     }
 
     @Override
@@ -18,6 +22,7 @@ public class RetrieveStudentListTask extends TimerTask {
         // And put them in the courseyear
         // This should be ran 5/10 minutes before the period becomes active
         degreeYear.initStudents();
+        degreeDAO.save(degreeYear.getDegree());
     }
 
 }

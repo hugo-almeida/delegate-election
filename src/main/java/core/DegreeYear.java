@@ -53,7 +53,7 @@ public class DegreeYear {
     public DegreeYear(int year, Degree d) {
         this.degreeDegreeYearPK = new DegreeDegreeYearPK(d.getName(), year, d.getYear());
         this.degree = d;
-        initStudents();
+//        initStudents();
     }
 
     public void initStudents() {
@@ -85,7 +85,6 @@ public class DegreeYear {
             }
         }
         students.addAll(Arrays.asList(degreeYearStudents));
-
     }
 
     public int getDegreeYear() {
