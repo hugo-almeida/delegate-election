@@ -44,7 +44,7 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
             JsonObject electionObject = new JsonObject();
 
             yearObject.addProperty("degreeYear", degreeYear.getDegreeYear());
-
+            LocalDate now = LocalDate.now();
             if (degreeYear.getCurrentApplicationPeriod() != null) {
                 applicationObject.addProperty("applicationPeriodId", degreeYear.getCurrentApplicationPeriod().getId());
                 applicationObject.addProperty("applicationPeriodStart", degreeYear.getCurrentApplicationPeriod().getStart()
@@ -52,6 +52,11 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
                 applicationObject.addProperty("applicationPeriodEnd",
                         degreeYear.getCurrentApplicationPeriod().getEnd().format(dtf));
                 applicationObject.addProperty("candidateCount", degreeYear.getCurrentApplicationPeriod().getCandidateCount());
+                if (degreeYear.getCurrentApplicationPeriod().getEnd().isBefore(now)) {
+                    applicationObject.addProperty("state", "passado");
+                } else {
+                    applicationObject.addProperty("state", "presente/futuro");
+                }
             }
 
             if (degreeYear.getCurrentElectionPeriod() != null) {
@@ -59,6 +64,11 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
                 electionObject.addProperty("electionPeriodStart", degreeYear.getCurrentElectionPeriod().getStart().format(dtf));
                 electionObject.addProperty("electionPeriodEnd", degreeYear.getCurrentElectionPeriod().getEnd().format(dtf));
                 electionObject.addProperty("voteCount", degreeYear.getCurrentElectionPeriod().getVotes().size());
+                if (degreeYear.getCurrentElectionPeriod().getEnd().isBefore(now)) {
+                    electionObject.addProperty("state", "passado");
+                } else {
+                    electionObject.addProperty("state", "presente/futuro");
+                }
             }
 
             yearObject.add("applicationPeriod", applicationObject);
