@@ -36,7 +36,8 @@
 			<table class="table">
 				<tr ng-repeat="candidato in candidatos | orderBy:'name'">
 					<td class="col-md-1">
-						<img class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28"></img>
+						<img ng-show="!isEmpty(candidato.photo)" class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28"></img>
+						<i ng-show="isEmpty(candidato.photo)" class="glyphicon glyphicon-user"></i>
 					</td>
 					<td>
 						<strong>{{candidato.name}}</strong>

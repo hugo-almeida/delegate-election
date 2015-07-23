@@ -15,6 +15,10 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	
 	sc.inspectDegreeYear = 0;
 	
+	sc.selectedPeriodType = 'none';
+	
+	sc.selectedPeriodOperation = 'none';
+	
 	sc.loadDegrees = function() {
 		http.get('periods').success(function(data){
 			sc.degrees = data;
@@ -83,6 +87,22 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		sc.details = false;
 	}
 	
+	sc.isEmpty = function (obj) {
+	    for (var i in obj) if (obj.hasOwnProperty(i)) return false;
+	    return true;
+	}
+	
+	sc.setSelectedRow = function(index) {
+		sc.selectedRow = index;
+	}
+	
+	sc.setSelectedPeriodType = function(type) {
+		sc.selectedPeriodType = type;
+	}
+	
+	sc.setSelectedPeriodOperation = function(operation) {
+		sc.selectedPeriodOperation = operation;
+	}
 	/***
 	 * Debug
 	 */

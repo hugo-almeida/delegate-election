@@ -54,29 +54,29 @@ public class DegreeYear {
     public DegreeYear(int year, Degree d) {
         this.degreeDegreeYearPK = new DegreeDegreeYearPK(d.getName(), year, d.getYear());
         this.degree = d;
-//        initStudents();
+        initStudents();
     }
 
     public void initStudents() {
         final String accessToken =
                 "ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
 
-        RestTemplate t = new RestTemplate();
-        Student[] degreeYearStudents =
+        final RestTemplate t = new RestTemplate();
+        final Student[] degreeYearStudents =
                 t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees/" + degree.getId()
                         + "/students?curricularYear=" + getDegreeYear() + "&access_token=" + accessToken, Student[].class);
 
-        String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + accessToken;
+        final String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + accessToken;
 
-        HttpHeaders requestHeaders = new HttpHeaders();
-        for (Student student : degreeYearStudents) {
+        final HttpHeaders requestHeaders = new HttpHeaders();
+        for (final Student student : degreeYearStudents) {
             student.setDegreeYear(this);
 
             requestHeaders.set("__username__", student.getUsername());
-            HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
+            final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
 
-            HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
-            JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
+            final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
+            final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
             if (!result.get("email").isJsonNull()) {
                 student.setEmail(result.get("email").toString());
             }
@@ -113,7 +113,7 @@ public class DegreeYear {
     }
 
     public Set<Student> getCandidates() {
-        Period activePeriod = getActivePeriod();
+        final Period activePeriod = getActivePeriod();
         if (activePeriod != null) {
             return activePeriod.getCandidates();
         }
@@ -131,22 +131,22 @@ public class DegreeYear {
     }
 
     public void addPeriod(Period period) throws InvalidPeriodException {
-        if (getActivePeriod() != null && period.getStart().isBefore(getActivePeriod().getEnd())) {
-            throw new InvalidPeriodException("A period can't start before the active period ends");
-        }
+//        if (getActivePeriod() != null && period.getStart().isBefore(getActivePeriod().getEnd())) {
+//            throw new InvalidPeriodException("A period can't start before the active period ends");
+//        }
 
         for (final Period p : periods) {
-            if (period.conflictsWith(p)) {
-                throw new InvalidPeriodException("There should not be overlapping periods");
-            }
+//            if (period.conflictsWith(p)) {
+//                throw new InvalidPeriodException("There should not be overlapping periods");
+//            }
         }
 
         periods.add(period);
     }
 
     public Set<Period> getInactivePeriods() {
-        Set<Period> inactive = new HashSet<Period>();
-        for (Period p : periods) {
+        final Set<Period> inactive = new HashSet<Period>();
+        for (final Period p : periods) {
             if (!p.isActive()) {
                 inactive.add(p);
             }
@@ -155,7 +155,7 @@ public class DegreeYear {
     }
 
     public Period getActivePeriod() {
-        for (Period p : periods) {
+        for (final Period p : periods) {
             if (p.isActive()) {
                 return p;
             }
@@ -165,7 +165,7 @@ public class DegreeYear {
 
     public ApplicationPeriod getCurrentApplicationPeriod() {
         ApplicationPeriod period = null;
-        for (Period p : periods) {
+        for (final Period p : periods) {
             if (p.getType().equals(PeriodType.Application) && (period == null || p.getStart().isAfter(period.getStart()))) {
                 period = (ApplicationPeriod) p;
             }
@@ -175,7 +175,7 @@ public class DegreeYear {
 
     public ElectionPeriod getCurrentElectionPeriod() {
         ElectionPeriod period = null;
-        for (Period p : periods) {
+        for (final Period p : periods) {
             if (p.getType().equals(PeriodType.Election) && (period == null || p.getStart().isAfter(period.getStart()))) {
                 period = (ElectionPeriod) p;
             }
@@ -214,5 +214,10 @@ public class DegreeYear {
         if (newPeriod.getEnd().isAfter(now) && end.isAfter(now)) {
             newPeriod.setEnd(end);
         }
+    }
+
+    public boolean hasPeriodBetweenDates(LocalDate first, LocalDate secondDate) {
+        //TODO
+        return false;
     }
 }

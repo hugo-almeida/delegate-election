@@ -24,8 +24,10 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import core.util.ActivatePeriod;
+import core.util.DeactivatePeriod;
 import core.util.RetrieveStudentListTask;
 
 @Entity
@@ -86,6 +88,10 @@ public abstract class Period implements Serializable {
 
     @Column(name = "active")
     private boolean active;
+
+//    @Column(name = "timer")
+    @Transient
+    private Timer timer;
 
     Period() {
 
@@ -207,11 +213,19 @@ public abstract class Period implements Serializable {
 
     abstract public PeriodType getType();
 
+    public void unschedulePeriod(PeriodDAO periodDAO, DegreeDAO degreeDAO) {
+        timer.cancel();
+    }
+
     public void schedulePeriod(PeriodDAO periodDAO, DegreeDAO degreeDAO) {
-        TimerTask retrieveTask = new RetrieveStudentListTask(getDegreeYear(), degreeDAO);
-        TimerTask activateTask = new ActivatePeriod(this, periodDAO);
-        Timer timer = new Timer(true);
-        timer.schedule(retrieveTask, Date.from(getStart().atStartOfDay().minusHours(1).toInstant(null))); //Vai buscar os alunos 1 hora antes
-        timer.schedule(activateTask, Date.from(getStart().atStartOfDay().toInstant(null)));
+        timer = new Timer(true);
+
+        TimerTask retrieveStudentsTask = new RetrieveStudentListTask(getDegreeYear(), degreeDAO);
+        TimerTask activatePeriodTask = new ActivatePeriod(this, periodDAO);
+        TimerTask deactivatePeriodTask = new DeactivatePeriod(this, periodDAO);
+
+        timer.schedule(retrieveStudentsTask, Date.from(getStart().atStartOfDay().minusHours(1).toInstant(null))); //Vai buscar os alunos 1 hora antes
+        timer.schedule(activatePeriodTask, Date.from(getStart().atStartOfDay().toInstant(null)));
+        timer.schedule(deactivatePeriodTask, Date.from(getEnd().plusDays(1).atStartOfDay().minusMinutes(1).toInstant(null))); //termina às 23:59 do dia de fim
     }
 }

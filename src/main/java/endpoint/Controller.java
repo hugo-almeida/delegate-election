@@ -2,6 +2,8 @@ package endpoint;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +60,7 @@ import core.DegreeDAO;
 import core.DegreePeriodAdapter;
 import core.DegreeYear;
 import core.DegreeYearAdapter;
+import core.DegreeYearHistoryAdapter;
 import core.ElectionPeriod;
 import core.HibernateProxyTypeAdapter;
 import core.Period;
@@ -270,13 +273,11 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/history", method = RequestMethod.GET)
     public @ResponseBody String getHistoy(@PathVariable String degreeId, @PathVariable int year) {
-        final Set<DegreeYear> degreeYears =
-                StreamSupport.stream(calendarDAO.findAll().spliterator(), false)
-                        .map(c -> degreeDAO.findByIdAndYear(degreeId, c.getYear()).getDegreeYear(year))
-                        .collect(Collectors.toSet());
+        DegreeYear degreeYear =
+                degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
         final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreePeriodAdapter()).create();
-        return gson.toJson(degreeYears);
+        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreeYearHistoryAdapter()).create();
+        return gson.toJson(degreeYear);
     }
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/periods", method = RequestMethod.GET)
@@ -365,6 +366,35 @@ public class Controller {
                 }
             }
         }
+        return new Gson().toJson("ok");
+    }
+
+    // recebe Json com 2 datas: start e end
+    @RequestMapping(value = "/periods/{periodId}", method = RequestMethod.PUT)
+    public @ResponseBody String updatePeriod(@PathVariable int periodId, @RequestBody String dates) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        JsonParser parser = new JsonParser();
+
+        Period period = periodDAO.findById(periodId);
+        DegreeYear degreeYear = period.getDegreeYear();
+
+        JsonObject datesObject = (JsonObject) parser.parse(dates);
+        LocalDate newStart = LocalDate.parse(datesObject.get("start").getAsString(), dtf);
+        LocalDate newEnd = LocalDate.parse(datesObject.get("end").getAsString(), dtf);
+
+        LocalDate start = period.getStart();
+        LocalDate end = period.getEnd();
+
+        if (newStart.isAfter(LocalDate.now()) && start.isAfter(LocalDate.now())
+                && !degreeYear.hasPeriodBetweenDates(newStart, end)) {
+            period.setStart(newStart);
+        }
+
+        if (newEnd.isAfter(LocalDate.now()) && end.isAfter(LocalDate.now()) && !degreeYear.hasPeriodBetweenDates(start, newEnd)) {
+            period.setEnd(newEnd);
+        }
+
+        periodDAO.save(period);
         return new Gson().toJson("ok");
     }
 
