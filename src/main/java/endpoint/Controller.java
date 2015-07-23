@@ -271,13 +271,11 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/history", method = RequestMethod.GET)
     public @ResponseBody String getHistoy(@PathVariable String degreeId, @PathVariable int year) {
-        final Set<DegreeYear> degreeYears =
-                StreamSupport.stream(calendarDAO.findAll().spliterator(), false)
-                        .map(c -> degreeDAO.findByIdAndYear(degreeId, c.getYear()).getDegreeYear(year))
-                        .collect(Collectors.toSet());
+        DegreeYear degreeYear =
+                degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreeYearHistoryAdapter()).create();
-        return gson.toJson(degreeYears);
+        return gson.toJson(degreeYear);
     }
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/periods", method = RequestMethod.GET)

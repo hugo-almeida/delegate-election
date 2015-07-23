@@ -130,14 +130,14 @@ public class DegreeYear {
     }
 
     public void addPeriod(Period period) throws InvalidPeriodException {
-        if (getActivePeriod() != null && period.getStart().isBefore(getActivePeriod().getEnd())) {
-            throw new InvalidPeriodException("A period can't start before the active period ends");
-        }
+//        if (getActivePeriod() != null && period.getStart().isBefore(getActivePeriod().getEnd())) {
+//            throw new InvalidPeriodException("A period can't start before the active period ends");
+//        }
 
         for (final Period p : periods) {
-            if (period.conflictsWith(p)) {
-                throw new InvalidPeriodException("There should not be overlapping periods");
-            }
+//            if (period.conflictsWith(p)) {
+//                throw new InvalidPeriodException("There should not be overlapping periods");
+//            }
         }
 
         periods.add(period);

@@ -24,6 +24,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import core.util.ActivatePeriod;
 import core.util.DeactivatePeriod;
@@ -87,6 +88,9 @@ public abstract class Period implements Serializable {
 
     @Column(name = "active")
     private boolean active;
+
+//    @Column(name = "timer")
+    @Transient
     private Timer timer;
 
     Period() {
