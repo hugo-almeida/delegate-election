@@ -141,6 +141,13 @@ public abstract class Period implements Serializable {
         return true;
     }
 
+    public boolean conflictsWith(LocalDate otherStart, LocalDate otherEnd) {
+        if (end.isBefore(otherStart) || start.isAfter(otherEnd)) {
+            return false;
+        }
+        return true;
+    }
+
     public DegreeYear getDegreeYear() {
         return degreeYear;
     }

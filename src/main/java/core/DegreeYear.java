@@ -183,6 +183,7 @@ public class DegreeYear {
         return period;
     }
 
+<<<<<<< HEAD
     public void setDate(LocalDate start, LocalDate end, PeriodType periodType) {
         LocalDate now = LocalDate.now();
         Period newPeriod = null;
@@ -216,8 +217,12 @@ public class DegreeYear {
         }
     }
 
-    public boolean hasPeriodBetweenDates(LocalDate first, LocalDate secondDate) {
-        //TODO
+    public boolean hasPeriodBetweenDates(LocalDate first, LocalDate second) {
+        for (Period period : periods) {
+            if (period.conflictsWith(first, second)) {
+                return true;
+            }
+        }
         return false;
     }
 }
