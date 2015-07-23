@@ -1,5 +1,6 @@
 package core;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -180,5 +181,38 @@ public class DegreeYear {
             }
         }
         return period;
+    }
+
+    public void setDate(LocalDate start, LocalDate end, PeriodType periodType) {
+        LocalDate now = LocalDate.now();
+        Period newPeriod = null;
+        //Changing the past is impossible, the end can't happen before the start
+        if (end.isBefore(now) || end.isBefore(start)) {
+            return;
+        }
+        //Change cannot conflict with more than one period
+        for (Period p : periods) {
+            //No conflict
+            if (p.getEnd().isBefore(start) || p.getStart().isAfter(end)) {
+                continue;
+            } else {
+                //Two conflicts - do nothing
+                if (newPeriod != null) {
+                    return;
+                } else {
+                    newPeriod = p;
+                }
+            }
+        }
+        //Types should match
+        if (newPeriod.getType() != periodType) {
+            return;
+        }
+        if (newPeriod.getStart().isAfter(now) && start.isAfter(now)) {
+            newPeriod.setStart(start);
+        }
+        if (newPeriod.getEnd().isAfter(now) && end.isAfter(now)) {
+            newPeriod.setEnd(end);
+        }
     }
 }

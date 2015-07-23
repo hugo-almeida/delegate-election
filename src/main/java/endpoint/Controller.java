@@ -337,9 +337,13 @@ public class Controller {
         for (final DegreeChange degreeChange : degrees) {
             for (final Integer year : degreeChange.getPeriods().keySet()) {
                 for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
-                    final Period period = periodDAO.findById(change.getPeriodId());
-                    period.setStart(change.getStart());
-                    period.setEnd(change.getEnd());
+                    //final Period period = periodDAO.findById(change.getPeriodId());
+                    DegreeYear dy =
+                            degreeDAO.findByIdAndYear(degreeChange.getDegreeId(),
+                                    calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
+                    dy.setDate(change.getStart(), change.getEnd(), change.getPeriodType());
+                    //period.setStart(change.getStart());
+                    //period.setEnd(change.getEnd());
                 }
             }
         }
