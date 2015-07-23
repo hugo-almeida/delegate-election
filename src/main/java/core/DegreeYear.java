@@ -1,5 +1,6 @@
 package core;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -180,5 +181,10 @@ public class DegreeYear {
             }
         }
         return period;
+    }
+
+    public boolean hasPeriodBetweenDates(LocalDate first, LocalDate secondDate) {
+        //TODO
+        return false;
     }
 }
