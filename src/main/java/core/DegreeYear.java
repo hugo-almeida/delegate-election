@@ -183,13 +183,13 @@ public class DegreeYear {
         return period;
     }
 
-<<<<<<< HEAD
-    public void setDate(LocalDate start, LocalDate end, PeriodType periodType) {
+    // Caso não exista nenhum periodo em conflito, significa que não há periodos e é retornado falso.
+    public boolean setDate(LocalDate start, LocalDate end, PeriodType periodType) {
         LocalDate now = LocalDate.now();
         Period newPeriod = null;
         //Changing the past is impossible, the end can't happen before the start
         if (end.isBefore(now) || end.isBefore(start)) {
-            return;
+            return true;
         }
         //Change cannot conflict with more than one period
         for (Period p : periods) {
@@ -199,15 +199,19 @@ public class DegreeYear {
             } else {
                 //Two conflicts - do nothing
                 if (newPeriod != null) {
-                    return;
+                    return true;
                 } else {
                     newPeriod = p;
                 }
             }
         }
+
+        if (newPeriod == null) {
+            return false;
+        }
         //Types should match
         if (newPeriod.getType() != periodType) {
-            return;
+            return true;
         }
         if (newPeriod.getStart().isAfter(now) && start.isAfter(now)) {
             newPeriod.setStart(start);
@@ -215,6 +219,7 @@ public class DegreeYear {
         if (newPeriod.getEnd().isAfter(now) && end.isAfter(now)) {
             newPeriod.setEnd(end);
         }
+        return true;
     }
 
     public boolean hasPeriodBetweenDates(LocalDate first, LocalDate second) {
