@@ -1,5 +1,6 @@
 package endpoint;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
@@ -12,17 +13,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.security.oauth2.sso.EnableOAuth2Sso;
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurerAdapter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -90,6 +95,56 @@ public class Controller {
 
     @Autowired
     PeriodDAO periodDAO;
+
+    @PostConstruct
+    public void schedulePeriods() {
+        for (Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
+            for (DegreeYear dy : d.getYears()) {
+                for (Period p : dy.getInactivePeriods()) {
+                    if (p.getStart().isAfter(LocalDate.now())) {
+                        p.schedulePeriod(periodDAO, degreeDAO);
+                    } else if (p.getStart().isBefore(LocalDate.now()) && p.getEnd().isAfter(LocalDate.now())) {
+                        if (dy.getStudents().isEmpty()) {
+                            // Caso seja uma segunda oportunidade de candidatura deviamos voltar a inicializar os alunos.
+                            dy.initStudents();
+                        }
+                        dy.setActivePeriod(p);
+                    }
+                }
+                Period activePeriod = dy.getActivePeriod();
+                // Passar tudo a localdatetime talvez seja melhor.
+                if (activePeriod != null) {
+                    if (!activePeriod.getEnd().isBefore(LocalDate.now())) {
+                        activePeriod.schedulePeriodEnd(periodDAO);
+                    } else {
+                        activePeriod.setInactive();
+                    }
+                }
+            }
+        }
+    }
+
+    @RequestMapping(value = "/excel", method = RequestMethod.GET, produces = { "application/x-octet-stream" })
+    public @ResponseBody Response getFile() throws IOException {
+        FileSystemResource fsr = new FileSystemResource("delegados.xls");
+        File file = new File("Delegados.xls");
+
+//        WorkbookSettings wbSettings = new WorkbookSettings();
+
+//        wbSettings.setLocale(new Locale("en", "EN"));
+
+//        WritableWorkbook workbook = Workbook.createWorkbook(file, wbSettings);
+//        workbook.createSheet("Report", 0);
+//        WritableSheet excelSheet = workbook.getSheet(0);
+//        createLabel(excelSheet);
+//        createContent(excelSheet);
+//        workbook.write();
+//        workbook.close();
+
+        return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM)
+//                .header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"") //optional
+                .build();
+    }
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
     public @ResponseBody String getStudentDegrees(@PathVariable String istId) {
@@ -303,35 +358,63 @@ public class Controller {
 
     // Permitir criar apenas periodos futuros
     @RequestMapping(value = "/periods", method = RequestMethod.POST)
-    public @ResponseBody String addPeriods(@RequestBody String periodsJson) throws InvalidPeriodException {
-        final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
-        final DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
-        for (final DegreeChange degreeChange : degrees) {
-            for (final Integer year : degreeChange.getPeriods().keySet()) {
-                final DegreeYear degreeYear =
-                        degreeDAO.findByIdAndYear(degreeChange.getDegreeId(), calendarDAO.findFirstByOrderByYearDesc().getYear())
-                                .getDegreeYear(year);
-                for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
-                    if (change.getPeriodType().equals(PeriodType.Application)) {
-                        final Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
-                        degreeYear.addPeriod(period);
-                        period.schedulePeriod(periodDAO, degreeDAO);
-                    } else if (change.getPeriodType().equals(PeriodType.Election)) {
-                        final Period period = new ElectionPeriod(change.getStart(), change.getEnd(), degreeYear);
-                        degreeYear.addPeriod(period);
-                        period.schedulePeriod(periodDAO, degreeDAO);
-                    }
-                }
-            }
+    public @ResponseBody String addPeriod(@RequestBody String periodJson) throws InvalidPeriodException {
+//        final GsonBuilder gsonBuilder = new GsonBuilder();
+//        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
+//        final DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
+//        for (final DegreeChange degreeChange : degrees) {
+//            for (final Integer year : degreeChange.getPeriods().keySet()) {
+//                final DegreeYear degreeYear =
+//                        degreeDAO.findByIdAndYear(degreeChange.getDegreeId(), calendarDAO.findFirstByOrderByYearDesc().getYear())
+//                                .getDegreeYear(year);
+//                for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
+//                    if (change.getPeriodType().equals(PeriodType.Application)) {
+//                        final Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
+//                        degreeYear.addPeriod(period);
+//                        period.schedulePeriod(periodDAO, degreeDAO);
+//                    } else if (change.getPeriodType().equals(PeriodType.Election)) {
+//                        final Period period = new ElectionPeriod(change.getStart(), change.getEnd(), degreeYear);
+//                        degreeYear.addPeriod(period);
+//                        period.schedulePeriod(periodDAO, degreeDAO);
+//                    }
+//                }
+//            }
+//        }
+//        calendarDAO.save(calendarDAO.findFirstByOrderByYearDesc());
+//        return new Gson().toJson("ok");
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        JsonParser parser = new JsonParser();
+
+        JsonObject periodObject = (JsonObject) parser.parse(periodJson);
+        String degreeId = periodObject.get("degreeId").getAsString();
+        int year = periodObject.get("degreeYear").getAsInt();
+        String periodType = periodObject.get("periodType").getAsString();
+        LocalDate start = LocalDate.parse(periodObject.get("start").getAsString(), dtf);
+        LocalDate end = LocalDate.parse(periodObject.get("end").getAsString(), dtf);
+
+        DegreeYear degreeYear =
+                degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
+
+        if (periodType.equals(PeriodType.Application.toString())) {
+            Period period = new ApplicationPeriod(start, end, degreeYear);
+            degreeYear.addPeriod(period);
+            period.schedulePeriod(periodDAO, degreeDAO);
+            periodDAO.save(period);
+        } else if (periodType.equals(PeriodType.Election.toString())) {
+            Period period = new ElectionPeriod(start, end, degreeYear);
+            degreeYear.addPeriod(period);
+            period.schedulePeriod(periodDAO, degreeDAO);
+            periodDAO.save(period);
         }
-        calendarDAO.save(calendarDAO.findFirstByOrderByYearDesc());
+
         return new Gson().toJson("ok");
     }
 
     // Permitir alterar apenas periodos futuros
+    // Permitir criar
     @RequestMapping(value = "/periods", method = RequestMethod.PUT)
-    public @ResponseBody String updatePeriods(@RequestBody String periodsJson) {
+    public @ResponseBody String updatePeriods(@RequestBody String periodsJson) throws InvalidPeriodException {
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
         final DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
@@ -349,8 +432,6 @@ public class Controller {
         return new Gson().toJson("ok");
     }
 
-    //TODO Testar isto.
-    // Permitir apagar apenas periodos futuros
     @RequestMapping(value = "/periods", method = RequestMethod.DELETE)
     public @ResponseBody String removePeriods(@RequestBody String periodsJson) {
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -359,7 +440,10 @@ public class Controller {
         for (DegreeChange degreeChange : degrees) {
             for (Integer year : degreeChange.getPeriods().keySet()) {
                 for (PeriodChange change : degreeChange.getPeriods().get(year)) {
-                    periodDAO.delete(change.getPeriodId());
+                    Period period = periodDAO.findById(change.getPeriodId());
+                    if (period.getStart().isAfter(LocalDate.now())) {
+                        periodDAO.delete(change.getPeriodId());
+                    }
                 }
             }
         }
