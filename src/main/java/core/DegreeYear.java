@@ -222,9 +222,12 @@ public class DegreeYear {
         return true;
     }
 
-    public boolean hasPeriodBetweenDates(LocalDate first, LocalDate second) {
-        for (Period period : periods) {
-            if (period.conflictsWith(first, second)) {
+    public boolean hasPeriodBetweenDates(LocalDate first, LocalDate second, Period period) {
+        for (Period p : periods) {
+            if (p.getId() == period.getId()) {
+                continue;
+            }
+            if (p.conflictsWith(first, second)) {
                 return true;
             }
         }

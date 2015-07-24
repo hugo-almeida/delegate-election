@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -20,14 +21,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.security.oauth2.sso.EnableOAuth2Sso;
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurerAdapter;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -125,25 +131,23 @@ public class Controller {
     }
 
     @RequestMapping(value = "/excel", method = RequestMethod.GET, produces = { "application/x-octet-stream" })
-    public @ResponseBody Response getFile() throws IOException {
-        FileSystemResource fsr = new FileSystemResource("delegados.xls");
-        File file = new File("Delegados.xls");
+    public ModelAndView getFile() throws IOException, RowsExceededException, WriteException {
+        File file = new File("src/main/resources/static/delegados.xls");
+        WorkbookSettings wbSettings = new WorkbookSettings();
 
-//        WorkbookSettings wbSettings = new WorkbookSettings();
+        wbSettings.setLocale(new Locale("en", "EN"));
 
-//        wbSettings.setLocale(new Locale("en", "EN"));
+        WritableWorkbook workbook = Workbook.createWorkbook(file, wbSettings);
+        workbook.createSheet("Delegados", 0);
+        WritableSheet excelSheet = workbook.getSheet(0);
 
-//        WritableWorkbook workbook = Workbook.createWorkbook(file, wbSettings);
-//        workbook.createSheet("Report", 0);
-//        WritableSheet excelSheet = workbook.getSheet(0);
-//        createLabel(excelSheet);
-//        createContent(excelSheet);
-//        workbook.write();
-//        workbook.close();
+        Label f = new Label(0, 10, "Epah isto é um label... I guess");
+        excelSheet.addCell(f);
 
-        return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM)
-//                .header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"") //optional
-                .build();
+        workbook.write();
+        workbook.close();
+
+        return new ModelAndView("redirect:/delegados.xls");
     }
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
@@ -467,11 +471,12 @@ public class Controller {
         LocalDate end = period.getEnd();
 
         if (newStart.isAfter(LocalDate.now()) && start.isAfter(LocalDate.now())
-                && !degreeYear.hasPeriodBetweenDates(newStart, end)) {
+                && !degreeYear.hasPeriodBetweenDates(newStart, end, period)) {
             period.setStart(newStart);
         }
 
-        if (newEnd.isAfter(LocalDate.now()) && end.isAfter(LocalDate.now()) && !degreeYear.hasPeriodBetweenDates(start, newEnd)) {
+        if (newEnd.isAfter(LocalDate.now()) && end.isAfter(LocalDate.now())
+                && !degreeYear.hasPeriodBetweenDates(start, newEnd, period)) {
             period.setEnd(newEnd);
         }
 
