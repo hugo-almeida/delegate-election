@@ -30,6 +30,8 @@ import javax.persistence.Transient;
 import core.util.ActivatePeriod;
 import core.util.DeactivatePeriod;
 import core.util.RetrieveStudentListTask;
+import dao.DegreeDAO;
+import dao.PeriodDAO;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -192,13 +194,13 @@ public abstract class Period implements Serializable {
         } else {
             p = (ElectionPeriod) o;
         }
-        if (this.degree_Year == p.degree_Year && this.calendarYear == p.calendarYear && this.degreeName.equals(p.degreeName)
-                && this.start.equals(p.start) && this.end.equals(p.end)) {
-            return true;
-        } else {
-            return false;
-        }
-
+//        if (this.degree_Year == p.degree_Year && this.calendarYear == p.calendarYear && this.degreeName.equals(p.degreeName)
+//                && this.start.equals(p.start) && this.end.equals(p.end)) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+        return p.getId() == getId();
     }
 
     @Override
@@ -209,8 +211,9 @@ public abstract class Period implements Serializable {
 //        int start = this.start.hashCode();
 //        int end = this.end.hashCode();
 //        return year * calendar * degreeName * start * end;
+        return getId();
         //Forcing equals to be called
-        return 0;
+//        return 0;
     }
 
     public int getId() {

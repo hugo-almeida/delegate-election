@@ -1,4 +1,4 @@
-package core;
+package adapter;
 
 import java.lang.reflect.Type;
 
@@ -7,6 +7,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
+import core.Student;
 
 public class StudentAdapter implements JsonSerializer<Student> {
     @Override

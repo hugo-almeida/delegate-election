@@ -4,7 +4,7 @@ import java.util.TimerTask;
 
 import core.DegreeYear;
 import core.Period;
-import core.PeriodDAO;
+import dao.PeriodDAO;
 
 public class ActivatePeriod extends TimerTask {
 

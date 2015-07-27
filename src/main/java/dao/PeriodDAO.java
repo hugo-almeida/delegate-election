@@ -1,7 +1,9 @@
-package core;
+package dao;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
+
+import core.Period;
 
 @Transactional
 public interface PeriodDAO extends CrudRepository<Period, Integer> {

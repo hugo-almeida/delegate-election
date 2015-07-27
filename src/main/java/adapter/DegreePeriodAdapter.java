@@ -1,4 +1,4 @@
-package core;
+package adapter;
 
 import java.lang.reflect.Type;
 import java.time.format.DateTimeFormatter;
@@ -7,6 +7,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
+import core.ApplicationPeriod;
+import core.DegreeYear;
+import core.ElectionPeriod;
 
 public class DegreePeriodAdapter implements JsonSerializer<DegreeYear> {
 

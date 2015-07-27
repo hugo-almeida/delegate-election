@@ -2,8 +2,8 @@ package core.util;
 
 import java.util.TimerTask;
 
-import core.DegreeDAO;
 import core.DegreeYear;
+import dao.DegreeDAO;
 
 public class RetrieveStudentListTask extends TimerTask {
 

@@ -1,4 +1,4 @@
-package core;
+package adapter;
 
 import java.io.IOException;
 

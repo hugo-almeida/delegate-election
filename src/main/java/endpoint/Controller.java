@@ -57,30 +57,31 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.WebUtils;
 
+import adapter.DegreeAdapter;
+import adapter.DegreeChange;
+import adapter.DegreePeriodAdapter;
+import adapter.DegreeYearAdapter;
+import adapter.DegreeYearHistoryAdapter;
+import adapter.HibernateProxyTypeAdapter;
+import adapter.PeriodChange;
+import adapter.StudentAdapter;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import core.ApplicationPeriod;
-import core.CalendarDAO;
 import core.Degree;
-import core.DegreeAdapter;
-import core.DegreeChange;
-import core.DegreeDAO;
-import core.DegreePeriodAdapter;
 import core.DegreeYear;
-import core.DegreeYearAdapter;
-import core.DegreeYearHistoryAdapter;
 import core.ElectionPeriod;
-import core.HibernateProxyTypeAdapter;
 import core.Period;
 import core.Period.PeriodType;
-import core.PeriodChange;
-import core.PeriodDAO;
 import core.Student;
-import core.StudentAdapter;
-import core.StudentDAO;
+import dao.CalendarDAO;
+import dao.DegreeDAO;
+import dao.PeriodDAO;
+import dao.StudentDAO;
 import endpoint.exception.UnauthorizedException;
 
 @EnableOAuth2Sso

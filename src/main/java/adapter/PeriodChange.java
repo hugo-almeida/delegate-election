@@ -1,7 +1,8 @@
-package core;
+package adapter;
 
 import java.time.LocalDate;
 
+import core.Period;
 import core.Period.PeriodType;
 
 public class PeriodChange {

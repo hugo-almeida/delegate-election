@@ -13,17 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import core.ApplicationPeriod;
 import core.Calendar;
-import core.CalendarDAO;
 import core.Degree;
-import core.DegreeDAO;
 import core.DegreeYear;
 import core.ElectionPeriod;
 import core.Period;
-import core.PeriodDAO;
 import core.Student;
-import core.StudentDAO;
 import core.util.ActivatePeriod;
 import core.util.RetrieveStudentListTask;
+import dao.CalendarDAO;
+import dao.DegreeDAO;
+import dao.PeriodDAO;
+import dao.StudentDAO;
 
 @RestController
 public class TestController {
