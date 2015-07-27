@@ -25,7 +25,7 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
     public JsonElement serialize(Degree degree, Type arg1, JsonSerializationContext arg2) {
         JsonObject degreeObject = new JsonObject();
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM");
 
         degreeObject.addProperty("degree", degree.getAcronym());
         degreeObject.addProperty("degreeName", degree.getName());

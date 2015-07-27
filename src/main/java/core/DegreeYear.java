@@ -24,7 +24,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import core.Period.PeriodType;
-import core.exception.InvalidPeriodException;
 
 @Entity
 @Table(name = "DegreeYear")
@@ -54,7 +53,7 @@ public class DegreeYear {
     public DegreeYear(int year, Degree d) {
         this.degreeDegreeYearPK = new DegreeDegreeYearPK(d.getName(), year, d.getYear());
         this.degree = d;
-        initStudents();
+        initStudents(); // Development only.
     }
 
     public void initStudents() {
@@ -130,15 +129,15 @@ public class DegreeYear {
         }
     }
 
-    public void addPeriod(Period period) throws InvalidPeriodException {
-//        if (getActivePeriod() != null && period.getStart().isBefore(getActivePeriod().getEnd())) {
-//            throw new InvalidPeriodException("A period can't start before the active period ends");
-//        }
+    public void addPeriod(Period period) {
+        if (getActivePeriod() != null && period.getStart().isBefore(getActivePeriod().getEnd())) {
+            return;
+        }
 
         for (final Period p : periods) {
-//            if (period.conflictsWith(p)) {
-//                throw new InvalidPeriodException("There should not be overlapping periods");
-//            }
+            if (period.conflictsWith(p)) {
+                return;
+            }
         }
 
         periods.add(period);

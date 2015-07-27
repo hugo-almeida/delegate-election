@@ -81,7 +81,6 @@ import core.PeriodDAO;
 import core.Student;
 import core.StudentAdapter;
 import core.StudentDAO;
-import core.exception.InvalidPeriodException;
 import endpoint.exception.UnauthorizedException;
 
 @EnableOAuth2Sso
@@ -311,6 +310,10 @@ public class Controller {
     /***************************** Manager API *****************************/
     @RequestMapping(value = "/students/{istId}", method = RequestMethod.GET)
     public @ResponseBody String getStudent(@PathVariable String istId, @PathVariable String degreeId) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
+
         final Student student =
                 studentDAO.findByUsernameAndDegreeAndCalendarYear(istId, degreeId, calendarDAO.findFirstByOrderByYearDesc()
                         .getYear());
@@ -321,6 +324,10 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/votes", method = RequestMethod.GET)
     public @ResponseBody String getVotes(@PathVariable String degreeId, @PathVariable int year) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
+
         //Obtem todos os votos (aluno -> numero de votos)
         final Map<String, Long> voteCount =
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year)
@@ -332,6 +339,10 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/history", method = RequestMethod.GET)
     public @ResponseBody String getHistoy(@PathVariable String degreeId, @PathVariable int year) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
+
         DegreeYear degreeYear =
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -341,6 +352,10 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/periods", method = RequestMethod.GET)
     public @ResponseBody String getPeriods(@PathVariable String degreeId, @PathVariable int year) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
+
         final DegreeYear degreeYear =
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -350,6 +365,10 @@ public class Controller {
 
     @RequestMapping(value = "/periods", method = RequestMethod.GET)
     public @ResponseBody String getPeriods() {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
+
         final Set<Degree> degrees =
                 StreamSupport.stream(degreeDAO.findAll().spliterator(), false)
                         .filter(d -> d.getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
@@ -362,30 +381,10 @@ public class Controller {
 
     // Permitir criar apenas periodos futuros
     @RequestMapping(value = "/periods", method = RequestMethod.POST)
-    public @ResponseBody String addPeriod(@RequestBody String periodJson) throws InvalidPeriodException {
-//        final GsonBuilder gsonBuilder = new GsonBuilder();
-//        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
-//        final DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
-//        for (final DegreeChange degreeChange : degrees) {
-//            for (final Integer year : degreeChange.getPeriods().keySet()) {
-//                final DegreeYear degreeYear =
-//                        degreeDAO.findByIdAndYear(degreeChange.getDegreeId(), calendarDAO.findFirstByOrderByYearDesc().getYear())
-//                                .getDegreeYear(year);
-//                for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
-//                    if (change.getPeriodType().equals(PeriodType.Application)) {
-//                        final Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
-//                        degreeYear.addPeriod(period);
-//                        period.schedulePeriod(periodDAO, degreeDAO);
-//                    } else if (change.getPeriodType().equals(PeriodType.Election)) {
-//                        final Period period = new ElectionPeriod(change.getStart(), change.getEnd(), degreeYear);
-//                        degreeYear.addPeriod(period);
-//                        period.schedulePeriod(periodDAO, degreeDAO);
-//                    }
-//                }
-//            }
-//        }
-//        calendarDAO.save(calendarDAO.findFirstByOrderByYearDesc());
-//        return new Gson().toJson("ok");
+    public @ResponseBody String addPeriod(@RequestBody String periodJson) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         JsonParser parser = new JsonParser();
@@ -418,7 +417,11 @@ public class Controller {
     // Permitir alterar apenas periodos futuros
     // Permitir criar
     @RequestMapping(value = "/periods", method = RequestMethod.PUT)
-    public @ResponseBody String updatePeriods(@RequestBody String periodsJson) throws InvalidPeriodException {
+    public @ResponseBody String updatePeriods(@RequestBody String periodsJson) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
+
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
         final DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
@@ -438,6 +441,10 @@ public class Controller {
 
     @RequestMapping(value = "/periods", method = RequestMethod.DELETE)
     public @ResponseBody String removePeriods(@RequestBody String periodsJson) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
+
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
         DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
@@ -457,6 +464,10 @@ public class Controller {
     // recebe Json com 2 datas: start e end
     @RequestMapping(value = "/periods/{periodId}", method = RequestMethod.PUT)
     public @ResponseBody String updatePeriod(@PathVariable int periodId, @RequestBody String dates) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         JsonParser parser = new JsonParser();
 
@@ -520,6 +531,14 @@ public class Controller {
     /************************************* MVC ***************************************/
     @RequestMapping("/admin")
     public ModelAndView testpedagogico() throws UnauthorizedException {
+        if (hasAccessToManagement()) {
+            return new ModelAndView("redirect:/pedagogico.html");
+        } else {
+            throw new UnauthorizedException();
+        }
+    }
+
+    private boolean hasAccessToManagement() {
         final Properties prop = new Properties();
         try {
             prop.load(getClass().getResourceAsStream("/pedagogico.properties"));
@@ -539,11 +558,7 @@ public class Controller {
 
         final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
         final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
-        if (userset.contains(userDetails.get("username"))) {
-            return new ModelAndView("redirect:/pedagogico.html");
-        } else {
-            throw new UnauthorizedException();
-        }
+        return userset.contains(userDetails.get("username"));
     }
 
     /*********************************** CONFIG *****************************************/
