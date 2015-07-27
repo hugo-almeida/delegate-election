@@ -1,11 +1,8 @@
-package dao;
+package core;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
-
-import core.Student;
-import core.StudentPK;
 
 @Transactional
 public interface StudentDAO extends CrudRepository<Student, StudentPK> {

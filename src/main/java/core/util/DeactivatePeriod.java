@@ -3,7 +3,7 @@ package core.util;
 import java.util.TimerTask;
 
 import core.Period;
-import dao.PeriodDAO;
+import core.PeriodDAO;
 
 public class DeactivatePeriod extends TimerTask {
 

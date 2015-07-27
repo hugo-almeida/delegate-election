@@ -72,16 +72,16 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import core.ApplicationPeriod;
+import core.CalendarDAO;
 import core.Degree;
+import core.DegreeDAO;
 import core.DegreeYear;
 import core.ElectionPeriod;
 import core.Period;
+import core.PeriodDAO;
+import core.StudentDAO;
 import core.Period.PeriodType;
 import core.Student;
-import dao.CalendarDAO;
-import dao.DegreeDAO;
-import dao.PeriodDAO;
-import dao.StudentDAO;
 import endpoint.exception.UnauthorizedException;
 
 @EnableOAuth2Sso
@@ -429,10 +429,33 @@ public class Controller {
         for (final DegreeChange degreeChange : degrees) {
             for (final Integer year : degreeChange.getPeriods().keySet()) {
                 for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
-                    DegreeYear dy =
+                    DegreeYear degreeYear =
                             degreeDAO.findByIdAndYear(degreeChange.getDegreeId(),
                                     calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
-                    dy.setDate(change.getStart(), change.getEnd(), change.getPeriodType());
+                    boolean periodExists = degreeYear.setDate(change.getStart(), change.getEnd(), change.getPeriodType());
+                    // Se o periodo existe, tem de agendar novamente, pois uma ou ambas as datas foram alteradas.
+                    if (periodExists) {
+                        Period period = degreeYear.getPeriodActiveOnDate(change.getStart());
+                        if (period == null) {
+                            period = degreeYear.getPeriodActiveOnDate(change.getEnd());
+                        } else {
+                            continue;
+                        }
+                        period.unschedulePeriod(periodDAO, degreeDAO);
+                        period.schedulePeriod(periodDAO, degreeDAO);
+                    } else {
+                        if (change.getPeriodType().toString().equals(PeriodType.Application.toString())) {
+                            Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
+                            degreeYear.addPeriod(period);
+                            period.schedulePeriod(periodDAO, degreeDAO);
+                            periodDAO.save(period);
+                        } else if (change.getPeriodType().toString().equals(PeriodType.Election.toString())) {
+                            Period period = new ElectionPeriod(change.getStart(), change.getEnd(), degreeYear);
+                            degreeYear.addPeriod(period);
+                            period.schedulePeriod(periodDAO, degreeDAO);
+                            periodDAO.save(period);
+                        }
+                    }
                 }
             }
         }
@@ -454,6 +477,7 @@ public class Controller {
                 for (PeriodChange change : degreeChange.getPeriods().get(year)) {
                     Period period = periodDAO.findById(change.getPeriodId());
                     if (period.getStart().isAfter(LocalDate.now())) {
+                        period.unschedulePeriod(periodDAO, degreeDAO);
                         periodDAO.delete(change.getPeriodId());
                     }
                 }
@@ -491,6 +515,9 @@ public class Controller {
                 && !degreeYear.hasPeriodBetweenDates(start, newEnd, period)) {
             period.setEnd(newEnd);
         }
+
+        period.unschedulePeriod(periodDAO, degreeDAO);
+        period.schedulePeriod(periodDAO, degreeDAO);
 
         periodDAO.save(period);
         return new Gson().toJson("ok");

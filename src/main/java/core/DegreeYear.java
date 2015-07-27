@@ -221,6 +221,15 @@ public class DegreeYear {
         return true;
     }
 
+    public Period getPeriodActiveOnDate(LocalDate date) {
+        for (Period p : periods) {
+            if (!p.getStart().isAfter(date) && !p.getEnd().isBefore(date)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
     public boolean hasPeriodBetweenDates(LocalDate first, LocalDate second, Period period) {
         for (Period p : periods) {
             if (p.getId() == period.getId()) {

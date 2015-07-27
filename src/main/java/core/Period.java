@@ -30,8 +30,6 @@ import javax.persistence.Transient;
 import core.util.ActivatePeriod;
 import core.util.DeactivatePeriod;
 import core.util.RetrieveStudentListTask;
-import dao.DegreeDAO;
-import dao.PeriodDAO;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
