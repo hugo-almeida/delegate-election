@@ -1,13 +1,11 @@
 package endpoint;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -21,14 +19,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import jxl.write.Label;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.security.oauth2.sso.EnableOAuth2Sso;
@@ -78,10 +68,10 @@ import core.DegreeDAO;
 import core.DegreeYear;
 import core.ElectionPeriod;
 import core.Period;
-import core.PeriodDAO;
-import core.StudentDAO;
 import core.Period.PeriodType;
+import core.PeriodDAO;
 import core.Student;
+import core.StudentDAO;
 import endpoint.exception.UnauthorizedException;
 
 @EnableOAuth2Sso
@@ -128,26 +118,6 @@ public class Controller {
                 }
             }
         }
-    }
-
-    @RequestMapping(value = "/excel", method = RequestMethod.GET, produces = { "application/x-octet-stream" })
-    public ModelAndView getFile() throws IOException, RowsExceededException, WriteException {
-        File file = new File("src/main/resources/static/delegados.xls");
-        WorkbookSettings wbSettings = new WorkbookSettings();
-
-        wbSettings.setLocale(new Locale("en", "EN"));
-
-        WritableWorkbook workbook = Workbook.createWorkbook(file, wbSettings);
-        workbook.createSheet("Delegados", 0);
-        WritableSheet excelSheet = workbook.getSheet(0);
-
-        Label f = new Label(0, 10, "Epah isto é um label... I guess");
-        excelSheet.addCell(f);
-
-        workbook.write();
-        workbook.close();
-
-        return new ModelAndView("redirect:/delegados.xls");
     }
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
@@ -511,7 +481,7 @@ public class Controller {
             period.setStart(newStart);
         }
 
-        if (newEnd.isAfter(LocalDate.now()) && end.isAfter(LocalDate.now())
+        if (newEnd.isAfter(LocalDate.now()) && end.isAfter(LocalDate.now()) && newEnd.isAfter(period.getStart())
                 && !degreeYear.hasPeriodBetweenDates(start, newEnd, period)) {
             period.setEnd(newEnd);
         }
