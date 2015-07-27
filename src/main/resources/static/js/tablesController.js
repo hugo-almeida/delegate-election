@@ -1,5 +1,5 @@
-angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$http', '$log',
-                                                          function(rc, sc, http, log)  {
+angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$http', '$log', 'periodEdit',
+                                                          function(rc, sc, http, log, periodEdit)  {
 	
 	sc.debug = true;
 	
@@ -14,10 +14,6 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	sc.inspectDegree = {};
 	
 	sc.inspectDegreeYear = 0;
-	
-	sc.selectedPeriodType = 'none';
-	
-	sc.selectedPeriodOperation = 'none';
 	
 	sc.loadDegrees = function() {
 		http.get('periods').success(function(data){
@@ -97,12 +93,21 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	}
 	
 	sc.setSelectedPeriodType = function(type) {
-		sc.selectedPeriodType = type;
+		periodEdit.setSelectedPeriodType(type);
 	}
 	
 	sc.setSelectedPeriodOperation = function(operation) {
-		sc.selectedPeriodOperation = operation;
+		periodEdit.setSelectedPeriodOperation(operation);
 	}
+	
+	sc.setSelectedDegree = function(degree){
+		periodEdit.setSelectedDegree(degree);
+	}
+	
+	sc.setSelectedYear = function(year) {
+		periodEdit.setSelectedYear(year);
+	}
+	
 	/***
 	 * Debug
 	 */

@@ -12,8 +12,7 @@
 	<script src="js/voteController.js"></script>
 	<script src="js/applyController.js"></script>
 
-	<link rel="stylesheet" type="text/css" href="webjars/fenixedu-canvas/css/bootstrap.min.css" />
-	<link rel="stylesheet" type="text/css" href="webjars/fenixedu-canvas/css/bootstrap-theme.min.css" />
+	<link rel="stylesheet" type="text/css" href="/webjars/fenixedu-canvas/css/canvas.css" />
 </head>
 
 <body ng-app="delegados" ng-cloak> <!-- cloak b0rken -->
@@ -30,12 +29,8 @@
 		
 		<div class="container">	
 			<div class="page-header">
-				<h1>Eleição de Delegado de Ano</h1>
-				<h3>{{subTitle}}</h3>
-				<ol class="breadcrumb">
-					<li>Estudante</li>
-					<li class="active">{{subTitle}}</li>
-				</ol>
+				<h1>{{subTitle}}</h1>
+				<h3>Eleição de Delegado de Ano</h3>
 			</div>
 			
 			<!-- This needs changing to accomodate students with multiple degrees-->

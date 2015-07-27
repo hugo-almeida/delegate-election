@@ -44,7 +44,7 @@
 							<strong>C:</strong>
 							<span ng-show="!year.applicationPeriod || isEmpty(year.applicationPeriod)"><small></small></span>
 							<span ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state =='presente/futuro'">
-								{{year.applicationPeriod.applicationPeriodStart}} - {{year.applicationPeriod.applicationPeriodEnd}}</span>
+								{{year.applicationPeriod.applicationPeriodStart}} — {{year.applicationPeriod.applicationPeriodEnd}}</span>
 							<span ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state == 'passado'">
 								{{year.applicationPeriod.candidateCount}} candidatos</span>
 						</span>
@@ -61,79 +61,24 @@
 					<div class="dropdown pull-right text-left">
 						<span class="dropdown-toggle" data-toggle="dropdown"
 							aria-haspopup="true" aria-expanded="false">
-							<i class="glyphicon glyphicon-check"></i> <!-- should use option-vertical icon -->
+							<i class="glyphicon glyphicon-option-vertical"></i> <!-- should use option-vertical icon -->
 						</span>
 				
 						<ul class="dropdown-menu">
 							<li ng-show="isEmpty(year.applicationPeriod)" data-toggle="modal" data-target="#editModal"
-								ng-click="setSelectedPeriodType('Candidatura'); setSelectedPeriodOperation('Criar')">
+								ng-click="setSelectedPeriodType('Candidatura'); setSelectedPeriodOperation('Criar'); setSelectedDegree(degree); setSelectedYear(year)">
 								<a href="#">Criar - Candidatura</a></li>
 							<li ng-show="isEmpty(year.electionPeriod)" data-toggle="modal" data-target="#editModal" 
-								ng-click="setSelectedPeriodType('Votação'); setSelectedPeriodOperation('Criar')">
+								ng-click="setSelectedPeriodType('Votação'); setSelectedPeriodOperation('Criar'); setSelectedDegree(degree); setSelectedYear(year)">
 								<a href="#">Criar - Votação</a></li>
 							<li ng-show="!isEmpty(year.applicationPeriod)" data-toggle="modal" data-target="#editModal"
-								ng-click="setSelectedPeriodType('Votação'); setSelectedPeriodOperation('Estender')">
+								ng-click="setSelectedPeriodType('Candidatura'); setSelectedPeriodOperation('Estender'); setSelectedDegree(degree); setSelectedYear(year)">
 								<a href="#">Estender - Candidatura</a></li>
 							<li ng-show="!isEmpty(year.electionPeriod)" data-toggle="modal" data-target="#editModal"
-								ng-click="setSelectedPeriodType('Votação'); setSelectedPeriodOperation('Estender')">
+								ng-click="setSelectedPeriodType('Votação'); setSelectedPeriodOperation('Estender'); setSelectedDegree(degree); setSelectedYear(year)">
 								<a href="#">Estender - Votação</a></li>
 							<li><a href="#" ng-click="showDetails(degree, $index)">Detalhes</a></li>
 						</ul>
-					</div>
-					
-					<div id="editModal" class="modal fade" role="dialog">
-						<div class="modal-dialog modal-lg">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h3>
-										<strong>{{selectedPeriodOperation}} Período de {{selectedPeriodType}}</strong>
-										<br>
-										<small>Defina as datas de início e fim do período de {{selectedPeriodType}}</small>
-									</h3>
-								    <button type="button" class="close" data-dismiss="modal"></button>
-								</div>
-								<div class="modal-body">
-					        		<table class="table">
-										<tr>
-											<th class="col-md-8">Curso</th>
-											<td class="col-md-12 col-md-12-offset-4">{{degree.degree}}</td>
-										</tr>
-										<tr>
-											<th>Ano Lectivo</th>
-											<td>{{degree.academicYear}}</td>
-										</tr>
-										<tr>
-											<th>Ano Curricular</th>
-											<td>{{year.degreeYear}}</td>
-										</tr>
-										<tr ng-show="selectedPeriodType=='Candidatura'">
-											<th>Período de candidatura</th>
-											<td>
-												<div class="input-group">
-													<input type="date" class="form-control">
-												  	<span class="input-group-addon" id="basic-addon1">to</span>
-													<input type="date" class="form-control">
-												</div>
-											</td>
-										</tr>
-										<tr ng-show="selectedPeriodType=='Votação'">
-											<th>Período de votação</th>
-											<td>
-												<div class="input-group">
-													<input type="date" class="form-control">
-												  	<span class="input-group-addon" id="basic-addon1">to</span>
-													<input type="date" class="form-control">
-												</div>
-											</td>
-										</tr>
-									</table>
-					      		</div>
-					      		<div class="modal-footer">
-					        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-					        			<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="edit()">Confirmar</button>
-					      		</div>
-							</div>
-						</div>
 					</div>
 				</td>
 				<td>
@@ -147,6 +92,51 @@
 			</tr>
 		</tbody>
 	</table>
+	
+	<div id="editModal" class="modal fade" role="dialog" ng-controller="modalCtrl">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>
+						<strong>{{selectedPeriodOperation()}} Período de {{selectedPeriodType()}}</strong>
+						<br>
+						<small>Defina as datas de início e fim do período de {{selectedPeriodType()}}</small>
+					</h3>
+				    <button type="button" class="close" data-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+	        		<table class="table">
+						<tr>
+							<th class="col-md-8">Curso</th>
+							<td class="col-md-12 col-md-12-offset-4">{{selectedDegree().degree}}</td>
+						</tr>
+						<tr>
+							<th>Ano Lectivo</th>
+							<td>{{selectedDegree().academicYear}}</td>
+						</tr>
+						<tr>
+							<th>Ano Curricular</th>
+							<td>{{selectedYear().degreeYear}}</td>
+						</tr>
+						<tr>
+							<th>Período de {{selectedPeriodType()}}</th>
+							<td>
+								<div class="input-group">
+									<input type="date" class="form-control" ng-model="start">
+								  	<span class="input-group-addon" id="basic-addon1">to</span>
+									<input type="date" class="form-control" ng-model="end">
+								</div>
+							</td>
+						</tr>
+					</table>
+	      		</div>
+	      		<div class="modal-footer">
+	        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+	        			<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="edit()">Confirmar</button>
+	      		</div>
+			</div>
+		</div>
+	</div>
 	
 	<div id="bulkModal" class="modal fade" role="dialog">
 		<div class="modal-dialog modal-lg">

@@ -182,16 +182,15 @@ public class DegreeYear {
         return period;
     }
 
-    // Caso não exista nenhum periodo em conflito, significa que não há periodos e é retornado falso.
-    public boolean setDate(LocalDate start, LocalDate end, PeriodType periodType) {
-        LocalDate now = LocalDate.now();
+    public void setDate(LocalDate start, LocalDate end, PeriodType periodType) {
+        final LocalDate now = LocalDate.now();
         Period newPeriod = null;
         //Changing the past is impossible, the end can't happen before the start
         if (end.isBefore(now) || end.isBefore(start)) {
             return true;
         }
         //Change cannot conflict with more than one period
-        for (Period p : periods) {
+        for (final Period p : periods) {
             //No conflict
             if (p.getEnd().isBefore(start) || p.getStart().isAfter(end)) {
                 continue;
