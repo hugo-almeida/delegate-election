@@ -94,11 +94,6 @@ public class Controller {
 
     @PostConstruct
     public void schedulePeriods() {
-<<<<<<< HEAD
-        for (final Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
-            for (final DegreeYear dy : d.getYears()) {
-                for (final Period p : dy.getInactivePeriods()) {
-=======
         //Pode nao haver nada iniciado
         if (calendarDAO.findFirstByOrderByYearDesc() == null) {
             return;
@@ -109,7 +104,6 @@ public class Controller {
         for (Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
             for (DegreeYear dy : d.getYears()) {
                 for (Period p : dy.getInactivePeriods()) {
->>>>>>> 929fd036a788632a51e77648a3f1e7e50f677041
                     if (p.getStart().isAfter(LocalDate.now())) {
                         p.schedulePeriod(periodDAO, degreeDAO);
                     } else if (p.getStart().isBefore(LocalDate.now()) && p.getEnd().isAfter(LocalDate.now())) {
@@ -395,15 +389,17 @@ public class Controller {
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
 
         if (periodType.equals(PeriodType.Application.toString())) {
-            final Period period = new ApplicationPeriod(start, end, degreeYear);
-            degreeYear.addPeriod(period);
-            period.schedulePeriod(periodDAO, degreeDAO);
-            periodDAO.save(period);
+            Period period = degreeYear.addPeriod(start, end, periodType);
+            if (period != null) {
+                period.schedulePeriod(periodDAO, degreeDAO);
+                periodDAO.save(period);
+            }
         } else if (periodType.equals(PeriodType.Election.toString())) {
-            final Period period = new ElectionPeriod(start, end, degreeYear);
-            degreeYear.addPeriod(period);
-            period.schedulePeriod(periodDAO, degreeDAO);
-            periodDAO.save(period);
+            Period period = degreeYear.addPeriod(start, end, periodType);
+            if (period != null) {
+                period.schedulePeriod(periodDAO, degreeDAO);
+                periodDAO.save(period);
+            }
         }
 
         return new Gson().toJson("ok");
@@ -554,7 +550,7 @@ public class Controller {
     @RequestMapping("/pedagogico")
     public ModelAndView testpedagogico() throws UnauthorizedException {
         if (hasAccessToManagement()) {
-            return new ModelAndView("redirect:/pedagogico.html");
+            return new ModelAndView("redirect:/gerir.html");
         } else {
             throw new UnauthorizedException();
         }
