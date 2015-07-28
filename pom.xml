@@ -79,6 +79,7 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
+<<<<<<< HEAD
 	<dependency>
   		<groupId>org.fenixedu</groupId>
   		<artifactId>feaf4j-api</artifactId>
@@ -97,6 +98,8 @@
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
   </dependency>
+=======
+>>>>>>> 929fd036a788632a51e77648a3f1e7e50f677041
 	</dependencies>
 
 	<properties>

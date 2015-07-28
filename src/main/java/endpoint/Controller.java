@@ -94,9 +94,22 @@ public class Controller {
 
     @PostConstruct
     public void schedulePeriods() {
+<<<<<<< HEAD
         for (final Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
             for (final DegreeYear dy : d.getYears()) {
                 for (final Period p : dy.getInactivePeriods()) {
+=======
+        //Pode nao haver nada iniciado
+        if (calendarDAO.findFirstByOrderByYearDesc() == null) {
+            return;
+        }
+        if (calendarDAO.findFirstByOrderByYearDesc().getDegrees() == null) {
+            return;
+        }
+        for (Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
+            for (DegreeYear dy : d.getYears()) {
+                for (Period p : dy.getInactivePeriods()) {
+>>>>>>> 929fd036a788632a51e77648a3f1e7e50f677041
                     if (p.getStart().isAfter(LocalDate.now())) {
                         p.schedulePeriod(periodDAO, degreeDAO);
                     } else if (p.getStart().isBefore(LocalDate.now()) && p.getEnd().isAfter(LocalDate.now())) {
@@ -161,6 +174,10 @@ public class Controller {
 
     @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.POST)
     public @ResponseBody String addVote(@PathVariable String istId, @PathVariable String degreeId, @RequestBody String vote) {
+        if (!getLoggedUsername().equals(istId)) {
+            return new Gson().toJson("");
+        }
+
         final Student student =
                 StreamSupport
                         .stream(studentDAO.findAll().spliterator(), false)
@@ -206,6 +223,9 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.POST)
     public @ResponseBody String addCandidate(@PathVariable String degreeId, @PathVariable int year, @RequestBody String istId) {
+        if (!getLoggedUsername().equals(istId) && !hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
         final Student applicant =
                 StreamSupport
                         .stream(studentDAO.findAll().spliterator(), false)
@@ -247,6 +267,10 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.DELETE)
     public @ResponseBody String removeCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId) {
+        if (!getLoggedUsername().equals(istId)) {
+            return new Gson().toJson("");
+        }
+
         final Student candidate =
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year)
                         .getCandidates().stream().filter(c -> c.getUsername().equals(istId)).collect(Collectors.toList()).get(0);
@@ -481,7 +505,7 @@ public class Controller {
             period.setStart(newStart);
         }
 
-        if (newEnd.isAfter(LocalDate.now()) && end.isAfter(LocalDate.now())
+        if (newEnd.isAfter(LocalDate.now()) && end.isAfter(LocalDate.now()) && newEnd.isAfter(period.getStart())
                 && !degreeYear.hasPeriodBetweenDates(start, newEnd, period)) {
             period.setEnd(newEnd);
         }
@@ -534,6 +558,12 @@ public class Controller {
         } else {
             throw new UnauthorizedException();
         }
+    }
+
+    private String getLoggedUsername() {
+        final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
+        final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
+        return (String) userDetails.get("username");
     }
 
     private boolean hasAccessToManagement() {

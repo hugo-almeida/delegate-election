@@ -214,7 +214,7 @@ public class DegreeYear {
         if (newPeriod.getStart().isAfter(now) && start.isAfter(now)) {
             newPeriod.setStart(start);
         }
-        if (newPeriod.getEnd().isAfter(now) && end.isAfter(now)) {
+        if (newPeriod.getEnd().isAfter(now) && end.isAfter(now) && end.isAfter(newPeriod.getStart())) {
             newPeriod.setEnd(end);
         }
         return true;
