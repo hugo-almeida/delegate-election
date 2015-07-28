@@ -2,6 +2,7 @@ package adapter;
 
 import java.lang.reflect.Type;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,8 +26,11 @@ public class DegreeYearHistoryAdapter implements JsonSerializer<DegreeYear> {
         final JsonObject degreeYearJson = new JsonObject();
         final JsonArray periodsJson = new JsonArray();
 
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM");
+
         degreeYearJson.addProperty("degreeName", degree.getDegreeName());
         degreeYearJson.addProperty("degreeYear", degree.getDegreeYear());
+        degreeYearJson.addProperty("degreeType", degree.getType());
 
         List<Period> periods = new ArrayList<Period>(degree.getInactivePeriods());
         if (degree.getActivePeriod() != null) {
@@ -47,8 +51,8 @@ public class DegreeYearHistoryAdapter implements JsonSerializer<DegreeYear> {
             periodJson.addProperty("academicYear", p.getDegreeYear().getCalendarYear() + "/"
                     + (p.getDegreeYear().getCalendarYear() + 1));
             periodJson.addProperty("periodType", p.getType().toString());
-            periodJson.addProperty("start", p.getStart().toString());
-            periodJson.addProperty("end", p.getEnd().toString());
+            periodJson.addProperty("start", p.getStart().format(dtf));
+            periodJson.addProperty("end", p.getEnd().format(dtf));
 
             if (p.getType().equals(PeriodType.Application)) {
                 periodJson.addProperty("info", ((ApplicationPeriod) p).getCandidateCount());

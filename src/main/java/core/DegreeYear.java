@@ -240,4 +240,30 @@ public class DegreeYear {
         }
         return false;
     }
+
+    public Period addPeriod(LocalDate start, LocalDate end, String periodType) {
+        if (getActivePeriod() != null && start.isBefore(getActivePeriod().getEnd())) {
+            return null;
+        }
+
+        for (final Period p : periods) {
+            if (p.conflictsWith(start, end)) {
+                return null;
+            }
+        }
+        Period p = null;
+        if (periodType.equals(PeriodType.Application.toString())) {
+            p = new ApplicationPeriod(start, end, this);
+            periods.add(p);
+        }
+        if (periodType.equals(PeriodType.Election.toString())) {
+            p = new ElectionPeriod(start, end, this);
+            periods.add(p);
+        }
+        return p;
+    }
+
+    public String getType() {
+        return degree.getType();
+    }
 }

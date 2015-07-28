@@ -49,9 +49,11 @@ angular.module('delegados').factory('periodEdit', ['$log', '$http', function(log
 			var requestUrl = 'periods/';
 			if(selectedPeriodType == 'Votação') {
 				log.log('vote');
+				requestUrl += selectedYear.electionPeriod.electionPeriodId;
 			}
 			else if(selectedPeriodType == 'Candidatura') {
 				log.log('apply');
+				requestUrl += selectedYear.applicationPeriod.applicationPeriodId;
 			}
 			
 			http.put(requestUrl, dates).success(function(data) {

@@ -94,6 +94,7 @@ public class Controller {
 
     @PostConstruct
     public void schedulePeriods() {
+
         //Pode nao haver nada iniciado
         if (calendarDAO.findFirstByOrderByYearDesc() == null) {
             return;
@@ -101,6 +102,7 @@ public class Controller {
         if (calendarDAO.findFirstByOrderByYearDesc().getDegrees() == null) {
             return;
         }
+
         for (final Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
             for (final DegreeYear dy : d.getYears()) {
                 for (final Period p : dy.getInactivePeriods()) {
@@ -389,15 +391,17 @@ public class Controller {
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
 
         if (periodType.equals(PeriodType.Application.toString())) {
-            final Period period = new ApplicationPeriod(start, end, degreeYear);
-            degreeYear.addPeriod(period);
+            Period period = degreeYear.addPeriod(start, end, periodType);
+            if (period != null) {
             period.schedulePeriod(periodDAO, degreeDAO);
             periodDAO.save(period);
+            }
         } else if (periodType.equals(PeriodType.Election.toString())) {
-            final Period period = new ElectionPeriod(start, end, degreeYear);
-            degreeYear.addPeriod(period);
+            Period period = degreeYear.addPeriod(start, end, periodType);
+            if (period != null) {
             period.schedulePeriod(periodDAO, degreeDAO);
             periodDAO.save(period);
+        }
         }
 
         return new Gson().toJson("ok");
@@ -548,7 +552,7 @@ public class Controller {
     @RequestMapping("/pedagogico")
     public ModelAndView testpedagogico() throws UnauthorizedException {
         if (hasAccessToManagement()) {
-            return new ModelAndView("redirect:/pedagogico.html");
+            return new ModelAndView("redirect:/gerir.html");
         } else {
             throw new UnauthorizedException();
         }
