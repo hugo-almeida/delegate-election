@@ -1,4 +1,4 @@
-<div>
+<div ng-controller="historyCtrl">
 	<div>
 		<!-- Default panel contents -->
 		<h3>Detalhes</h3>
@@ -7,29 +7,28 @@
 		<table class="table">
 			<tr>
 				<th class="col-md-2">Curso</th>
-				<td class="col-md-10">{{inspectDegree.degreeName}}</td>
+				<td class="col-md-10">{{history().degreeName}}</td>
 			</tr>
 			<tr>
 				<th>Ano Lectivo</th>
-				<td>2014/2015</td>
+				<td>{{inspectedPeriod().academicYear}}</td>
 			</tr>
 			<tr>
 				<th>Ano Curricular</th>
-				<td>1</td>
+				<td>{{history().degreeYear}}</td>
 			</tr>
 			<tr>
-				<th>Candidaturas</th>
-				<td>{{inspectDegree.years[inspectDegreeYear].applicationPeriod.applicationPeriodStart}} - {{inspectDegree.years[inspectDegreeYear].applicationPeriod.applicationPeriodEnd}}
-					<div ng-show="inspectDegree.years[inspectDegreeYear].applicationPeriod.state == 'ongoing'"> - A decorrer</div>
-					<div ng-show="inspectDegree.years[inspectDegreeYear].applicationPeriod.state == 'over'"> - Terminado</div>
+				<th ng-show="inspectedPeriod().periodType=='APPLICATION'">Candidaturas</th>
+				<th ng-show="inspectedPeriod().periodType=='ELECTION'">Votação</th>
+				<td>{{inspectedPeriod().start}} – {{inspectedPeriod().end}}
+					<div ng-show="inspectedPeriod.state == 'ongoing'"> - A decorrer</div>
+					<div ng-show="inspectedPeriod.state == 'over'"> - Terminado</div>
 				</td>
 			</tr>
 			<tr>
-				<th>Período de votação</th>
-				<td>{{inspectDegree.years[inspectDegreeYear].electionPeriod.electionPeriodStart}} - {{inspectDegree.years[inspectDegreeYear].electionPeriod.electionPeriodEnd}}
-					<div ng-show="inspectDegree.years[inspectDegreeYear].electionPeriod.state == 'ongoing'"> - A decorrer</div>
-					<div ng-show="inspectDegree.years[inspectDegreeYear].electionPeriod.state == 'over'"> - Terminado</div>
-				</td>
+				<th ng-show="inspectedPeriod().periodType=='APPLICATION'">Candidatos</th>
+				<th ng-show="inspectedPeriod().periodType=='ELECTION'">Votos</th>
+				<td>{{inspectedPeriod().info}}</td>
 			</tr>
 		</table>
 	</div>
@@ -73,10 +72,18 @@
 			</tr>
 		</thead>
 			<tbody>
-				<tr class="{'active':selectedRow == true">
-					<td>2014/2015</td>
-					<td>Candidatura</td>
-					<td>14/11/2014 - 18/11/2014 <span><button class="btn btn-default pull-right" ng-click="setSelectedRow(true)">Detalhes</button></span></td>
+				<tr ng-repeat="period in history().periods">
+					<td>{{period.academicYear}}</td>
+					<td ng-show="period.periodType=='APPLICATION'">Candidatura</td>
+					<td ng-show="period.periodType=='ELECTION'">Votação</td>
+					<td>
+						<span>
+							<button class="btn btn-default btn-xs pull-right" ng-click="inspectPeriod($index)">
+								Detalhes
+							</button>
+						</span>
+						{{period.start}} – {{period.end}}
+					</td>
 				</tr>
 			</tbody>
 		</table>

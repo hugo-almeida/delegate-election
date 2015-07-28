@@ -79,27 +79,6 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
-<<<<<<< HEAD
-	<dependency>
-  		<groupId>org.fenixedu</groupId>
-  		<artifactId>feaf4j-api</artifactId>
- 		 <version>2.0.0</version>
-	</dependency>
-	<dependency>
- 		 <groupId>org.fenixedu</groupId>
- 		 <artifactId>feaf4j-okhttp</artifactId>
- 		 <version>2.0.0</version>
-	</dependency>
-	<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-jpa</artifactId>
-  </dependency>
-  <dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-  </dependency>
-=======
->>>>>>> 929fd036a788632a51e77648a3f1e7e50f677041
 	</dependencies>
 
 	<properties>

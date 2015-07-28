@@ -94,11 +94,6 @@ public class Controller {
 
     @PostConstruct
     public void schedulePeriods() {
-<<<<<<< HEAD
-        for (final Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
-            for (final DegreeYear dy : d.getYears()) {
-                for (final Period p : dy.getInactivePeriods()) {
-=======
         //Pode nao haver nada iniciado
         if (calendarDAO.findFirstByOrderByYearDesc() == null) {
             return;
@@ -106,10 +101,9 @@ public class Controller {
         if (calendarDAO.findFirstByOrderByYearDesc().getDegrees() == null) {
             return;
         }
-        for (Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
-            for (DegreeYear dy : d.getYears()) {
-                for (Period p : dy.getInactivePeriods()) {
->>>>>>> 929fd036a788632a51e77648a3f1e7e50f677041
+        for (final Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
+            for (final DegreeYear dy : d.getYears()) {
+                for (final Period p : dy.getInactivePeriods()) {
                     if (p.getStart().isAfter(LocalDate.now())) {
                         p.schedulePeriod(periodDAO, degreeDAO);
                     } else if (p.getStart().isBefore(LocalDate.now()) && p.getEnd().isAfter(LocalDate.now())) {
@@ -589,7 +583,7 @@ public class Controller {
         return userset.contains(userDetails.get("username"));
     }
 
-    @RequestMapping(value = "estudante", method = RequestMethod.GET)
+    @RequestMapping(value = "/estudante", method = RequestMethod.GET)
     public String testestudante() throws UnauthorizedException {
         return "/index.html";
         /** nao funciona, why? **/
