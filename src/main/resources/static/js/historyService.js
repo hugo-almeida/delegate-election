@@ -28,7 +28,7 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 		http.get('degrees/' + degreeId + '/years/' + year + '/history').success(function(data) {
 			history = data;
 			inspectPeriod(0);
-			
+			log.log(history);
 		});
 	}
 	

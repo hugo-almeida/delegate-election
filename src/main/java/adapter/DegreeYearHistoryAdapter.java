@@ -26,13 +26,13 @@ public class DegreeYearHistoryAdapter implements JsonSerializer<DegreeYear> {
         final JsonObject degreeYearJson = new JsonObject();
         final JsonArray periodsJson = new JsonArray();
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM");
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         degreeYearJson.addProperty("degreeName", degree.getDegreeName());
         degreeYearJson.addProperty("degreeYear", degree.getDegreeYear());
         degreeYearJson.addProperty("degreeType", degree.getType());
 
-        List<Period> periods = new ArrayList<Period>(degree.getInactivePeriods());
+        final List<Period> periods = new ArrayList<Period>(degree.getInactivePeriods());
         if (degree.getActivePeriod() != null) {
             periods.add(degree.getActivePeriod());
         }
@@ -46,8 +46,8 @@ public class DegreeYearHistoryAdapter implements JsonSerializer<DegreeYear> {
             }
         });
 
-        for (Period p : periods) {
-            JsonObject periodJson = new JsonObject();
+        for (final Period p : periods) {
+            final JsonObject periodJson = new JsonObject();
             periodJson.addProperty("academicYear", p.getDegreeYear().getCalendarYear() + "/"
                     + (p.getDegreeYear().getCalendarYear() + 1));
             periodJson.addProperty("periodType", p.getType().toString());

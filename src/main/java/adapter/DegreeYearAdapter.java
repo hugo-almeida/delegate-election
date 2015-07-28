@@ -25,28 +25,29 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
 
     @Override
     public JsonElement serialize(Degree degree, Type arg1, JsonSerializationContext arg2) {
-        JsonObject degreeObject = new JsonObject();
+        final JsonObject degreeObject = new JsonObject();
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM");
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM");
 
         degreeObject.addProperty("degree", degree.getAcronym());
         degreeObject.addProperty("degreeName", degree.getName());
         degreeObject.addProperty("degreeId", degree.getId());
         degreeObject.addProperty("academicYear", degree.getYear() + "/" + (degree.getYear() + 1));
+        degreeObject.addProperty("degreeType", degree.getType());
 
-        JsonArray years = new JsonArray();
-        Map<Integer, DegreeYear> sortedDegrees = new HashMap<Integer, DegreeYear>();
-        for (DegreeYear degreeYear : degree.getYears()) {
+        final JsonArray years = new JsonArray();
+        final Map<Integer, DegreeYear> sortedDegrees = new HashMap<Integer, DegreeYear>();
+        for (final DegreeYear degreeYear : degree.getYears()) {
             sortedDegrees.put(degreeYear.getDegreeYear(), degreeYear);
         }
-        for (Integer i : sortedDegrees.keySet()) {
-            DegreeYear degreeYear = sortedDegrees.get(i);
-            JsonObject yearObject = new JsonObject();
-            JsonObject applicationObject = new JsonObject();
-            JsonObject electionObject = new JsonObject();
+        for (final Integer i : sortedDegrees.keySet()) {
+            final DegreeYear degreeYear = sortedDegrees.get(i);
+            final JsonObject yearObject = new JsonObject();
+            final JsonObject applicationObject = new JsonObject();
+            final JsonObject electionObject = new JsonObject();
 
             yearObject.addProperty("degreeYear", degreeYear.getDegreeYear());
-            LocalDate now = LocalDate.now();
+            final LocalDate now = LocalDate.now();
             if (degreeYear.getCurrentApplicationPeriod() != null) {
                 applicationObject.addProperty("applicationPeriodId", degreeYear.getCurrentApplicationPeriod().getId());
                 applicationObject.addProperty("applicationPeriodStart", degreeYear.getCurrentApplicationPeriod().getStart()
@@ -85,22 +86,22 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
     @Override
     public DegreeChange deserialize(JsonElement degreeElement, Type arg1, JsonDeserializationContext arg2)
             throws JsonParseException {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        JsonObject degreeObject = degreeElement.getAsJsonObject();
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        final JsonObject degreeObject = degreeElement.getAsJsonObject();
 
-        String degreeId = degreeObject.get("degreeId").getAsString();
-        DegreeChange degree = new DegreeChange(degreeId);
+        final String degreeId = degreeObject.get("degreeId").getAsString();
+        final DegreeChange degree = new DegreeChange(degreeId);
 
-        JsonArray years = degreeObject.get("years").getAsJsonArray();
+        final JsonArray years = degreeObject.get("years").getAsJsonArray();
 
-        for (JsonElement yearElement : years) {
-            JsonObject yearObject = yearElement.getAsJsonObject();
+        for (final JsonElement yearElement : years) {
+            final JsonObject yearObject = yearElement.getAsJsonObject();
 
-            int year = yearObject.get("degreeYear").getAsInt();
+            final int year = yearObject.get("degreeYear").getAsInt();
 
-            Set<PeriodChange> periods = new HashSet<PeriodChange>();
+            final Set<PeriodChange> periods = new HashSet<PeriodChange>();
 
-            JsonObject applicationPeriodObject = yearObject.getAsJsonObject("applicationPeriod");
+            final JsonObject applicationPeriodObject = yearObject.getAsJsonObject("applicationPeriod");
             if (applicationPeriodObject.has("applicationPeriodId")
                     || (applicationPeriodObject.has("applicationPeriodStart") && applicationPeriodObject
                             .has("applicationPeriodEnd"))) {
@@ -108,22 +109,22 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
                 if (applicationPeriodObject.has("applicationPeriodId")) {
                     id = applicationPeriodObject.get("applicationPeriodId").getAsInt();
                 }
-                LocalDate start = LocalDate.parse(applicationPeriodObject.get("applicationPeriodStart").getAsString(), dtf);
-                LocalDate end = LocalDate.parse(applicationPeriodObject.get("applicationPeriodEnd").getAsString(), dtf);
-                PeriodChange applicationPeriod = new PeriodChange(PeriodType.Application, id, start, end);
+                final LocalDate start = LocalDate.parse(applicationPeriodObject.get("applicationPeriodStart").getAsString(), dtf);
+                final LocalDate end = LocalDate.parse(applicationPeriodObject.get("applicationPeriodEnd").getAsString(), dtf);
+                final PeriodChange applicationPeriod = new PeriodChange(PeriodType.Application, id, start, end);
                 periods.add(applicationPeriod);
             }
 
-            JsonObject electionPeriodObject = yearObject.getAsJsonObject("electionPeriod");
+            final JsonObject electionPeriodObject = yearObject.getAsJsonObject("electionPeriod");
             if (electionPeriodObject.has("electionPeriodId")
                     || (electionPeriodObject.has("electionPeriodStart") && electionPeriodObject.has("electionPeriodEnd"))) {
                 int id = Integer.MIN_VALUE;
                 if (electionPeriodObject.has("electionPeriodId")) {
                     id = electionPeriodObject.get("electionPeriodId").getAsInt();
                 }
-                LocalDate start = LocalDate.parse(electionPeriodObject.get("electionPeriodStart").getAsString(), dtf);
-                LocalDate end = LocalDate.parse(electionPeriodObject.get("electionPeriodEnd").getAsString(), dtf);
-                PeriodChange electionPeriod = new PeriodChange(PeriodType.Election, id, start, end);
+                final LocalDate start = LocalDate.parse(electionPeriodObject.get("electionPeriodStart").getAsString(), dtf);
+                final LocalDate end = LocalDate.parse(electionPeriodObject.get("electionPeriodEnd").getAsString(), dtf);
+                final PeriodChange electionPeriod = new PeriodChange(PeriodType.Election, id, start, end);
                 periods.add(electionPeriod);
             }
 

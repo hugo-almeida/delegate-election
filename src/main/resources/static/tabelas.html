@@ -20,19 +20,26 @@
 		</ul>
 	</div>
 
-	<div class="col-md-2 input-group pull-right">
-	    <span class="input-group-addon">
-	        <i class="glyphicon glyphicon-search"></i>
-	    </span>
-	    <input type="text"  class="form-control" ng-model="degreeFilter"/>
+	<div class="btn-group pull-right text-left">
+		<button class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+			aria-haspopup="true" aria-expanded="false">
+			Filtrar <i class="caret"></i>
+		</button>
+
+		<ul class="dropdown-menu">
+			<li ng-click="filterDegrees('Todos')"><a>Todos</a></li>
+			<li ng-click="filterDegrees('Licenciatura Bolonha')"><a>Licenciatura Bolonha</a></li>
+			<li ng-click="filterDegrees('Mestrado Bolonha')"><a>Mestrado Bolonha</a></li>
+			<li ng-click="filterDegrees('Mestrado Integrado')"><a>Mestrado Integrado</a></li>
+		</ul>
 	</div>
-	
+
 	<p></p>
 
 	<table class="table table-hover">
 		<thead>
 			<tr>
-				<th class="col-md-2"><input type="checkbox"	ng-click="toggleSelectAll()"> <strong>Curso</strong></th>
+				<th class="col-md-2"><input type="checkbox"	ng-checked="allSelected" ng-click="toggleSelectAll()"> <strong>Curso</strong></th>
 				<th class="col-md-2"><strong>1º ano</strong></th>
 				<th class="col-md-2"><strong>2º ano</strong></th>
 				<th class="col-md-2"><strong>3º ano</strong></th>
@@ -41,7 +48,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="degree in degrees | orderBy: 'degree' | filter: degreeFilter">
+			<tr ng-repeat="degree in filteredDegrees | orderBy: 'degree'">
 				<td><input id="{{degree.degree}}" type="checkbox"
 					value="{{degree.degree}}"
 					ng-checked="selection.indexOf(degree.degree) > -1"

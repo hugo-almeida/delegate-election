@@ -1,8 +1,6 @@
 angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$http', '$log', 'periodEdit', 'history',
                                                           function(rc, sc, http, log, periodEdit, history)  {
 	
-	sc.debug = true;
-	
 	sc.details = false;
 	
 	sc.loaded = false;
@@ -10,23 +8,51 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	sc.allSelected = false;
 	
 	sc.active = 'Delegados';
-	
-	sc.inspectDegree = {};
-	
-	sc.inspectDegreeYear = 0;
-	
+
+	sc.filteredDegrees = [];
+
 	sc.loadDegrees = function() {
 		http.get('periods').success(function(data){
 			sc.degrees = data;
 			sc.loaded = true;
+			sc.filteredDegrees = sc.degrees;
 		});
 	};
 	
 	sc.loadDegrees();
 	
 	sc.selection = [];
+
+	function isLicBol(value) {
+		return value.degreeType == 'Licenciatura Bolonha';
+	}
 	
-	sc.history = {};
+	function isMesBol(value) {
+		return value.degreeType == 'Mestrado Bolonha';
+	}
+	
+	function isMesInt(value) {
+		return value.degreeType == 'Mestrado Integrado';
+	}
+	
+	sc.filterDegrees = function(filter) {
+		sc.selection = [];
+		sc.allSelected = false;
+		switch(filter) {
+		case 'Todos':
+			sc.filteredDegrees = sc.degrees;
+			break;
+		case 'Licenciatura Bolonha':
+			sc.filteredDegrees = sc.degrees.filter(isLicBol);
+			break;
+		case 'Mestrado Bolonha':
+			sc.filteredDegrees = sc.degrees.filter(isMesBol);
+			break;
+		case 'Mestrado Integrado':
+			sc.filteredDegrees = sc.degrees.filter(isMesInt);
+			break;
+		}
+	}
 	
 	sc.toggleSelection = function(degree) {
 		var index = sc.selection.indexOf(degree);
@@ -43,9 +69,8 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		log.log('hi');
 		if(!sc.allSelected) {
 			log.log('toggling off')
-			for(degree in sc.degrees) {
-				log.log(sc.degrees[degree])
-				var name = sc.degrees[degree].degree;
+			for(degree in sc.filteredDegrees) {
+				var name = sc.filteredDegrees[degree].degree;
 				var index = sc.selection.indexOf(name);
 				
 				if(index <= -1) {
@@ -56,9 +81,8 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		}
 		else {
 			log.log('toggling on')
-			for(degree in sc.degrees) {
-				log.log(sc.degrees[degree])
-				var name = sc.degrees[degree].degree;
+			for(degree in sc.filteredDegrees) {
+				var name = sc.filteredDegrees[degree].degree;
 				var index = sc.selection.indexOf(name);
 				
 				if(index > -1) {
@@ -70,19 +94,9 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	}
 	
 	sc.showDetails = function(degree, year) {
-		/*sc.inspectDegree = degree;
-		sc.inspectDegreeYear = year;
 		log.log(degree);
-		log.log(year);
-		http.get('degrees/' + sc.inspectDegree.degreeId + '/years/' + sc.inspectDegree.years[sc.inspectDegreeYear].degreeYear + '/candidates')
-		.success(function(data) {
-			sc.candidates = data;
-		});	*/
-		log.log('loading history');
-		
 		history.loadHistory(degree.degreeId, year);
 		sc.details = true;
-		log.log('history loaded');
 	}
 	
 	sc.hideDetails = function() {
@@ -94,10 +108,6 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	    return true;
 	}
 	
-	sc.setSelectedRow = function(index) {
-		sc.selectedRow = index;
-	}
-	
 	sc.setSelectionDetails = function(type, operation, degree, year) {
 		periodEdit.setSelectedPeriodType(type);
 		periodEdit.setSelectedPeriodOperation(operation);
@@ -105,11 +115,4 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		periodEdit.setSelectedYear(year);
 	}
 	
-	/***
-	 * Debug
-	 */
-	
-	sc.toggleDebug = function() {
-		sc.debug = !sc.debug;
-	}
 }]);
