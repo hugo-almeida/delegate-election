@@ -94,6 +94,13 @@ public class Controller {
 
     @PostConstruct
     public void schedulePeriods() {
+        //Pode nao haver nada iniciado
+        if (calendarDAO.findFirstByOrderByYearDesc() == null) {
+            return;
+        }
+        if (calendarDAO.findFirstByOrderByYearDesc().getDegrees() == null) {
+            return;
+        }
         for (Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
             for (DegreeYear dy : d.getYears()) {
                 for (Period p : dy.getInactivePeriods()) {
