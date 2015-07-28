@@ -18,13 +18,19 @@
 		</ul>
 	</div>
 
+	<div class="col-md-2 input-group pull-right">
+	    <span class="input-group-addon">
+	        <i class="glyphicon glyphicon-search"></i>
+	    </span>
+	    <input type="text"  class="form-control" ng-model="degreeFilter"/>
+	</div>
+	
 	<p></p>
 
 	<table class="table table-hover">
 		<thead>
 			<tr>
-				<th class="col-md-2"><input type="checkbox"
-					ng-click="toggleSelectAll()"> <strong>Curso</strong></th>
+				<th class="col-md-2"><input type="checkbox"	ng-click="toggleSelectAll()"> <strong>Curso</strong></th>
 				<th class="col-md-2"><strong>1º ano</strong></th>
 				<th class="col-md-2"><strong>2º ano</strong></th>
 				<th class="col-md-2"><strong>3º ano</strong></th>
@@ -33,31 +39,12 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="degree in degrees | orderBy: 'degree'">
+			<tr ng-repeat="degree in degrees | orderBy: 'degree' | filter: degreeFilter">
 				<td><input id="{{degree.degree}}" type="checkbox"
 					value="{{degree.degree}}"
 					ng-checked="selection.indexOf(degree.degree) > -1"
 					ng-click="toggleSelection(degree.degree)" /> <strong>{{degree.degree}}</strong></td>
-				<td ng-repeat="year in degree.years"> <!-- nao pode ser feito assim -->
-					<div>
-						<span>
-							<strong>C:</strong>
-							<span ng-show="!year.applicationPeriod || isEmpty(year.applicationPeriod)"><small></small></span>
-							<span ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state =='presente/futuro'">
-								{{year.applicationPeriod.applicationPeriodStart}} — {{year.applicationPeriod.applicationPeriodEnd}}</span>
-							<span ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state == 'passado'">
-								{{year.applicationPeriod.candidateCount}} candidatos</span>
-						</span>
-						<br>
-						<span>
-							<strong>V:</strong>
-							<span ng-show="!year.electionPeriod || isEmpty(year.electionPeriod)"><small></small></span>
-							<span ng-show="!isEmpty(year.electionPeriod) && year.electionPeriod.state =='presente/futuro'">
-								{{year.electionPeriod.electionPeriodStart}} - {{year.electionPeriod.electionPeriodEnd}}</span>
-							<span ng-show="!isEmpty(year.electionPeriod) && year.electionPeriod.state == 'passado'">
-								{{year.electionPeriod.voteCount}} votos</span>
-						</span>
-					</div>
+				<td ng-repeat="year in degree.years">
 					<div class="dropdown pull-right text-left">
 						<span class="dropdown-toggle" data-toggle="dropdown"
 							aria-haspopup="true" aria-expanded="false">
@@ -66,19 +53,38 @@
 				
 						<ul class="dropdown-menu">
 							<li ng-show="isEmpty(year.applicationPeriod)" data-toggle="modal" data-target="#editModal"
-								ng-click="setSelectedPeriodType('Candidatura'); setSelectedPeriodOperation('Criar'); setSelectedDegree(degree); setSelectedYear(year)">
+								ng-click="setSelectionDetails('Candidatura', 'Criar', degree, year)">
 								<a href="#">Criar - Candidatura</a></li>
 							<li ng-show="isEmpty(year.electionPeriod)" data-toggle="modal" data-target="#editModal" 
-								ng-click="setSelectedPeriodType('Votação'); setSelectedPeriodOperation('Criar'); setSelectedDegree(degree); setSelectedYear(year)">
+								ng-click="setSelectionDetails('Votação', 'Criar', degree, year)">
 								<a href="#">Criar - Votação</a></li>
 							<li ng-show="!isEmpty(year.applicationPeriod)" data-toggle="modal" data-target="#editModal"
-								ng-click="setSelectedPeriodType('Candidatura'); setSelectedPeriodOperation('Estender'); setSelectedDegree(degree); setSelectedYear(year)">
+								ng-click="setSelectionDetails('Candidatura', 'Estender', degree, year)">
 								<a href="#">Estender - Candidatura</a></li>
 							<li ng-show="!isEmpty(year.electionPeriod)" data-toggle="modal" data-target="#editModal"
-								ng-click="setSelectedPeriodType('Votação'); setSelectedPeriodOperation('Estender'); setSelectedDegree(degree); setSelectedYear(year)">
+								ng-click="setSelectionDetails('Votação', 'Estender', degree, year)">
 								<a href="#">Estender - Votação</a></li>
 							<li><a href="#" ng-click="showDetails(degree, $index)">Detalhes</a></li>
 						</ul>
+					</div>
+					<div>
+						<span>
+							<strong>C:</strong>
+							<span ng-show="!year.applicationPeriod || isEmpty(year.applicationPeriod)"><small></small></span>
+							<span ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state =='presente/futuro'">
+								{{year.applicationPeriod.applicationPeriodStart}} – {{year.applicationPeriod.applicationPeriodEnd}}</span>
+							<span ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state == 'passado'">
+								{{year.applicationPeriod.candidateCount}} candidatos</span>
+						</span>
+						<br>
+						<span>
+							<strong>V:</strong>
+							<span ng-show="!year.electionPeriod || isEmpty(year.electionPeriod)"><small></small></span>
+							<span ng-show="!isEmpty(year.electionPeriod) && year.electionPeriod.state =='presente/futuro'">
+								{{year.electionPeriod.electionPeriodStart}} – {{year.electionPeriod.electionPeriodEnd}}</span>
+							<span ng-show="!isEmpty(year.electionPeriod) && year.electionPeriod.state == 'passado'">
+								{{year.electionPeriod.voteCount}} votos</span>
+						</span>
 					</div>
 				</td>
 				<td>

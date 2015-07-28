@@ -1,13 +1,11 @@
 package endpoint;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -21,14 +19,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import jxl.write.Label;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.security.oauth2.sso.EnableOAuth2Sso;
@@ -78,10 +68,10 @@ import core.DegreeDAO;
 import core.DegreeYear;
 import core.ElectionPeriod;
 import core.Period;
-import core.PeriodDAO;
-import core.StudentDAO;
 import core.Period.PeriodType;
+import core.PeriodDAO;
 import core.Student;
+import core.StudentDAO;
 import endpoint.exception.UnauthorizedException;
 
 @EnableOAuth2Sso
@@ -104,9 +94,9 @@ public class Controller {
 
     @PostConstruct
     public void schedulePeriods() {
-        for (Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
-            for (DegreeYear dy : d.getYears()) {
-                for (Period p : dy.getInactivePeriods()) {
+        for (final Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
+            for (final DegreeYear dy : d.getYears()) {
+                for (final Period p : dy.getInactivePeriods()) {
                     if (p.getStart().isAfter(LocalDate.now())) {
                         p.schedulePeriod(periodDAO, degreeDAO);
                     } else if (p.getStart().isBefore(LocalDate.now()) && p.getEnd().isAfter(LocalDate.now())) {
@@ -117,7 +107,7 @@ public class Controller {
                         dy.setActivePeriod(p);
                     }
                 }
-                Period activePeriod = dy.getActivePeriod();
+                final Period activePeriod = dy.getActivePeriod();
                 // Passar tudo a localdatetime talvez seja melhor.
                 if (activePeriod != null) {
                     if (!activePeriod.getEnd().isBefore(LocalDate.now())) {
@@ -128,26 +118,6 @@ public class Controller {
                 }
             }
         }
-    }
-
-    @RequestMapping(value = "/excel", method = RequestMethod.GET, produces = { "application/x-octet-stream" })
-    public ModelAndView getFile() throws IOException, RowsExceededException, WriteException {
-        File file = new File("src/main/resources/static/delegados.xls");
-        WorkbookSettings wbSettings = new WorkbookSettings();
-
-        wbSettings.setLocale(new Locale("en", "EN"));
-
-        WritableWorkbook workbook = Workbook.createWorkbook(file, wbSettings);
-        workbook.createSheet("Delegados", 0);
-        WritableSheet excelSheet = workbook.getSheet(0);
-
-        Label f = new Label(0, 10, "Epah isto é um label... I guess");
-        excelSheet.addCell(f);
-
-        workbook.write();
-        workbook.close();
-
-        return new ModelAndView("redirect:/delegados.xls");
     }
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
@@ -344,7 +314,7 @@ public class Controller {
             return new Gson().toJson("");
         }
 
-        DegreeYear degreeYear =
+        final DegreeYear degreeYear =
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(DegreeYear.class, new DegreeYearHistoryAdapter()).create();
@@ -387,26 +357,26 @@ public class Controller {
             return new Gson().toJson("");
         }
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        JsonParser parser = new JsonParser();
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        final JsonParser parser = new JsonParser();
 
-        JsonObject periodObject = (JsonObject) parser.parse(periodJson);
-        String degreeId = periodObject.get("degreeId").getAsString();
-        int year = periodObject.get("degreeYear").getAsInt();
-        String periodType = periodObject.get("periodType").getAsString();
-        LocalDate start = LocalDate.parse(periodObject.get("start").getAsString(), dtf);
-        LocalDate end = LocalDate.parse(periodObject.get("end").getAsString(), dtf);
+        final JsonObject periodObject = (JsonObject) parser.parse(periodJson);
+        final String degreeId = periodObject.get("degreeId").getAsString();
+        final int year = periodObject.get("degreeYear").getAsInt();
+        final String periodType = periodObject.get("periodType").getAsString();
+        final LocalDate start = LocalDate.parse(periodObject.get("start").getAsString(), dtf);
+        final LocalDate end = LocalDate.parse(periodObject.get("end").getAsString(), dtf);
 
-        DegreeYear degreeYear =
+        final DegreeYear degreeYear =
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
 
         if (periodType.equals(PeriodType.Application.toString())) {
-            Period period = new ApplicationPeriod(start, end, degreeYear);
+            final Period period = new ApplicationPeriod(start, end, degreeYear);
             degreeYear.addPeriod(period);
             period.schedulePeriod(periodDAO, degreeDAO);
             periodDAO.save(period);
         } else if (periodType.equals(PeriodType.Election.toString())) {
-            Period period = new ElectionPeriod(start, end, degreeYear);
+            final Period period = new ElectionPeriod(start, end, degreeYear);
             degreeYear.addPeriod(period);
             period.schedulePeriod(periodDAO, degreeDAO);
             periodDAO.save(period);
@@ -429,10 +399,10 @@ public class Controller {
         for (final DegreeChange degreeChange : degrees) {
             for (final Integer year : degreeChange.getPeriods().keySet()) {
                 for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
-                    DegreeYear degreeYear =
+                    final DegreeYear degreeYear =
                             degreeDAO.findByIdAndYear(degreeChange.getDegreeId(),
                                     calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
-                    boolean periodExists = degreeYear.setDate(change.getStart(), change.getEnd(), change.getPeriodType());
+                    final boolean periodExists = degreeYear.setDate(change.getStart(), change.getEnd(), change.getPeriodType());
                     // Se o periodo existe, tem de agendar novamente, pois uma ou ambas as datas foram alteradas.
                     if (periodExists) {
                         Period period = degreeYear.getPeriodActiveOnDate(change.getStart());
@@ -445,12 +415,12 @@ public class Controller {
                         period.schedulePeriod(periodDAO, degreeDAO);
                     } else {
                         if (change.getPeriodType().toString().equals(PeriodType.Application.toString())) {
-                            Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
+                            final Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
                             degreeYear.addPeriod(period);
                             period.schedulePeriod(periodDAO, degreeDAO);
                             periodDAO.save(period);
                         } else if (change.getPeriodType().toString().equals(PeriodType.Election.toString())) {
-                            Period period = new ElectionPeriod(change.getStart(), change.getEnd(), degreeYear);
+                            final Period period = new ElectionPeriod(change.getStart(), change.getEnd(), degreeYear);
                             degreeYear.addPeriod(period);
                             period.schedulePeriod(periodDAO, degreeDAO);
                             periodDAO.save(period);
@@ -471,11 +441,11 @@ public class Controller {
 
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
-        DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
-        for (DegreeChange degreeChange : degrees) {
-            for (Integer year : degreeChange.getPeriods().keySet()) {
-                for (PeriodChange change : degreeChange.getPeriods().get(year)) {
-                    Period period = periodDAO.findById(change.getPeriodId());
+        final DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
+        for (final DegreeChange degreeChange : degrees) {
+            for (final Integer year : degreeChange.getPeriods().keySet()) {
+                for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
+                    final Period period = periodDAO.findById(change.getPeriodId());
                     if (period.getStart().isAfter(LocalDate.now())) {
                         period.unschedulePeriod(periodDAO, degreeDAO);
                         periodDAO.delete(change.getPeriodId());
@@ -493,18 +463,18 @@ public class Controller {
             return new Gson().toJson("");
         }
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        JsonParser parser = new JsonParser();
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        final JsonParser parser = new JsonParser();
 
-        Period period = periodDAO.findById(periodId);
-        DegreeYear degreeYear = period.getDegreeYear();
+        final Period period = periodDAO.findById(periodId);
+        final DegreeYear degreeYear = period.getDegreeYear();
 
-        JsonObject datesObject = (JsonObject) parser.parse(dates);
-        LocalDate newStart = LocalDate.parse(datesObject.get("start").getAsString(), dtf);
-        LocalDate newEnd = LocalDate.parse(datesObject.get("end").getAsString(), dtf);
+        final JsonObject datesObject = (JsonObject) parser.parse(dates);
+        final LocalDate newStart = LocalDate.parse(datesObject.get("start").getAsString(), dtf);
+        final LocalDate newEnd = LocalDate.parse(datesObject.get("end").getAsString(), dtf);
 
-        LocalDate start = period.getStart();
-        LocalDate end = period.getEnd();
+        final LocalDate start = period.getStart();
+        final LocalDate end = period.getEnd();
 
         if (newStart.isAfter(LocalDate.now()) && start.isAfter(LocalDate.now())
                 && !degreeYear.hasPeriodBetweenDates(newStart, end, period)) {
@@ -557,7 +527,7 @@ public class Controller {
     }
 
     /************************************* MVC ***************************************/
-    @RequestMapping("/admin")
+    @RequestMapping("/pedagogico")
     public ModelAndView testpedagogico() throws UnauthorizedException {
         if (hasAccessToManagement()) {
             return new ModelAndView("redirect:/pedagogico.html");
@@ -589,6 +559,12 @@ public class Controller {
         return userset.contains(userDetails.get("username"));
     }
 
+    @RequestMapping(value = "estudante", method = RequestMethod.GET)
+    public String testestudante() throws UnauthorizedException {
+        return "/index.html";
+        /** nao funciona, why? **/
+    }
+
     /*********************************** CONFIG *****************************************/
     @Configuration
     protected static class SecurityConfiguration extends OAuth2SsoConfigurerAdapter {
@@ -604,8 +580,8 @@ public class Controller {
                     .and()
                     .authorizeRequests()
                     .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user", "/get-candidates", "/apply",
-                            "/deapply", "get-students", "/students/**", "/degrees/**", "/admin", "/periods").authenticated()
-                    .and().csrf().csrfTokenRepository(csrfTokenRepository()).and()
+                            "/deapply", "get-students", "/students/**", "/degrees/**", "/pedagogico", "/periods", "/estudante")
+                    .authenticated().and().csrf().csrfTokenRepository(csrfTokenRepository()).and()
                     .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
         }
 

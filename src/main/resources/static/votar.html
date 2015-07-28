@@ -94,7 +94,12 @@
 								</td>
 								<td>
 									<!-- <span class="glyphicon glyphicon-search"></span>-->
-									<input type="search" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"></input>
+									<div class="col-md-3 input-group">
+									    <span class="input-group-addon">
+									        <i class="glyphicon glyphicon-search"></i>
+									    </span>
+									    <input type="text" class="form-control" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"/>
+									</div>	
 									<table class="table">
 										<tr ng-repeat="student in students | orderBy:'username'"  ng-hide="query==null || query==''">
 											<td class="col-md-1">

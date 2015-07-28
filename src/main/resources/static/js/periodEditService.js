@@ -67,12 +67,12 @@ angular.module('delegados').factory('periodEdit', ['$log', '$http', function(log
 			if(selectedPeriodType == 'Votação') {
 				log.log('vote');
 				log.log(dates);
-				changes.periodType = 'election';
+				changes.periodType = 'ELECTION';
 			}
 			else if(selectedPeriodType == 'Candidatura') {
 				log.log('apply');
 				log.log(dates);
-				changes.periodType = 'application'
+				changes.periodType = 'APPLICATION'
 			}
 			
 			http.post('periods', changes).success(function(data) {

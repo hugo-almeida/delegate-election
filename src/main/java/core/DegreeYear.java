@@ -182,7 +182,7 @@ public class DegreeYear {
         return period;
     }
 
-    public void setDate(LocalDate start, LocalDate end, PeriodType periodType) {
+    public boolean setDate(LocalDate start, LocalDate end, PeriodType periodType) {
         final LocalDate now = LocalDate.now();
         Period newPeriod = null;
         //Changing the past is impossible, the end can't happen before the start
@@ -221,7 +221,7 @@ public class DegreeYear {
     }
 
     public Period getPeriodActiveOnDate(LocalDate date) {
-        for (Period p : periods) {
+        for (final Period p : periods) {
             if (!p.getStart().isAfter(date) && !p.getEnd().isBefore(date)) {
                 return p;
             }
@@ -230,7 +230,7 @@ public class DegreeYear {
     }
 
     public boolean hasPeriodBetweenDates(LocalDate first, LocalDate second, Period period) {
-        for (Period p : periods) {
+        for (final Period p : periods) {
             if (p.getId() == period.getId()) {
                 continue;
             }

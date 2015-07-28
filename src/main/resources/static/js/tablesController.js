@@ -92,19 +92,10 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		sc.selectedRow = index;
 	}
 	
-	sc.setSelectedPeriodType = function(type) {
+	sc.setSelectionDetails = function(type, operation, degree, year) {
 		periodEdit.setSelectedPeriodType(type);
-	}
-	
-	sc.setSelectedPeriodOperation = function(operation) {
 		periodEdit.setSelectedPeriodOperation(operation);
-	}
-	
-	sc.setSelectedDegree = function(degree){
 		periodEdit.setSelectedDegree(degree);
-	}
-	
-	sc.setSelectedYear = function(year) {
 		periodEdit.setSelectedYear(year);
 	}
 	
