@@ -57,8 +57,10 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
                 applicationObject.addProperty("candidateCount", degreeYear.getCurrentApplicationPeriod().getCandidateCount());
                 if (degreeYear.getCurrentApplicationPeriod().getEnd().isBefore(now)) {
                     applicationObject.addProperty("state", "passado");
+                } else if (degreeYear.getCurrentApplicationPeriod().getStart().isAfter(now)) {
+                    applicationObject.addProperty("state", "futuro");
                 } else {
-                    applicationObject.addProperty("state", "presente/futuro");
+                    applicationObject.addProperty("state", "presente");
                 }
             }
 
@@ -69,8 +71,10 @@ public class DegreeYearAdapter implements JsonSerializer<Degree>, JsonDeserializ
                 electionObject.addProperty("voteCount", degreeYear.getCurrentElectionPeriod().getVotes().size());
                 if (degreeYear.getCurrentElectionPeriod().getEnd().isBefore(now)) {
                     electionObject.addProperty("state", "passado");
+                } else if (degreeYear.getCurrentElectionPeriod().getStart().isAfter(now)) {
+                    electionObject.addProperty("state", "futuro");
                 } else {
-                    electionObject.addProperty("state", "presente/futuro");
+                    electionObject.addProperty("state", "presente");
                 }
             }
 

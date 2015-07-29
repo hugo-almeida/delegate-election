@@ -1,5 +1,6 @@
 package core.util;
 
+import java.time.LocalDate;
 import java.util.TimerTask;
 
 import core.DegreeYear;
@@ -22,6 +23,11 @@ public class ActivatePeriod extends TimerTask {
     @Override
     public void run() {
         degreeYear.setActivePeriod(period);
+
+        Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
+        if (lastPeriod != null) {
+            period.setCandidates(lastPeriod.getCandidates());
+        }
         periodDAO.save(period);
     }
 }

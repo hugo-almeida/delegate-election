@@ -272,4 +272,18 @@ public class DegreeYear {
     public String getType() {
         return degree.getType();
     }
+
+    public Period getLastPeriod(LocalDate now) {
+        Period last = null;
+        for (Period p : periods) {
+            if (p.getEnd().isBefore(now)) {
+                if (last == null) {
+                    last = p;
+                } else if (p.getEnd().isAfter(last.getEnd())) {
+                    last = p;
+                }
+            }
+        }
+        return last;
+    }
 }
