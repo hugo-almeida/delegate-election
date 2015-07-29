@@ -1,6 +1,7 @@
 package adapter;
 
 import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -47,6 +48,9 @@ public class DegreeYearHistoryAdapter implements JsonSerializer<DegreeYear> {
         });
 
         for (final Period p : periods) {
+            if (p.getStart().isAfter(LocalDate.now())) {
+                continue;
+            }
             final JsonObject periodJson = new JsonObject();
             periodJson.addProperty("academicYear", p.getDegreeYear().getCalendarYear() + "/"
                     + (p.getDegreeYear().getCalendarYear() + 1));
