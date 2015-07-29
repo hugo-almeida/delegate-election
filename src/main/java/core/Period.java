@@ -221,7 +221,9 @@ public abstract class Period implements Serializable {
     abstract public PeriodType getType();
 
     public void unschedulePeriod(PeriodDAO periodDAO, DegreeDAO degreeDAO) {
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+        }
     }
 
     public void schedulePeriod(PeriodDAO periodDAO, DegreeDAO degreeDAO) {
