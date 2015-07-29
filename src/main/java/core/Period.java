@@ -254,4 +254,16 @@ public abstract class Period implements Serializable {
         timer.schedule(deactivatePeriodTask,
                 Date.from(getEnd().plusDays(1).atStartOfDay().minusMinutes(1).toInstant(ZoneOffset.UTC))); //termina às 23:59 do dia de fim
     }
+
+    public void addCandidate(Student s) {
+        getCandidates().add(s);
+        s.addPeriod(this);
+    }
+
+    public void removeCandidates(Student s) {
+        if (getCandidates().contains(s)) {
+            getCandidates().remove(s);
+        }
+        s.removePeriod(this);
+    }
 }
