@@ -17,18 +17,6 @@ public class ApplicationPeriod extends Period {
         super(start, end, degreeYear);
     }
 
-    public void addCandidate(Student s) {
-        super.getCandidates().add(s);
-        s.addPeriod(this);
-    }
-
-    public void removeCandidates(Student s) {
-        if (super.getCandidates().contains(s)) {
-            super.getCandidates().remove(s);
-        }
-        s.removePeriod(this);
-    }
-
     public int getCandidateCount() {
         return candidates.size();
     }
