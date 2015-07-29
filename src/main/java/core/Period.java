@@ -221,7 +221,9 @@ public abstract class Period implements Serializable {
     abstract public PeriodType getType();
 
     public void unschedulePeriod(PeriodDAO periodDAO, DegreeDAO degreeDAO) {
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+        }
     }
 
     public void schedulePeriod(PeriodDAO periodDAO, DegreeDAO degreeDAO) {
@@ -251,5 +253,17 @@ public abstract class Period implements Serializable {
         TimerTask deactivatePeriodTask = new DeactivatePeriod(this, periodDAO);
         timer.schedule(deactivatePeriodTask,
                 Date.from(getEnd().plusDays(1).atStartOfDay().minusMinutes(1).toInstant(ZoneOffset.UTC))); //termina às 23:59 do dia de fim
+    }
+
+    public void addCandidate(Student s) {
+        getCandidates().add(s);
+        s.addPeriod(this);
+    }
+
+    public void removeCandidates(Student s) {
+        if (getCandidates().contains(s)) {
+            getCandidates().remove(s);
+        }
+        s.removePeriod(this);
     }
 }

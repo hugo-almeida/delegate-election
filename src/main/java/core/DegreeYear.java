@@ -242,6 +242,12 @@ public class DegreeYear {
     }
 
     public Period addPeriod(LocalDate start, LocalDate end, String periodType) {
+        if (start.isAfter(end)) {
+            return null;
+        }
+        if (start.isBefore(LocalDate.now()) || end.isBefore(LocalDate.now())) {
+            return null;
+        }
         if (getActivePeriod() != null && start.isBefore(getActivePeriod().getEnd())) {
             return null;
         }

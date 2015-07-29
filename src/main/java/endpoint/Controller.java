@@ -393,15 +393,15 @@ public class Controller {
         if (periodType.equals(PeriodType.Application.toString())) {
             Period period = degreeYear.addPeriod(start, end, periodType);
             if (period != null) {
-            period.schedulePeriod(periodDAO, degreeDAO);
-            periodDAO.save(period);
+                period.schedulePeriod(periodDAO, degreeDAO);
+                periodDAO.save(period);
             }
         } else if (periodType.equals(PeriodType.Election.toString())) {
             Period period = degreeYear.addPeriod(start, end, periodType);
             if (period != null) {
-            period.schedulePeriod(periodDAO, degreeDAO);
-            periodDAO.save(period);
-        }
+                period.schedulePeriod(periodDAO, degreeDAO);
+                periodDAO.save(period);
+            }
         }
 
         return new Gson().toJson("ok");
@@ -512,6 +512,57 @@ public class Controller {
         period.schedulePeriod(periodDAO, degreeDAO);
 
         periodDAO.save(period);
+        return new Gson().toJson("ok");
+    }
+
+    @RequestMapping(value = "/periods/{periodId}/candidates", method = RequestMethod.GET)
+    public @ResponseBody String getCandidatesFromPeriod(@PathVariable int periodId) {
+        Period period = periodDAO.findById(periodId);
+        if (period == null) {
+            return new Gson().toJson("No Period with that Id");
+        }
+        Set<Student> candidates = period.getCandidates();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        return gson.toJson(candidates);
+    }
+
+    @RequestMapping(value = "/periods/{periodId}/candidates", method = RequestMethod.POST)
+    public @ResponseBody String addCandidateToPeriod(@PathVariable int periodId, @PathVariable String istId) {
+        Period period = periodDAO.findById(periodId);
+        if (period == null) {
+            return new Gson().toJson("No Period with that Id");
+        }
+
+        Set<Student> students = period.getDegreeYear().getStudents();
+        Student st = null;
+        for (Student s : students) {
+            if (s.getUsername().equals(istId)) {
+                st = s;
+            }
+        }
+        //Student doesn't exist in DegreeYear must be created
+        if (st == null) {
+            RestTemplate t = new RestTemplate();
+            String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
+
+            st = t.getForObject(infoUrl, Student.class);
+            st.setDegreeYear(period.getDegreeYear());
+            HttpHeaders requestHeaders = new HttpHeaders();
+            requestHeaders.set("__username__", istId);
+            HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
+            HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
+            JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
+            if (!result.get("email").isJsonNull()) {
+                st.setEmail(result.get("email").toString());
+            }
+            if (!result.get("photo").isJsonNull()) {
+                st.setPhotoType(result.getAsJsonObject("photo").get("type").toString());
+                st.setPhotoBytes(result.getAsJsonObject("photo").get("data").toString());
+            }
+        }
+        period.addCandidate(st);
+        studentDAO.save(st);
         return new Gson().toJson("ok");
     }
 
