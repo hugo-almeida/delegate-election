@@ -73,7 +73,7 @@
 							<li ng-show="!isEmpty(year.electionPeriod)" data-toggle="modal" data-target="#editModal"
 								ng-click="setSelectionDetails('Votação', 'Estender', degree, year)">
 								<a href="#">Estender - Votação</a></li>
-							<li><a href="#" ng-click="showDetails(degree, $index)">Detalhes</a></li>
+							<li><a href="#" ng-click="showDetails(degree, $index+1)">Detalhes</a></li>
 						</ul>
 					</div>
 					<div>
@@ -167,16 +167,41 @@
 				<div class="modal-body">
 	        		<table class="table">
 						<tr>
-							<th class="col-md-8">Curso</th>
-							<td class="col-md-12 col-md-12-offset-4">{{degree.degree}}</td>
+							<th class="col-md-8" ng-show="selection.length == 1">Curso</th>
+							<th class="col-md-8" ng-show="selection.length > 1">Cursos</th>
+							<td class="col-md-12 col-md-12-offset-4">
+								<ul class="list-inline">
+									<li ng-repeat="degree in selection">
+										{{degree}}
+									</li>
+								</ul>
+							</td>
 						</tr>
 						<tr>
 							<th>Ano Lectivo</th>
-							<td>{{degree.academicYear}}</td>
+							<td>{{degrees[0].academicYear}}</td>
 						</tr>
 						<tr>
 							<th>Ano Curricular</th>
-							<td>{{year.degreeYear}}</td>
+							<td>
+								<ul class="list-inline">
+									<li>
+										<input type="checkbox" value="">1º
+									</li>
+									<li>
+										<input type="checkbox" value="">2º
+									</li>
+									<li>
+										<input type="checkbox" value="">3º
+									</li>
+									<li>
+										<input type="checkbox" value="">4º
+									</li>
+									<li>
+										<input type="checkbox" value="">5º
+									</li>
+								</ul>
+							</td>
 						</tr>
 						<tr>
 							<th>Período de candidatura</th>

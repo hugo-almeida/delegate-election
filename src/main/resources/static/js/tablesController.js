@@ -9,13 +9,13 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	
 	sc.active = 'Delegados';
 
-	sc.filteredDegrees = [];
+	rc.filteredDegrees = [];
 
 	sc.loadDegrees = function() {
 		http.get('periods').success(function(data){
-			sc.degrees = data;
+			rc.degrees = data;
 			sc.loaded = true;
-			sc.filteredDegrees = sc.degrees;
+			rc.filteredDegrees = rc.degrees;
 		});
 	};
 	
@@ -40,16 +40,16 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		sc.allSelected = false;
 		switch(filter) {
 		case 'Todos':
-			sc.filteredDegrees = sc.degrees;
+			rc.filteredDegrees = rc.degrees;
 			break;
 		case 'Licenciatura Bolonha':
-			sc.filteredDegrees = sc.degrees.filter(isLicBol);
+			rc.filteredDegrees = rc.degrees.filter(isLicBol);
 			break;
 		case 'Mestrado Bolonha':
-			sc.filteredDegrees = sc.degrees.filter(isMesBol);
+			rc.filteredDegrees = rc.degrees.filter(isMesBol);
 			break;
 		case 'Mestrado Integrado':
-			sc.filteredDegrees = sc.degrees.filter(isMesInt);
+			rc.filteredDegrees = rc.degrees.filter(isMesInt);
 			break;
 		}
 	}
@@ -69,8 +69,8 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		log.log('hi');
 		if(!sc.allSelected) {
 			log.log('toggling off')
-			for(degree in sc.filteredDegrees) {
-				var name = sc.filteredDegrees[degree].degree;
+			for(degree in rc.filteredDegrees) {
+				var name = rc.filteredDegrees[degree].degree;
 				var index = sc.selection.indexOf(name);
 				
 				if(index <= -1) {
@@ -81,8 +81,8 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		}
 		else {
 			log.log('toggling on')
-			for(degree in sc.filteredDegrees) {
-				var name = sc.filteredDegrees[degree].degree;
+			for(degree in rc.filteredDegrees) {
+				var name = rc.filteredDegrees[degree].degree;
 				var index = sc.selection.indexOf(name);
 				
 				if(index > -1) {

@@ -1,4 +1,4 @@
-angular.module('delegados').factory('periodEdit', ['$log', '$http', function(log, http){
+angular.module('delegados').factory('periodEdit', ['$rootScope', '$log', '$http', function(rc, log, http){
 	var selectedPeriodType = 'none';
 	
 	var selectedPeriodOperation = 'none';
@@ -58,6 +58,10 @@ angular.module('delegados').factory('periodEdit', ['$log', '$http', function(log
 			
 			http.put(requestUrl, dates).success(function(data) {
 				log.log('success edit apply');
+				http.get('periods').success(function(data) {
+					rc.degrees = data;
+					rc.filteredDegrees = rc.degrees;
+				});
 			});
 		}
 		else if(selectedPeriodOperation == 'Criar') {
@@ -79,9 +83,12 @@ angular.module('delegados').factory('periodEdit', ['$log', '$http', function(log
 			
 			http.post('periods', changes).success(function(data) {
 				log.log('success edit apply');
+				http.get('periods').success(function(data) {
+					rc.degrees = data;
+					rc.filteredDegrees = rc.degrees;
+				});
 			});
 		}
-			
 	};
 	
 	return {
