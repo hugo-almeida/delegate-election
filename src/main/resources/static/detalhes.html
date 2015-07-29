@@ -4,41 +4,52 @@
 		<h3>Detalhes</h3>
 		
 		<!-- Table -->
-		<table class="table">
-			<tr>
-				<th class="col-md-2">Curso</th>
-				<td class="col-md-10">{{history().degreeName}}</td>
-			</tr>
-			<tr>
-				<th>Ano Lectivo</th>
-				<td>{{inspectedPeriod().academicYear}}</td>
-			</tr>
-			<tr>
-				<th>Ano Curricular</th>
-				<td>{{history().degreeYear}}</td>
-			</tr>
-			<tr>
-				<th ng-show="inspectedPeriod().periodType=='APPLICATION'">Candidaturas</th>
-				<th ng-show="inspectedPeriod().periodType=='ELECTION'">Votação</th>
-				<td>{{inspectedPeriod().start}} – {{inspectedPeriod().end}}
-					<div ng-show="inspectedPeriod.state == 'ongoing'"> - A decorrer</div>
-					<div ng-show="inspectedPeriod.state == 'over'"> - Terminado</div>
-				</td>
-			</tr>
-			<tr>
-				<th ng-show="inspectedPeriod().periodType=='APPLICATION'">Candidatos</th>
-				<th ng-show="inspectedPeriod().periodType=='ELECTION'">Votos</th>
-				<td>{{inspectedPeriod().info}}</td>
-			</tr>
-		</table>
+		<div class="row">
+			<table class="table">
+				<tr>
+					<th class="col-md-2">Curso</th>
+					<td class="col-md-10">{{history().degreeName}}</td>
+				</tr>
+				<tr>
+					<th>Ano Lectivo</th>
+					<td>{{currentYear}}</td>
+				</tr>
+				<tr>
+					<th>Ano Curricular</th>
+					<td>{{history().degreeYear}}</td>
+				</tr>
+				<tr>
+					<th>Candidaturas</th>
+					<td>{{getCurrentApplication().applicationPeriodStart}} – {{getCurrentApplication().applicationPeriodEnd}}
+						<div ng-show="getCurrentApplication().state == 'ongoing'"> - A decorrer</div>
+						<div ng-show="getCurrentApplication().state == 'over'"> - Terminado</div>
+						<div ng-hide="getCurrentApplication().state == 'futuro'">{{getCurrentApplication().candidateCount}} candidatos</div>
+					</td>
+				</tr>
+				<tr>
+					<th >Votação</th>
+					<td>{{getCurrentElection().electionPeriodStart}} – {{getCurrentElection().electionPeriodEnd}}
+						<div ng-show="getCurrentElection().state == 'presente'"> - A decorrer</div>
+						<div ng-show="getCurrentElection().state == 'futuro'"> - Terminado</div>
+						<div ng-hide="getCurrentElection().state == 'futuro'">{{getCurrentElection().voteCount}} votos</div>
+					</td>
+				</tr>
+			</table>
+		</div>
 	</div>
 	
 	<h3>Candidatos</h3>
-	<button class="btn btn-primary">Adicionar</button>
-	<div class="empty"><p><i class="glyphicon glyphicon-user"></i><span>Sem candidatos</span></p></div>
+	<button ng-show="getCurrentApplication().state == 'presente' || getCurrentElection().state == 'presente'" class="btn btn-primary">
+		Adicionar
+	</button>
 	
-<!-- 	<div ng-show="candidates.length < 1"> -->
-		<div>
+	<div ng-hide="candidates.length >= 1" class="empty">
+		<p>
+			<i class="glyphicon glyphicon-user"></i><span>Sem candidatos</span>
+		</p>
+	</div>
+	
+	<div class="row" ng-hide="candidates.length < 1">
 		<table class="table table-hover">
 			<thead>
 			<tr>
@@ -48,7 +59,7 @@
 			</tr>
 		</thead>
 			<tbody>
-				<tr ng-repeat="candidate in candidates">
+				<tr ng-repeat="candidate in candidates | orderBy: candidate.voteCount">
 					<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user"></i><strong>
 						<img ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}" height="28" width="28">
 						 {{candidate.name}}</strong><small>{{candidate.username}}</small></td>

@@ -11,11 +11,14 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 
 	rc.filteredDegrees = [];
 
+	rc.currentYear = '';
+	
 	sc.loadDegrees = function() {
 		http.get('periods').success(function(data){
 			rc.degrees = data;
 			sc.loaded = true;
 			rc.filteredDegrees = rc.degrees;
+			rc.currentYear = rc.degrees[0].academicYear;
 		});
 	};
 	
@@ -66,9 +69,7 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	};
 	
 	sc.toggleSelectAll = function() {
-		log.log('hi');
 		if(!sc.allSelected) {
-			log.log('toggling off')
 			for(degree in rc.filteredDegrees) {
 				var name = rc.filteredDegrees[degree].degree;
 				var index = sc.selection.indexOf(name);
@@ -80,7 +81,6 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 			sc.allSelected = true;
 		}
 		else {
-			log.log('toggling on')
 			for(degree in rc.filteredDegrees) {
 				var name = rc.filteredDegrees[degree].degree;
 				var index = sc.selection.indexOf(name);
@@ -94,8 +94,8 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	}
 	
 	sc.showDetails = function(degree, year) {
-		log.log(degree);
 		history.loadHistory(degree.degreeId, year);
+		history.setDegree(degree.years[year-1]);
 		sc.details = true;
 	}
 	
