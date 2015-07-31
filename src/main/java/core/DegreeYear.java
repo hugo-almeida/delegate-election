@@ -245,9 +245,9 @@ public class DegreeYear {
         if (start.isAfter(end)) {
             return null;
         }
-        if (start.isBefore(LocalDate.now()) || end.isBefore(LocalDate.now())) {
-            return null;
-        }
+//        if (start.isBefore(LocalDate.now()) || end.isBefore(LocalDate.now())) {
+//            return null;
+//        }
         if (getActivePeriod() != null && start.isBefore(getActivePeriod().getEnd())) {
             return null;
         }
