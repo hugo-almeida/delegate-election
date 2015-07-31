@@ -5,7 +5,7 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	
 	var inspect = {};
 	
-	var candidates = {};
+	var candidates = [];
 	
 	function getHistory() {
 		return history;
@@ -13,11 +13,15 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	
 	function inspectPeriod(index) {
 		inspect = history.periods[index];
-		log.log(inspect);
+		loadCandidates(index);
 	}
 	
 	function getInspectedPeriod() {
 		return inspect;
+	}
+	
+	function getInspectedPeriodCandidates() {
+		return candidates;
 	}
 	
 	function setDegree(d) {
@@ -34,25 +38,29 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	
 	function loadCandidates(id) {
 		http.get('periods/' + id + '/candidates').success(function(data) {
-			candidates = data;
-			return candidates;
+			if(!candidates == 'No Period with that Id') {
+				candidates = data;
+				log.log(candidates);
+				return data;
+			}
 		});
 	}
 	
 	function loadHistory(degreeId, year) {
 		http.get('degrees/' + degreeId + '/years/' + year + '/history').success(function(data) {
 			history = data;
-			inspectPeriod(0);
 		});
 	}
 	
 	return {
 		getInspectedPeriod: getInspectedPeriod,
+		getInspectedPeriodCandidates: getInspectedPeriodCandidates,
 		getHistory: getHistory,
 		getCurrentApplication: getCurrentApplication,
 		getCurrentElection: getCurrentElection,
 		setDegree: setDegree,
 		loadHistory: loadHistory,
+		loadCandidates: loadCandidates,
 		inspectPeriod: inspectPeriod
 	}
 }]);

@@ -69,7 +69,7 @@
 							<span>
 								<strong>C:</strong>
 								<span ng-show="!year.applicationPeriod || isEmpty(year.applicationPeriod)"><small></small></span>
-								<span ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state =='presente/futuro'">
+								<span ng-show="!isEmpty(year.applicationPeriod) && (year.applicationPeriod.state =='presente' || year.applicationPeriod.state == 'futuro')">
 									{{year.applicationPeriod.applicationPeriodStart}} – {{year.applicationPeriod.applicationPeriodEnd}}</span>
 								<span ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state == 'passado'">
 									{{year.applicationPeriod.candidateCount}} candidatos</span>
@@ -78,7 +78,7 @@
 							<span>
 								<strong>V:</strong>
 								<span ng-show="!year.electionPeriod || isEmpty(year.electionPeriod)"><small></small></span>
-								<span ng-show="!isEmpty(year.electionPeriod) && year.electionPeriod.state =='presente/futuro'">
+								<span ng-show="!isEmpty(year.electionPeriod) && (year.electionPeriod.state == 'presente' || year.electionPeriod.state == 'futuro')">
 									{{year.electionPeriod.electionPeriodStart}} – {{year.electionPeriod.electionPeriodEnd}}</span>
 								<span ng-show="!isEmpty(year.electionPeriod) && year.electionPeriod.state == 'passado'">
 									{{year.electionPeriod.voteCount}} votos</span>

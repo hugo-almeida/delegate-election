@@ -1,4 +1,4 @@
-<div ng-controller="historyCtrl">
+<div ng-controller="detailsCtrl">
 	<div>
 		<!-- Default panel contents -->
 		<h3>Detalhes</h3>
@@ -21,16 +21,16 @@
 				<tr>
 					<th>Candidaturas</th>
 					<td>{{getCurrentApplication().applicationPeriodStart}} – {{getCurrentApplication().applicationPeriodEnd}}
-						<div ng-show="getCurrentApplication().state == 'ongoing'"> - A decorrer</div>
-						<div ng-show="getCurrentApplication().state == 'over'"> - Terminado</div>
+						<span ng-show="getCurrentApplication().state == 'presente'"> - A decorrer</span>
+						<span ng-show="getCurrentApplication().state == 'passado'"> - Terminado</span>
 						<div ng-hide="getCurrentApplication().state == 'futuro'">{{getCurrentApplication().candidateCount}} candidatos</div>
 					</td>
 				</tr>
 				<tr>
 					<th >Votação</th>
-					<td>{{getCurrentElection().electionPeriodStart}} – {{getCurrentElection().electionPeriodEnd}}
-						<div ng-show="getCurrentElection().state == 'presente'"> - A decorrer</div>
-						<div ng-show="getCurrentElection().state == 'futuro'"> - Terminado</div>
+					<td>{{getCurrentElection().electionPeriodStart}} – {{getCurrentElection().electionPeriodEnd}}			
+						<span ng-show="getCurrentElection().state == 'presente'"> - A decorrer</span>
+						<span ng-show="getCurrentElection().state == 'passado'"> - Terminado</span>
 						<div ng-hide="getCurrentElection().state == 'futuro'">{{getCurrentElection().voteCount}} votos</div>
 					</td>
 				</tr>
@@ -59,14 +59,14 @@
 			</tr>
 		</thead>
 			<tbody>
-				<tr ng-repeat="candidate in candidates | orderBy: candidate.voteCount">
+				<tr ng-repeat="candidate in loadCandidates() | orderBy: candidate.voteCount">
 					<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user"></i><strong>
 						<img ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}" height="28" width="28">
 						 {{candidate.name}}</strong><small>{{candidate.username}}</small></td>
 					<td>sim</td>
 					<td>num votos 
 						<span class="pull-right">
-							<button class="btn btn-default btn-xs">Atribuir</button>
+							<button class="btn btn-default btn-xs" ng-click="assign(candidate.username)">Atribuir</button>
 							<i class="glyphicon glyphicon-check"></i>
 						</span>
 					</td>
@@ -76,7 +76,13 @@
 	</div>
 	
 	<h3>Histórico</h3>
-	<div>
+	<div ng-show="isEmpty(history())" class="empty">
+		<p>
+			<i class="glyphicon glyphicon-calendar"></i><span>Sem histórico</span>
+		</p>
+	</div>
+	
+	<div ng-hide="isEmpty(history())" class="row">
 		<table class="table table-hover">
 			<thead>
 			<tr>
@@ -92,7 +98,7 @@
 					<td ng-show="period.periodType=='ELECTION'">Votação</td>
 					<td>
 						<span>
-							<button class="btn btn-default btn-xs pull-right" ng-click="inspectPeriod($index)">
+							<button class="btn btn-default btn-xs pull-right" data-toggle="modal" data-target="#historyModal" ng-click="inspectPeriod($index)">
 								Detalhes
 							</button>
 						</span>
@@ -101,6 +107,89 @@
 				</tr>
 			</tbody>
 		</table>
+	</div>
+	
+	<div id="historyModal" class="modal fade" role="dialog" ng-controller="historyCtrl">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>
+						<strong>Histórico</strong>
+						<br>
+						<small>{{history().degreeName}} - {{inspectedPeriod().academicYear}}</small>
+					</h3>
+				    <button type="button" class="close" data-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<h3>Detalhes</h3>
+					
+					<!-- Table -->
+					<div class="row">
+						<table class="table">
+							<tr>
+								<th class="col-md-2">Curso</th>
+								<td class="col-md-10">{{history().degreeName}}</td>
+							</tr>
+							<tr>
+								<th>Ano Lectivo</th>
+								<td>{{inspectedPeriod().academicYear}}</td>
+							</tr>
+							<tr>
+								<th>Ano Curricular</th>
+								<td>{{history().degreeYear}}</td>
+							</tr>
+							<tr>
+								<th ng-show="inspectedPeriod().periodType == 'APPLICATION'">Candidaturas</th>
+								<th ng-show="inspectedPeriod().periodType == 'ELECTION'">Votação</th>
+								<td>{{inspectedPeriod().start}} – {{inspectedPeriod().end}}
+									<div>{{inspectedPeriod().info}} 
+										<span ng-show="inspectedPeriod().periodType == 'APPLICATION'">candidatos</span>
+										<span ng-show="inspectedPeriod().periodType == 'ELECTION'">votos</span>
+									</div>							
+								</td>
+							</tr>
+						</table>
+					</div>
+					
+					<h3>Candidatos</h3>
+					
+					<div ng-hide="candidates.length >= 1" class="empty">
+						<p>
+							<i class="glyphicon glyphicon-user"></i><span>Sem candidatos</span>
+						</p>
+					</div>
+					
+					<div class="row" ng-hide="candidates().length < 1">
+						<table class="table table-hover">
+							<thead>
+							<tr>
+								<th class="col-md-6"><strong>Nome</strong></th>
+								<th class="col-md-2"><strong>Auto-proposto</strong></th>
+								<th><strong>Nº de Votos</strong></th>
+							</tr>
+						</thead>
+							<tbody>
+								<tr ng-repeat="candidate in candidates() track by $index | orderBy: candidate.voteCount">
+									<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user"></i><strong>
+										<img ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}" height="28" width="28">
+										 {{candidate.name}}</strong><small>{{candidate.username}}</small></td>
+									<td>sim</td>
+									<td>num votos 
+										<span class="pull-right">
+											<button class="btn btn-default btn-xs">Atribuir</button>
+											<i class="glyphicon glyphicon-check"></i>
+										</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+	      		</div>
+	      		<div class="modal-footer">
+	        			<button type="button" class="btn btn-default" data-dismiss="modal">Voltar</button>
+	      		</div>
+			</div>
+		</div>
 	</div>
 	
 	<button class="btn btn-default" ng-click="hideDetails()">Voltar</button>
