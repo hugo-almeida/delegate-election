@@ -43,13 +43,13 @@
 		Adicionar
 	</button>
 	
-	<div ng-hide="candidates.length >= 1" class="empty">
+	<div ng-hide="getCandidates().length >= 1" class="empty">
 		<p>
 			<i class="glyphicon glyphicon-user"></i><span>Sem candidatos</span>
 		</p>
 	</div>
 	
-	<div class="row" ng-hide="candidates.length < 1">
+	<div class="row" ng-hide="getCandidates().length < 1">
 		<table class="table table-hover">
 			<thead>
 			<tr>
@@ -59,7 +59,7 @@
 			</tr>
 		</thead>
 			<tbody>
-				<tr ng-repeat="candidate in loadCandidates() | orderBy: candidate.voteCount">
+				<tr ng-repeat="candidate in getCandidates() track by $index | orderBy: candidate.voteCount">
 					<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user"></i><strong>
 						<img ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}" height="28" width="28">
 						 {{candidate.name}}</strong><small>{{candidate.username}}</small></td>
@@ -67,7 +67,6 @@
 					<td>num votos 
 						<span class="pull-right">
 							<button class="btn btn-default btn-xs" ng-click="assign(candidate.username)">Atribuir</button>
-							<i class="glyphicon glyphicon-check"></i>
 						</span>
 					</td>
 				</tr>
@@ -153,7 +152,7 @@
 					
 					<h3>Candidatos</h3>
 					
-					<div ng-hide="candidates.length >= 1" class="empty">
+					<div ng-hide="candidates().length >= 1" class="empty">
 						<p>
 							<i class="glyphicon glyphicon-user"></i><span>Sem candidatos</span>
 						</p>
@@ -163,7 +162,7 @@
 						<table class="table table-hover">
 							<thead>
 							<tr>
-								<th class="col-md-6"><strong>Nome</strong></th>
+								<th class="col-md-8"><strong>Nome</strong></th>
 								<th class="col-md-2"><strong>Auto-proposto</strong></th>
 								<th><strong>Nº de Votos</strong></th>
 							</tr>
@@ -175,10 +174,6 @@
 										 {{candidate.name}}</strong><small>{{candidate.username}}</small></td>
 									<td>sim</td>
 									<td>num votos 
-										<span class="pull-right">
-											<button class="btn btn-default btn-xs">Atribuir</button>
-											<i class="glyphicon glyphicon-check"></i>
-										</span>
 									</td>
 								</tr>
 							</tbody>

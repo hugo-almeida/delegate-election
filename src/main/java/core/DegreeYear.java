@@ -266,6 +266,9 @@ public class DegreeYear {
             p = new ElectionPeriod(start, end, this);
             periods.add(p);
         }
+        /***
+         * DEBUG
+         */
         if (start.isBefore(LocalDate.now()) && end.isAfter(LocalDate.now())) {
             p.setActive();
         }
@@ -278,7 +281,7 @@ public class DegreeYear {
 
     public Period getLastPeriod(LocalDate now) {
         Period last = null;
-        for (Period p : periods) {
+        for (final Period p : periods) {
             if (p.getEnd().isBefore(now)) {
                 if (last == null) {
                     last = p;

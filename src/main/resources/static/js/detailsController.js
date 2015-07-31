@@ -3,8 +3,6 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 	
 	sc.loaded = false;
 	
-	sc.candidates = [];
-	
 	sc.history = function () {
 		return history.getHistory();
 	};
@@ -14,6 +12,7 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 	};
 	
 	sc.inspectPeriod = function(index) {
+		log.log(index);
 		history.inspectPeriod(index);
 	}
 	
@@ -25,17 +24,8 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 		return history.getCurrentElection();
 	}
 	
-	sc.loadCandidates = function() {
-		if(!sc.loaded) {
-			if(sc.getCurrentApplication() != null && sc.getCurrentApplication().state == 'presente') {
-				candidates = history.loadCandidates(sc.getCurrentApplication().applicationPeriodId);
-				sc.loaded = true;
-			}
-			else if(sc.getCurrentElection() != null && sc.getCurrentElection().state == 'presente') {
-				candidates = history.loadCandidates(sc.getCurrentElection().electionPeriodId);
-				sc.loaded = true;
-			}
-		}
+	sc.getCandidates = function() {
+		return history.getCandidates();
 	}
 	
 	sc.assign = function(username) {
