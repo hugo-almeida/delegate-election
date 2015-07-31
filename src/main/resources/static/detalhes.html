@@ -23,7 +23,7 @@
 					<td>{{getCurrentApplication().applicationPeriodStart}} – {{getCurrentApplication().applicationPeriodEnd}}
 						<span ng-show="getCurrentApplication().state == 'presente'"> - A decorrer</span>
 						<span ng-show="getCurrentApplication().state == 'passado'"> - Terminado</span>
-						<div ng-hide="getCurrentApplication().state == 'futuro'">{{getCurrentApplication().candidateCount}} candidatos</div>
+						<div ng-hide="isEmpty(getCurrentApplication()) || getCurrentApplication().state == 'futuro'">{{getCurrentApplication().candidateCount}} candidatos</div>
 					</td>
 				</tr>
 				<tr>
@@ -31,7 +31,7 @@
 					<td>{{getCurrentElection().electionPeriodStart}} – {{getCurrentElection().electionPeriodEnd}}			
 						<span ng-show="getCurrentElection().state == 'presente'"> - A decorrer</span>
 						<span ng-show="getCurrentElection().state == 'passado'"> - Terminado</span>
-						<div ng-hide="getCurrentElection().state == 'futuro'">{{getCurrentElection().voteCount}} votos</div>
+						<div ng-hide="isEmpty(getCurrentElection()) ||getCurrentElection().state == 'futuro'">{{getCurrentElection().voteCount}} votos</div>
 					</td>
 				</tr>
 			</table>
