@@ -55,6 +55,7 @@ public class DegreeYearHistoryAdapter implements JsonSerializer<DegreeYear> {
             periodJson.addProperty("academicYear", p.getDegreeYear().getCalendarYear() + "/"
                     + (p.getDegreeYear().getCalendarYear() + 1));
             periodJson.addProperty("periodType", p.getType().toString());
+            periodJson.addProperty("periodId", p.getId());
             periodJson.addProperty("start", p.getStart().format(dtf));
             periodJson.addProperty("end", p.getEnd().format(dtf));
 
