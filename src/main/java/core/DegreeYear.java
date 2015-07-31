@@ -266,6 +266,9 @@ public class DegreeYear {
             p = new ElectionPeriod(start, end, this);
             periods.add(p);
         }
+        if (start.isBefore(LocalDate.now()) && end.isAfter(LocalDate.now())) {
+            p.setActive();
+        }
         return p;
     }
 
