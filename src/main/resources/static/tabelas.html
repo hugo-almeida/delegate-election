@@ -143,7 +143,7 @@
 		</div>
 	</div>
 	
-	<div id="bulkModal" class="modal fade" role="dialog">
+	<div id="bulkModal" class="modal fade" role="dialog" ng-controller="bulkCtrl">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -169,26 +169,26 @@
 						</tr>
 						<tr>
 							<th>Ano Lectivo</th>
-							<td>{{degrees[0].academicYear}}</td>
+							<td>{{academicYear()}}</td>
 						</tr>
 						<tr>
 							<th>Ano Curricular</th>
 							<td>
 								<ul class="list-inline">
 									<li>
-										<input type="checkbox" value="">1º
+										<input type="checkbox" value="1" ng-model="years[1]">1º
 									</li>
 									<li>
-										<input type="checkbox" value="">2º
+										<input type="checkbox" value="2" ng-model="years[2]">2º
 									</li>
 									<li>
-										<input type="checkbox" value="">3º
+										<input type="checkbox" value="3" ng-model="years[3]">3º
 									</li>
 									<li>
-										<input type="checkbox" value="">4º
+										<input type="checkbox" value="4" ng-model="years[4]">4º
 									</li>
 									<li>
-										<input type="checkbox" value="">5º
+										<input type="checkbox" value="5" ng-model="years[5]">5º
 									</li>
 								</ul>
 							</td>
@@ -197,9 +197,9 @@
 							<th>Período de candidatura</th>
 							<td>
 								<div class="input-group">
-									<input type="date" class="form-control">
+									<input type="date" class="form-control" ng-model="applicationStart">
 								  	<span class="input-group-addon" id="basic-addon1">to</span>
-									<input type="date" class="form-control">
+									<input type="date" class="form-control" ng-model="applicationEnd">
 								</div>
 							</td>
 						</tr>
@@ -207,9 +207,9 @@
 							<th>Período de votação</th>
 							<td>
 								<div class="input-group">
-									<input type="date" class="form-control">
+									<input type="date" class="form-control" ng-model="electionStart">
 								  	<span class="input-group-addon" id="basic-addon1">to</span>
-									<input type="date" class="form-control">
+									<input type="date" class="form-control" ng-model="electionEnd">
 								</div>
 							</td>
 						</tr>

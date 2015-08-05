@@ -1,5 +1,6 @@
 angular.module('delegados').factory('formatDate',  function(){
 	return function(date) {
+		if (!date) return date;
 		var dd = date.getDate();
 		var mm = date.getMonth()+1;
 		var yyyy = date.getFullYear();

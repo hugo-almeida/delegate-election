@@ -414,7 +414,7 @@ public class Controller {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
         }
-
+        System.out.println(periodsJson);
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
         final DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
@@ -427,6 +427,7 @@ public class Controller {
                     final boolean periodExists = degreeYear.setDate(change.getStart(), change.getEnd(), change.getPeriodType());
                     // Se o periodo existe, tem de agendar novamente, pois uma ou ambas as datas foram alteradas.
                     if (periodExists) {
+                        System.out.println("Period Exists");
                         Period period = degreeYear.getPeriodActiveOnDate(change.getStart());
                         if (period == null) {
                             period = degreeYear.getPeriodActiveOnDate(change.getEnd());
@@ -436,6 +437,7 @@ public class Controller {
                         period.unschedulePeriod(periodDAO, degreeDAO);
                         period.schedulePeriod(periodDAO, degreeDAO);
                     } else {
+                        System.out.println("Period Does Not Exist");
                         if (change.getPeriodType().toString().equals(PeriodType.Application.toString())) {
                             final Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
                             degreeYear.addPeriod(period);
