@@ -72,6 +72,7 @@ import core.Period.PeriodType;
 import core.PeriodDAO;
 import core.Student;
 import core.StudentDAO;
+import core.Vote;
 import endpoint.exception.UnauthorizedException;
 
 @EnableOAuth2Sso
@@ -524,6 +525,17 @@ public class Controller {
             return new Gson().toJson("No Period with that Id");
         }
         Set<Student> candidates = period.getCandidates();
+        //Necessário ir buscar estudantes não auto-propostos
+        if (period.getType().toString().equals(PeriodType.Election.toString())) {
+            Set<Vote> votes = ((ElectionPeriod) period).getVotes();
+            Student st = null;
+            for (Vote v : votes) {
+                st =
+                        studentDAO.findByUsernameAndDegreeAndCalendarYear(v.getVoted(), period.getDegreeYear().getDegree()
+                                .getId(), period.getDegreeYear().getCalendarYear());
+                candidates.add(st);
+            }
+        }
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
         return gson.toJson(candidates);
@@ -566,6 +578,20 @@ public class Controller {
         period.addCandidate(st);
         studentDAO.save(st);
         return new Gson().toJson("ok");
+    }
+
+    @RequestMapping(value = "periods/{periodId}/student/{username}", method = RequestMethod.GET)
+    public @ResponseBody boolean selfPropposed(@PathVariable int periodId, @PathVariable String username) {
+        Period period = periodDAO.findById(periodId);
+        Set<Student> candidates = period.getCandidates();
+        Student st = null;
+        for (Student s : candidates) {
+            if (s.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        //Nao está na lista de candidatos
+        return false;
     }
 
     /***************************** OLD API *****************************/
