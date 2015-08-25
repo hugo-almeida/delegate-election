@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,7 @@ import adapter.StudentAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -72,6 +74,7 @@ import core.Period.PeriodType;
 import core.PeriodDAO;
 import core.Student;
 import core.StudentDAO;
+import core.Vote;
 import endpoint.exception.UnauthorizedException;
 
 @EnableOAuth2Sso
@@ -523,9 +526,20 @@ public class Controller {
         if (period == null) {
             return new Gson().toJson("No Period with that Id");
         }
-        final Set<Student> candidates = period.getCandidates();
-        final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        Set<Student> candidates = period.getCandidates();
+        //Necessário ir buscar estudantes não auto-propostos
+        if (period.getType().toString().equals(PeriodType.Election.toString())) {
+            Set<Vote> votes = ((ElectionPeriod) period).getVotes();
+            Student st = null;
+            for (Vote v : votes) {
+                st =
+                        studentDAO.findByUsernameAndDegreeAndCalendarYear(v.getVoted(), period.getDegreeYear().getDegree()
+                                .getId(), period.getDegreeYear().getCalendarYear());
+                candidates.add(st);
+            }
+        }
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
         return gson.toJson(candidates);
     }
 
@@ -566,6 +580,31 @@ public class Controller {
         period.addCandidate(st);
         studentDAO.save(st);
         return new Gson().toJson("ok");
+    }
+
+    @RequestMapping(value = "periods/{periodId}/student/{username}", method = RequestMethod.GET)
+    public @ResponseBody String selfPropposed(@PathVariable int periodId, @RequestBody String studentJson) {
+        Period period = periodDAO.findById(periodId);
+        Set<Student> candidates = period.getCandidates();
+        JsonParser parser = new JsonParser();
+        JsonObject students = new JsonParser().parse(studentJson).getAsJsonObject();
+        JsonArray array = students.get("usernames").getAsJsonArray();
+        List<String> usernames = new ArrayList<String>();
+        for (int i = 0; i < array.size(); i++) {
+            usernames.add(array.get(i).toString());
+        }
+        JsonObject result = new JsonObject();
+        for (String s : usernames) {
+            Student st =
+                    studentDAO.findByUsernameAndDegreeAndCalendarYear(s, period.getDegreeYear().getDegree().getId(), period
+                            .getDegreeYear().getCalendarYear());
+            if (candidates.contains(st)) {
+                result.addProperty(s, true);
+            } else {
+                result.addProperty(s, false);
+            }
+        }
+        return new Gson().toJson(result);
     }
 
     /***************************** OLD API *****************************/
