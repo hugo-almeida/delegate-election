@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,7 @@ import adapter.StudentAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -581,17 +583,28 @@ public class Controller {
     }
 
     @RequestMapping(value = "periods/{periodId}/student/{username}", method = RequestMethod.GET)
-    public @ResponseBody boolean selfPropposed(@PathVariable int periodId, @PathVariable String username) {
+    public @ResponseBody String selfPropposed(@PathVariable int periodId, @RequestBody String studentJson) {
         Period period = periodDAO.findById(periodId);
         Set<Student> candidates = period.getCandidates();
-        Student st = null;
-        for (Student s : candidates) {
-            if (s.getUsername().equals(username)) {
-                return true;
+        JsonParser parser = new JsonParser();
+        JsonObject students = new JsonParser().parse(studentJson).getAsJsonObject();
+        JsonArray array = students.get("usernames").getAsJsonArray();
+        List<String> usernames = new ArrayList<String>();
+        for (int i = 0; i < array.size(); i++) {
+            usernames.add(array.get(i).toString());
+        }
+        JsonObject result = new JsonObject();
+        for (String s : usernames) {
+            Student st =
+                    studentDAO.findByUsernameAndDegreeAndCalendarYear(s, period.getDegreeYear().getDegree().getId(), period
+                            .getDegreeYear().getCalendarYear());
+            if (candidates.contains(st)) {
+                result.addProperty(s, true);
+            } else {
+                result.addProperty(s, false);
             }
         }
-        //Nao está na lista de candidatos
-        return false;
+        return new Gson().toJson(result);
     }
 
     /***************************** OLD API *****************************/
