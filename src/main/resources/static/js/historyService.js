@@ -56,8 +56,7 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 						result.usernames.push(candidates[index].username); 
 					}
 					log.log(result);
-					var stuff = {usernames: ['ist168268', 'ist179808']};
-					http.get('periods/' + degree.applicationPeriod.applicationPeriodId + '/student/', stuff)
+					http.post('periods/' + degree.applicationPeriod.applicationPeriodId + '/selfProposed', result)
 						.success(function(data) {
 						log.log(data);
 					});
