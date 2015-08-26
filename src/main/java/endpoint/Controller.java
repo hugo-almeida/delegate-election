@@ -582,7 +582,7 @@ public class Controller {
         return new Gson().toJson("ok");
     }
 
-    @RequestMapping(value = "periods/{periodId}/student/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = "periods/{periodId}/selfProposed", method = RequestMethod.GET)
     public @ResponseBody String selfPropposed(@PathVariable int periodId, @RequestBody String studentJson) {
         Period period = periodDAO.findById(periodId);
         Set<Student> candidates = period.getCandidates();
