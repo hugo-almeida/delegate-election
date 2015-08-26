@@ -582,7 +582,7 @@ public class Controller {
         return new Gson().toJson("ok");
     }
 
-    @RequestMapping(value = "periods/{periodId}/student/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = "periods/{periodId}/selfProposed", method = RequestMethod.GET)
     public @ResponseBody String selfPropposed(@PathVariable int periodId, @RequestBody String studentJson) {
         Period period = periodDAO.findById(periodId);
         Set<Student> candidates = period.getCandidates();
@@ -604,6 +604,18 @@ public class Controller {
                 result.addProperty(s, false);
             }
         }
+        return new Gson().toJson(result);
+    }
+
+    @RequestMapping("/roles")
+    public @ResponseBody String roles() {
+        OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName().toLowerCase();
+        JsonObject result = new JsonObject();
+        result.addProperty("pedagogico", hasAccessToManagement());
+        Iterable<Student> students = null;
+        students = studentDAO.findByUsername(username, calendarDAO.findFirstByOrderByYearDesc().getYear());
+        result.addProperty("aluno", students.iterator().hasNext());
         return new Gson().toJson(result);
     }
 
