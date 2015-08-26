@@ -394,13 +394,13 @@ public class Controller {
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
 
         if (periodType.equals(PeriodType.Application.toString())) {
-            Period period = degreeYear.addPeriod(start, end, periodType);
+            final Period period = degreeYear.addPeriod(start, end, periodType);
             if (period != null) {
                 period.schedulePeriod(periodDAO, degreeDAO);
                 periodDAO.save(period);
             }
         } else if (periodType.equals(PeriodType.Election.toString())) {
-            Period period = degreeYear.addPeriod(start, end, periodType);
+            final Period period = degreeYear.addPeriod(start, end, periodType);
             if (period != null) {
                 period.schedulePeriod(periodDAO, degreeDAO);
                 periodDAO.save(period);
@@ -522,7 +522,7 @@ public class Controller {
 
     @RequestMapping(value = "/periods/{periodId}/candidates", method = RequestMethod.GET)
     public @ResponseBody String getCandidatesFromPeriod(@PathVariable int periodId) {
-        Period period = periodDAO.findById(periodId);
+        final Period period = periodDAO.findById(periodId);
         if (period == null) {
             return new Gson().toJson("No Period with that Id");
         }
@@ -545,30 +545,30 @@ public class Controller {
 
     @RequestMapping(value = "/periods/{periodId}/candidates", method = RequestMethod.POST)
     public @ResponseBody String addCandidateToPeriod(@PathVariable int periodId, @PathVariable String istId) {
-        Period period = periodDAO.findById(periodId);
+        final Period period = periodDAO.findById(periodId);
         if (period == null) {
             return new Gson().toJson("No Period with that Id");
         }
 
-        Set<Student> students = period.getDegreeYear().getStudents();
+        final Set<Student> students = period.getDegreeYear().getStudents();
         Student st = null;
-        for (Student s : students) {
+        for (final Student s : students) {
             if (s.getUsername().equals(istId)) {
                 st = s;
             }
         }
         //Student doesn't exist in DegreeYear must be created
         if (st == null) {
-            RestTemplate t = new RestTemplate();
-            String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
+            final RestTemplate t = new RestTemplate();
+            final String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
 
             st = t.getForObject(infoUrl, Student.class);
             st.setDegreeYear(period.getDegreeYear());
-            HttpHeaders requestHeaders = new HttpHeaders();
+            final HttpHeaders requestHeaders = new HttpHeaders();
             requestHeaders.set("__username__", istId);
-            HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
-            HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
-            JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
+            final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
+            final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
+            final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
             if (!result.get("email").isJsonNull()) {
                 st.setEmail(result.get("email").toString());
             }
@@ -677,12 +677,6 @@ public class Controller {
         final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
         final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
         return userset.contains(userDetails.get("username"));
-    }
-
-    @RequestMapping(value = "/estudante", method = RequestMethod.GET)
-    public String testestudante() throws UnauthorizedException {
-        return "/index.html";
-        /** nao funciona, why? **/
     }
 
     /*********************************** CONFIG *****************************************/

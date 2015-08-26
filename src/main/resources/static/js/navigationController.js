@@ -37,20 +37,7 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	$rootScope.loaded = false;
 	
 	$rootScope.nextPeriod = false;
-	/***
-	 * LOGOUT
-	 */
-	$scope.logout = function() {
-		$http.post('logout', {}).success(function() {
-			$rootScope.authenticated = false;
-			$rootScope.credentials = {};
-			//$location.path("/");
-		}).error(function(data) {
-			console.log("Logout failed")
-			$rootScope.authenticated = false;
-		});
-	};
-	
+
 	/***
 	 * DEGREES
 	 */
@@ -86,9 +73,9 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 				$rootScope.voted = true;
 				$rootScope.voto = data;
 			}
-			$rootScope.loaded = true;	//
-		}).error(function(data) {		//	Dirty hack, should probably be done with angularjs promises instead
-			$rootScope.loaded = true;	//
+			$rootScope.loaded = true;	
+		}).error(function(data) {		
+			$rootScope.loaded = true;	
 		});						
 		$log.log('checked voted');
 	}
