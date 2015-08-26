@@ -41,13 +41,11 @@
 					<td><input id="{{degree.degree}}" type="checkbox"
 						value="{{degree.degree}}"
 						ng-checked="selection.indexOf(degree.degree) > -1"
-						ng-click="toggleSelection(degree.degree)" /> <strong>{{degree.degree}}</strong></td>
+						ng-click="toggleSelection(degree.degree)" /> {{degree.degree}}</td>
 					<td ng-repeat="year in degree.years">
-						<div class="dropdown pull-right text-left">
-							<span class="dropdown-toggle" data-toggle="dropdown"
-								aria-haspopup="true" aria-expanded="false">
-								<i class="glyphicon glyphicon-option-vertical"></i> <!-- should use option-vertical icon -->
-							</span>
+						<div class="dropdown pull-right">
+							<i class="glyphicon glyphicon-option-vertical dropdown-toggle" data-toggle="dropdown"
+								aria-haspopup="true" aria-expanded="false"></i> <!-- should use option-vertical icon -->
 					
 							<ul class="dropdown-menu">
 								<li ng-show="isEmpty(year.applicationPeriod)" data-toggle="modal" data-target="#editModal"
@@ -147,73 +145,94 @@
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"></button>
 					<h3>
-						<strong>Definir Período</strong>
-						<br>
-						<small>Defina as datas de início e fim dos períodos</small>
+						Definir Período
 					</h3>
-				    <button type="button" class="close" data-dismiss="modal"></button>
+					<small>Defina as datas de início e fim dos períodos</small>
 				</div>
 				<div class="modal-body">
-	        		<table class="table">
-						<tr>
-							<th class="col-md-8" ng-show="selection.length == 1">Curso</th>
-							<th class="col-md-8" ng-show="selection.length > 1">Cursos</th>
-							<td class="col-md-12 col-md-12-offset-4">
+	        		<form class="form-horizontal">
+						<div class="form-group">
+							<label class="control-label col-sm-4" ng-show="selection.length == 1">Curso</label>
+							<label class="control-label col-sm-4" ng-show="selection.length > 1">Cursos</label>
+							<div class="col-sm-8">
 								<ul class="list-inline">
 									<li ng-repeat="degree in selection">
 										{{degree}}
 									</li>
 								</ul>
-							</td>
-						</tr>
-						<tr>
-							<th>Ano Lectivo</th>
-							<td>{{academicYear()}}</td>
-						</tr>
-						<tr>
-							<th>Ano Curricular</th>
-							<td>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-4">Ano Lectivo</label>
+							<div class="col-sm-8">
+								<p class="form-control-static">{{academicYear()}}</p>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-4">Ano Curricular</label>
+							<div class="col-sm-8">
 								<ul class="list-inline">
 									<li>
-										<input type="checkbox" value="1" ng-model="years[1]">1º
+										 <div class="checkbox">
+										 	<label>
+										    	<input type="checkbox" value="1" ng-model="years[1]">1º
+										   	</label>
+										 </div>
 									</li>
 									<li>
-										<input type="checkbox" value="2" ng-model="years[2]">2º
+										<div class="checkbox">
+										 	<label>
+										    	<input type="checkbox" value="2" ng-model="years[2]">2º
+										   	</label>
+										 </div>
 									</li>
 									<li>
-										<input type="checkbox" value="3" ng-model="years[3]">3º
+										<div class="checkbox">
+										 	<label>
+										    	<input type="checkbox" value="3" ng-model="years[3]">3º
+										   	</label>
+										 </div>
 									</li>
 									<li>
-										<input type="checkbox" value="4" ng-model="years[4]">4º
+										<div class="checkbox">
+										 	<label>
+										    	<input type="checkbox" value="4" ng-model="years[4]">4º
+										   	</label>
+										 </div>
 									</li>
 									<li>
-										<input type="checkbox" value="5" ng-model="years[5]">5º
+										<div class="checkbox">
+										 	<label>
+										    	<input type="checkbox" value="5" ng-model="years[5]">5º
+										   	</label>
+										 </div>
 									</li>
 								</ul>
-							</td>
-						</tr>
-						<tr>
-							<th>Período de candidatura</th>
-							<td>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-4">Período de candidatura</label>
+							<div class="col-sm-8">
 								<div class="input-group">
 									<input type="date" class="form-control" ng-model="applicationStart">
 								  	<span class="input-group-addon" id="basic-addon1">to</span>
 									<input type="date" class="form-control" ng-model="applicationEnd">
 								</div>
-							</td>
-						</tr>
-						<tr>
-							<th>Período de votação</th>
-							<td>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-4">Período de votação</label>
+							<div class="col-sm-8">
 								<div class="input-group">
 									<input type="date" class="form-control" ng-model="electionStart">
 								  	<span class="input-group-addon" id="basic-addon1">to</span>
 									<input type="date" class="form-control" ng-model="electionEnd">
 								</div>
-							</td>
-						</tr>
-					</table>
+							</div>
+						</div>
+					</form>
 	      		</div>
 	      		<div class="modal-footer">
 	        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>

@@ -4,24 +4,16 @@
 		<h3>Detalhes</h3>
 		
 		<!-- Table -->
-		<table class="table">
-			<tr>
-				<th class="col-md-2">Curso</th>
-				<td class="col-md-8 col-md-8-offset-4">{{degree.name}}</td>
-			</tr>
-			<tr>
-				<th>Ano Lectivo</th>
-				<td>{{degree.academicYear}}</td>
-			</tr>
-			<tr>
-				<th>Candidaturas</th>
-				<td>{{candidatos.length}}</td>
-			</tr>
-			<tr>
-				<th>Período de votação</th>
-				<td>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</td>
-			</tr>
-		</table>
+		<dl class="dl-entity-horizontal">
+			<dt>Curso</dt>
+			<dd>{{degree.name}}</dd>
+			<dt>Ano Lectivo</dt>
+			<dd>{{degree.academicYear}}</dd>
+			<dt>Candidaturas</dt>
+			<dd>{{candidatos.length}}</dd>
+			<dt>Período de votação</dt>
+			<dd>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</dd>
+		</dl>
 	</div>
 	
 	<h3>Votação</h3>
@@ -31,97 +23,79 @@
 				<button type="button" class="close" data-dismiss="alert"><span class="sr-only">Close</span></button>
 				<i class="glyphicon glyphicon-info-sign"></i><strong>   </strong> O teu voto já foi submetido.
 			</div>
-			<div class="panel panel-default" >
-				<div class="panel-heading">Nome</div>
-				<div class="table-responsive">
-					<table class="table">
-						<td class="col-md-1">
-							<i ng-show="isEmpty(voto.photo)" class="glyphicon glyphicon-user"></i>
-							<img ng-show="!isEmpty(voto.photo)" ng-src="data:{{voto.photo.type}};base64,{{voto.photo.data}}" height="28" width="28">
-						</td>
-						<td ng-show="voto != 'null'">
-							<strong>{{voto.name}}</strong>
-							<small>{{voto.username}}</small>
-						</td>
-						<td ng-show="voto == 'null'">
-							<strong>Voto em branco</strong>
-						</td>
-					</table>
-				</div>
-			</div>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Nome</th>
+					</tr>
+				</thead>
+				<tbody>
+					<td ng-show="voto != 'null'">
+						<i class="avatar" ng-show="isEmpty(voto.photo)" class="glyphicon glyphicon-user"></i>
+						<img class="avatar" ng-show="!isEmpty(voto.photo)" ng-src="data:{{voto.photo.type}};base64,{{voto.photo.data}}">
+						{{voto.name}}
+						<span class="detail">{{voto.username}}</span>
+					</td>
+					<td ng-show="voto == 'null'">
+						Voto em branco
+					</td>
+				</tbody>
+			</table>
 		</div>
 		
-		<div class="panel panel-default" ng-show="voted==false"> <!-- table of candidates, shown if the user hasn't voted yet -->
-			<div class="panel-heading">Nome</div>
-			<div class="table-responsive">
-				<table class="table"> 
-					<tr ng-repeat="candidato in candidatos | orderBy:'username'">
-						<td class="col-md-1">
-							<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
-						</td>
-						<td class="col-md-1">
-							<i ng-show="isEmpty(candidato.photo)" class="glyphicon glyphicon-user"></i>
-							<img ng-show="!isEmpty(candidato.photo)" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28">
-						</td>
-						<td>
-							<strong>{{candidato.name}}</strong>
-							<small>{{candidato.username}}</small>
-						</td>
-					</tr>
-					<tr>
-						<td class="col-md-1">
-							<input type="radio" ng-model="selected" value="nil" name="voted">
-						</td>
-						<td class="col-md-1">
-						</td>
-						<td>
-							<strong>Votar em branco</strong>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<input type="radio" ng-model="selected" value="other" name="voted" ng-change="loadStudents()">  
-						</td>
-						<td>
-						</td>
-						<td>
-							<strong>Outro</strong>
-							<small>Podes dar o teu voto a um aluno que não se candidatou {{search}}</small>
-							<tr ng-show="selected == 'other'">
-								<td>
-								</td>
-								<td>
-								</td>
-								<td>
-									<!-- <span class="glyphicon glyphicon-search"></span>-->
-									<div class="col-md-3 input-group">
-									    <span class="input-group-addon">
-									        <i class="glyphicon glyphicon-search"></i>
-									    </span>
-									    <input type="text" class="form-control" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"/>
-									</div>	
-									<table class="table">
-										<tr ng-repeat="student in students | orderBy:'username'"  ng-hide="query==null || query==''">
-											<td class="col-md-1">
-												<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
-											</td>
-											<td class="col-md-1">
-												<i ng-show="isEmpty(student.photo)" class="glyphicon glyphicon-user"></i>
-												<img ng-show="!isEmpty(student.photo)" ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}" height="28" width="28">
-											</td>	
-											<td>	
-												<strong>{{student.name}}</strong>
-												<small>{{student.username}}</small>
-											</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-						</td>
-					</tr>
-				</table>
-			</div>
-		</div>
+		<table class="table" ng-show="voted==false"> 
+			<thead>
+				<tr>
+					<th>Nome</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="candidato in candidatos | orderBy:'username'">
+					<td>
+						<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
+						<i class="avatar" ng-show="isEmpty(candidato.photo)" class="glyphicon glyphicon-user"></i>
+						<img class="avatar" ng-show="!isEmpty(candidato.photo)" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}">
+						{{candidato.name}}
+						<span class="detail">{{candidato.username}}</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="radio" ng-model="selected" value="nil" name="voted">
+						Votar em branco
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="radio" ng-model="selected" value="other" name="voted" ng-change="loadStudents()">  
+						Outro
+						<span class="detail">Podes dar o teu voto a um aluno que não se candidatou {{search}}</span>
+						<tr ng-show="selected == 'other'">
+							<td>
+								<!-- <span class="glyphicon glyphicon-search"></span>-->
+								<div class="col-md-3 input-group">
+								    <span class="input-group-addon">
+								        <i class="glyphicon glyphicon-search"></i>
+								    </span>
+								    <input type="text" class="form-control" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"/>
+								</div>	
+								<table class="table">
+									<tr ng-repeat="student in students | orderBy:'username'"  ng-hide="query==null || query==''">
+										<td>
+											<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
+											<i class="avatar" ng-show="isEmpty(student.photo)" class="glyphicon glyphicon-user"></i>
+											<img class="avatar" ng-show="!isEmpty(student.photo)" ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}">
+											{{student.name}}
+											<span class="detail">{{student.username}}</span>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 		<button class="btn btn-primary" data-toggle="modal" data-target="#voteModal" ng-hide="voted" ng-click="selection()"
 			ng-disabled="selected == '' || (selected == 'other' && (otherSelected == '' || otherSelected == null)) || selected == null">Votar</button>
 	
@@ -130,29 +104,23 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h3>
-							<strong>Confirmação de Voto</strong>
+							Confirmação de Voto
 						</h3>
+						<small>stff?</small>
 					    <button type="button" class="close" data-dismiss="modal"></button>
 					</div>
 					<div class="modal-body">
-		        		<table class="table">
-							<tr>
-								<th class="col-md-6">Curso</th>
-								<td class="col-md-12 col-md-12-offset-4">{{degree.name}}</td>
-							</tr>
-							<tr>
-								<th>Ano Lectivo</th>
-								<td>{{degree.academicYear}}</td>
-							</tr>
-							<tr>
-								<th>Ano Curricular</th>
-								<td>{{degree.curricularYear}}</td>
-							</tr>
-							<tr>
-								<th>Período de votação</th>
-								<td>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</td>
-							</tr>
-						</table>
+		        		<dl class="dl-entity-horizontal">
+								<dt>Curso</dt>
+								<dd>{{degree.name}}</dd>
+								<dt>Ano Lectivo</dt>
+								<dd>{{degree.academicYear}}</dd>
+								<dt>Ano Curricular</dt>
+								<dd>{{degree.curricularYear}}</dd>
+								<dt>Período de votação</dt>
+								<dd>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</dd>
+						</dl>
+						<br>
 						<p>
 							Confirmar o seu voto em {{selectionResult}}?
 						</p>

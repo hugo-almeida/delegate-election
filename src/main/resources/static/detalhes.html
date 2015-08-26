@@ -60,9 +60,9 @@
 		</thead>
 			<tbody>
 				<tr ng-repeat="candidate in getCandidates() track by $index | orderBy: candidate.voteCount">
-					<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user"></i><strong>
-						<img ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}" height="28" width="28">
-						 {{candidate.name}}</strong><small>{{candidate.username}}</small></td>
+					<td><i class="avatar" ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user"></i><strong>
+						<img class="avatar" ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}">
+						 {{candidate.name}}</strong><span class="detail">{{candidate.username}}</span></td>
 					<td>sim</td>
 					<td>num votos 
 						<span class="pull-right">

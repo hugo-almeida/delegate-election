@@ -16,9 +16,11 @@ angular.module('delegados').controller('applyCtrl', ['$rootScope', '$scope', '$h
 			http.delete('degrees/'+rc.degree.id+'/years/'+rc.degree.curricularYear+'/candidates/'+rc.credentials.username)
 			.success(function(data) { 
 				rc.applied = false;
+				log.log(rc.applied);
 				http.get('degrees/'+rc.degree.id+'/years/'+rc.degree.curricularYear+'/candidates')
 				.success(function(data) { 
 					rc.candidatos = data;
+					log.log(rc.candidatos);
 					sc.feedback = false;
 				});
 			});

@@ -55,6 +55,7 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 			rc.filteredDegrees = rc.degrees.filter(isMesInt);
 			break;
 		}
+		log.log(filter);
 	}
 	
 	sc.toggleSelection = function(degree) {
