@@ -2,12 +2,8 @@ package core;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,11 +21,6 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import core.util.ActivatePeriod;
-import core.util.DeactivatePeriod;
-import core.util.RetrieveStudentListTask;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -89,9 +80,6 @@ public abstract class Period implements Serializable {
 
     @Column(name = "active")
     private boolean active;
-
-    @Transient
-    private Timer timer;
 
     Period() {
 
@@ -220,41 +208,6 @@ public abstract class Period implements Serializable {
 
     abstract public PeriodType getType();
 
-    public void unschedulePeriod(PeriodDAO periodDAO, DegreeDAO degreeDAO) {
-        if (timer != null) {
-            timer.cancel();
-        }
-    }
-
-    public void schedulePeriod(PeriodDAO periodDAO, DegreeDAO degreeDAO) {
-        timer = new Timer(true);
-
-        schedulePeriodStart(periodDAO, degreeDAO);
-        schedulePeriodEnd(periodDAO);
-    }
-
-    public void schedulePeriodStart(PeriodDAO periodDAO, DegreeDAO degreeDAO) {
-        if (timer == null) {
-            timer = new Timer(true);
-        }
-
-        TimerTask retrieveStudentsTask = new RetrieveStudentListTask(getDegreeYear(), degreeDAO);
-        TimerTask activatePeriodTask = new ActivatePeriod(this, periodDAO);
-
-        timer.schedule(retrieveStudentsTask, Date.from(getStart().atStartOfDay().minusHours(1).toInstant(ZoneOffset.UTC))); //Vai buscar os alunos 1 hora antes
-        timer.schedule(activatePeriodTask, Date.from(getStart().atStartOfDay().toInstant(ZoneOffset.UTC)));
-    }
-
-    public void schedulePeriodEnd(PeriodDAO periodDAO) {
-        if (timer == null) {
-            timer = new Timer(true);
-        }
-
-        TimerTask deactivatePeriodTask = new DeactivatePeriod(this, periodDAO);
-        timer.schedule(deactivatePeriodTask,
-                Date.from(getEnd().plusDays(1).atStartOfDay().minusMinutes(1).toInstant(ZoneOffset.UTC))); //termina às 23:59 do dia de fim
-    }
-
     public void addCandidate(Student s) {
         getCandidates().add(s);
         s.addPeriod(this);
@@ -265,14 +218,6 @@ public abstract class Period implements Serializable {
             getCandidates().remove(s);
         }
         s.removePeriod(this);
-    }
-
-    //DEGUB
-    public String printTimer() {
-        if (timer == null) {
-            return "no timer on period " + getId();
-        }
-        return timer.toString();
     }
 
 }

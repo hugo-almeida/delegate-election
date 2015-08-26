@@ -106,7 +106,7 @@ public class ScheduledTasks {
 
     }
 
-    @Scheduled(cron = "0 0 0 1 9 *")
+    @Scheduled(cron = "0 59 23 31 8 *")
     public void createCalendar() {
         final Calendar calendar = new Calendar(LocalDate.now().getYear());
         calendar.init();
