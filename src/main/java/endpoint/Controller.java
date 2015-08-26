@@ -98,6 +98,8 @@ public class Controller {
     @PostConstruct
     public void schedulePeriods() {
 
+        System.out.println("SCHEDULING PERIODS");
+
         //Pode nao haver nada iniciado
         if (calendarDAO.findFirstByOrderByYearDesc() == null) {
             return;
@@ -109,8 +111,11 @@ public class Controller {
         for (final Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
             for (final DegreeYear dy : d.getYears()) {
                 for (final Period p : dy.getInactivePeriods()) {
+                    System.out.println("Checked period: " + p.getId() + " " + p.getStart() + " - " + p.getEnd());
                     if (p.getStart().isAfter(LocalDate.now())) {
                         p.schedulePeriod(periodDAO, degreeDAO);
+                        System.out.println("Inicio e Fim Periodo Agendado! periodo: " + p.getId());
+                        System.out.println(p.printTimer());
                     } else if (p.getStart().isBefore(LocalDate.now()) && p.getEnd().isAfter(LocalDate.now())) {
                         if (dy.getStudents().isEmpty()) {
                             // Caso seja uma segunda oportunidade de candidatura deviamos voltar a inicializar os alunos.
@@ -118,19 +123,45 @@ public class Controller {
                         }
                         dy.setActivePeriod(p);
                     }
+                    periodDAO.save(p);
                 }
                 final Period activePeriod = dy.getActivePeriod();
                 // Passar tudo a localdatetime talvez seja melhor.
                 if (activePeriod != null) {
+                    System.out.println("Checked period: " + activePeriod.getId() + " " + activePeriod.getStart() + " - "
+                            + activePeriod.getEnd());
                     if (!activePeriod.getEnd().isBefore(LocalDate.now())) {
                         activePeriod.schedulePeriodEnd(periodDAO);
+                        System.out.println("Fim de Periodo Agendado!");
                     } else {
                         activePeriod.setInactive();
                     }
+                    periodDAO.save(activePeriod);
                 }
             }
         }
+
+//        for (final Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
+//            for (final DegreeYear dy : d.getYears()) {
+//                for (final Period p : dy.getInactivePeriods()) {
+//                    System.out.println(p.printTimer());
+//                }
+//            }
+//        }
     }
+
+//    @RequestMapping(value = "/timers", method = RequestMethod.GET)
+//    public @ResponseBody String getStuff() {
+//        String s = "";
+//        for (final Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
+//            for (final DegreeYear dy : d.getYears()) {
+//                for (final Period p : dy.getInactivePeriods()) {
+//                    s += p.printTimer();
+//                }
+//            }
+//        }
+//        return s;
+//    }
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
     public @ResponseBody String getStudentDegrees(@PathVariable String istId) {

@@ -266,4 +266,13 @@ public abstract class Period implements Serializable {
         }
         s.removePeriod(this);
     }
+
+    //DEGUB
+    public String printTimer() {
+        if (timer == null) {
+            return "no timer on period " + getId();
+        }
+        return timer.toString();
+    }
+
 }
