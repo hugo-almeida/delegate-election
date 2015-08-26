@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +65,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import core.ApplicationPeriod;
+import core.Calendar;
 import core.CalendarDAO;
 import core.Degree;
 import core.DegreeDAO;
@@ -97,6 +99,69 @@ public class Controller {
 
     @PostConstruct
     public void schedulePeriods() {
+        Calendar calendar = calendarDAO.findFirstByOrderByYearDesc();
+        if (calendar == null) {
+            return;
+        }
+
+        Set<Degree> degrees = calendar.getDegrees();
+        if (degrees == null) {
+            return;
+        }
+
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plus(1, ChronoUnit.DAYS);
+
+        if (!today.isBefore(LocalDate.of(today.getYear(), 9, 1)) && calendar.getYear() < today.getYear()) {
+            calendar = new Calendar(LocalDate.now().getYear());
+            calendar.init();
+            calendarDAO.save(calendar);
+        }
+
+        for (final Degree degree : degrees) {
+            for (final DegreeYear degreeYear : degree.getYears()) {
+                Period newActivePeriod = degreeYear.getNextPeriod(tomorrow);
+                if (newActivePeriod != null && newActivePeriod.getStart().isEqual(tomorrow)) {
+                    degreeYear.initStudents();
+                    degreeDAO.save(degreeYear.getDegree());
+                }
+            }
+        }
+
+        for (final Degree degree : degrees) {
+            for (final DegreeYear degreeYear : degree.getYears()) {
+                Set<Student> candidates = null;
+                // Em cada degreeYear, verifica se o currentPeriod ja terminou
+                Period activePeriod = degreeYear.getActivePeriod();
+                if (activePeriod != null) {
+                    if (activePeriod.getEnd().isBefore(today)) {
+                        // Se terminou, tira esse de activo
+                        activePeriod.setInactive();
+                        candidates = activePeriod.getCandidates();
+                        periodDAO.save(activePeriod);
+                    } else {
+                        // Se nao terminou, continua para o proximo degreeYear
+                        continue;
+                    }
+                }
+                // Depois verifica se há algum para entrar em vigor no dia actual, caso haja, coloca-o como activo
+                Period newActivePeriod = degreeYear.getNextPeriod(today);
+                if (newActivePeriod != null && newActivePeriod.getStart().isEqual(today)) {
+                    degreeYear.setActivePeriod(newActivePeriod);
+
+                    if (candidates != null) {
+                        newActivePeriod.setCandidates(candidates);
+                    } else {
+                        Period lastPeriod = degreeYear.getLastPeriod(today);
+                        if (lastPeriod != null) {
+                            newActivePeriod.setCandidates(lastPeriod.getCandidates());
+                        }
+                    }
+
+                    periodDAO.save(newActivePeriod);
+                }
+            }
+        }
         // Aqui deve correr os tres metodos em ScheduledTasks se necessario.
     }
 
