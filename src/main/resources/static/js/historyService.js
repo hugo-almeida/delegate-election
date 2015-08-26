@@ -45,22 +45,44 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 		return degree.electionPeriod;
 	}
 	
-	function loadCandidates(){
+	function loadCandidates(){ //Isto ta um poop
 		log.log(degree);
-		if(degree.applicationPeriod != null && degree.applicationPeriod.state == 'presente') {
+		if(degree.applicationPeriod != null && degree.applicationPeriod.state == 'presente' || degree.applicationPeriod.state == 'futuro') {
 			http.get('periods/' + degree.applicationPeriod.applicationPeriodId + '/candidates').success(function(data) {
 				if(!(candidates == 'No Period with that Id')) {
 					candidates = data;
+					var result = {usernames: []};
+					for (index in candidates) {
+						result.usernames.push(candidates[index].username); 
+					}
+					log.log(result);
+					var stuff = {usernames: ['ist168268', 'ist179808']};
+					http.get('periods/' + degree.applicationPeriod.applicationPeriodId + '/student/', stuff)
+						.success(function(data) {
+						log.log(data);
+					});
 				}
 			});
 		}
-		else if(degree.electionPeriod != null && degree.electionPeriod.state == 'presente') {
+		else if(degree.electionPeriod != null && degree.electionPeriod.state == 'presente' || degree.electionPeriod.state == 'passado') {
 			http.get('periods/' + degree.electionPeriod.electionPeriodId + '/candidates').success(function(data) {
 				if(!(candidates == 'No Period with that Id')) {
 					candidates = data;
+					var result = {usernames: []};
+					for (index in candidates) {
+						result.usernames.push(candidates[index].username); 
+					}
+					log.log(result);
+					result.usernames = result.username.substring(0, result.username.length - 1);
+					http.get('periods/' + degree.applicationPeriod.applicationPeriodId + '/students/ist168268', result)
+						.success(function(data) {
+						log.log(data);
+					});
 				}
 			});
 		}
+		
+		
 	}
 	
 	function loadInspectCandidates(id) {

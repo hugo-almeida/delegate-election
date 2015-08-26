@@ -1,14 +1,10 @@
-<div class="container" ng-controller="navigationCtrl">
+<div class="container" ng-controller="electionCtrl">
 
-	<ul class="nav nav-tabs pull-right" role="tablist">
-		<li ng-hide="authenticated"><a href="login">login</a></li>
-		<li ng-show="authenticated && debug"><a href="" ng-click="specialLogin()">Change Info</a></li><!-- debug -->
+		<button class="btn btn-default" ng-show="authenticated && debug" ng-click="specialLogin()">Change Info</button><!-- debug -->
 		<input ng-show="authenticated && debug" ng-model="special_username" type="text" value=""><!-- debug -->
-	</ul>
 	
-	<button class="btn btn-default" ng-click="toggleDebug()">Toggle Debug</button><!-- debug -->
+		<button class="btn btn-default" ng-click="toggleDebug()">Toggle Debug</button><!-- debug -->
 	
-	<div class="container">	
 		<div class="page-header">
 			<h1>{{subTitle}}</h1>
 			<h3>Eleição de Delegado de Ano</h3>
@@ -55,5 +51,4 @@
 				</p>
 			</div>
 		</div>
-	</div>
 </div>
