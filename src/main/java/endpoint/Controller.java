@@ -281,7 +281,6 @@ public class Controller {
     }
 
     // Este Endpoint pode ser usado para obter todos os estudantes em que se pode votar.
-    // Falta acrescentar os filtros
     // Para cada estudante, devolve: nome, id e foto
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/students", method = RequestMethod.GET)
     public @ResponseBody String getDegreeYearStudents(@PathVariable String degreeId, @PathVariable int year, @RequestParam(
@@ -293,8 +292,8 @@ public class Controller {
         if (start != null) {
             filteredStudents =
                     students.stream()
-                            .filter(s -> s.getName().toLowerCase().contains(start.toLowerCase())
-                                    || s.getUsername().toLowerCase().contains(start.toLowerCase())).collect(Collectors.toSet());
+                            .filter(s -> s.getName().toLowerCase().equals(start.toLowerCase())
+                                    || s.getUsername().toLowerCase().equals(start.toLowerCase())).collect(Collectors.toSet());
         }
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
