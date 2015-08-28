@@ -292,4 +292,18 @@ public class DegreeYear {
         }
         return last;
     }
+
+    public Period getNextPeriod(LocalDate now) {
+        Period next = null;
+        for (final Period p : periods) {
+            if (!p.getStart().isBefore(now)) {
+                if (next == null) {
+                    next = p;
+                } else if (p.getStart().isBefore(next.getStart())) {
+                    next = p;
+                }
+            }
+        }
+        return next;
+    }
 }

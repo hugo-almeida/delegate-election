@@ -1,7 +1,10 @@
 angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$http', '$log', function(rc, sc, http,log) {
 		sc.students = [];
 		
+		sc.selected = '';
+		
 		sc.selection = function() {
+			log.log(sc.selected);
 			if(sc.selected == 'other') {
 				for(var i = 0; i < sc.students.length; i++) {
 				    if (sc.students[i].username == sc.otherSelected) {

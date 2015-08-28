@@ -4,25 +4,16 @@
 		<!-- Default panel contents -->
 		<h3>Detalhes</h3>
 		
-		<!-- Table -->
-		<table class="table">
-			<tr>
-				<th class="col-md-2">Curso</th>
-				<td class="col-md-8 col-md-8-offset-4">{{degree.name}}</td>
-			</tr>
-			<tr>
-				<th>Ano Lectivo</th>
-				<td>{{degree.academicYear}}</td>
-			</tr>
-			<tr>
-				<th>Ano Curricular</th>
-				<td>{{degree.curricularYear}}</td>
-			</tr>
-			<tr>
-				<th>Período de Candidatura</th>
-				<td>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</td>
-			</tr>
-		</table>
+		<dl class="dl-entity-horizontal">
+			<dt>Curso</dt>
+			<dd>{{degree.name}}</dd>
+			<dt>Ano Lectivo</dt>
+			<dd>{{degree.academicYear}}</dd>
+			<dt>Ano Curricular</dt>
+			<dd>{{degree.curricularYear}}</dd>
+			<dt>Período de Candidatura</dt>
+			<dd>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</dd>
+		</dl>
 	</div>
 	
 	<h3>Candidatos</h3>
@@ -31,59 +22,50 @@
 			<i class="glyphicon glyphicon-plus"></i>
 			Candidata-te
 		</button>
-		<div class="panel panel-default">
-			<div class="panel-heading">Nome</div>
-			<table class="table">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Nome</th>
+				</tr>
+			</thead>
+			<tbody>
 				<tr ng-repeat="candidato in candidatos | orderBy:'name'">
-					<td class="col-md-1">
-						<img ng-show="!isEmpty(candidato.photo)" class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}" height="28" width="28"></img>
-						<i ng-show="isEmpty(candidato.photo)" class="glyphicon glyphicon-user"></i>
-					</td>
 					<td>
-						<strong>{{candidato.name}}</strong>
-						<small>{{candidato.username}}</small>
+						<img class="avatar" ng-show="!isEmpty(candidato.photo)" class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}"></img>
+						<i class="avatar" ng-show="isEmpty(candidato.photo)" class="glyphicon glyphicon-user"></i>
+						{{candidato.name}}
+						<span class="detail">{{candidato.username}}</span>
 						<button type="button" class="pull-right close" ng-show="candidato.username == credentials.username" ng-click="unapply()"></button>
 					</td>
 				</tr>
-			</table>
-		</div>
+			</tbody>
+		</table>
 	
 		<div id="applyModal" class="modal fade" role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h3>
-							<strong>Confirmação de Candidatura</strong>
+							Confirmação de Candidatura
 						</h3>
+						<small>stuff?</small>
 					    <button type="button" class="close" data-dismiss="modal"></button>
 					</div>
 					<div class="modal-body">
-		        		<table class="table">
-		        			<tr>
-								<th class="col-md-6">Candidato</th>
-								<td class="col-md-12 col-md-12-offset-4">{{credentials.name}}</td>
-							</tr>
-							<tr>
-								<th>Curso</th>
-								<td>{{degree.name}}</td>
-							</tr>
-							<tr>
-								<th>Ano Lectivo</th>
-								<td>{{degree.academicYear}}</td>
-							</tr>
-							<tr>
-								<th>Ano Curricular</th>
-								<td>{{degree.curricularYear}}</td>
-							</tr>
-							<tr>
-								<th>Candidaturas</th>
-								<td>{{candidatos.length}}</td>
-							</tr>
-							<tr>
-								<th>Período de votação</th>
-								<td>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</td><!-- need election period date -->
-							</tr>
-						</table>
+		        		<dl class="dl-entity-horizontal">
+								<dt>Candidato</dt>
+								<dd>{{credentials.name}}</dd>
+								<dt>Curso</dt>
+								<dd>{{degree.name}}</dd>
+								<dt>Ano Lectivo</dt>
+								<dd>{{degree.academicYear}}</dd>
+								<dt>Ano Curricular</dt>
+								<dd>{{degree.curricularYear}}</dd>
+								<dt>Candidaturas</dt>
+								<dd>{{candidatos.length}}</dd>
+								<dt>Período de votação</dt>
+								<dd>{{degree.currentPeriod.start}} - {{degree.currentPeriod.end}}</dd><!-- need election period date -->
+						</dl>
 		      		</div>
 		      		<div class="modal-footer">
 		        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>

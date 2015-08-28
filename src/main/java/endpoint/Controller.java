@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +65,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import core.ApplicationPeriod;
+import core.Calendar;
 import core.CalendarDAO;
 import core.Degree;
 import core.DegreeDAO;
@@ -97,39 +99,70 @@ public class Controller {
 
     @PostConstruct
     public void schedulePeriods() {
-
-        //Pode nao haver nada iniciado
-        if (calendarDAO.findFirstByOrderByYearDesc() == null) {
-            return;
-        }
-        if (calendarDAO.findFirstByOrderByYearDesc().getDegrees() == null) {
+        Calendar calendar = calendarDAO.findFirstByOrderByYearDesc();
+        if (calendar == null) {
             return;
         }
 
-        for (final Degree d : calendarDAO.findFirstByOrderByYearDesc().getDegrees()) {
-            for (final DegreeYear dy : d.getYears()) {
-                for (final Period p : dy.getInactivePeriods()) {
-                    if (p.getStart().isAfter(LocalDate.now())) {
-                        p.schedulePeriod(periodDAO, degreeDAO);
-                    } else if (p.getStart().isBefore(LocalDate.now()) && p.getEnd().isAfter(LocalDate.now())) {
-                        if (dy.getStudents().isEmpty()) {
-                            // Caso seja uma segunda oportunidade de candidatura deviamos voltar a inicializar os alunos.
-                            dy.initStudents();
-                        }
-                        dy.setActivePeriod(p);
-                    }
-                }
-                final Period activePeriod = dy.getActivePeriod();
-                // Passar tudo a localdatetime talvez seja melhor.
-                if (activePeriod != null) {
-                    if (!activePeriod.getEnd().isBefore(LocalDate.now())) {
-                        activePeriod.schedulePeriodEnd(periodDAO);
-                    } else {
-                        activePeriod.setInactive();
-                    }
+        Set<Degree> degrees = calendar.getDegrees();
+        if (degrees == null) {
+            return;
+        }
+
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plus(1, ChronoUnit.DAYS);
+
+        if (!today.isBefore(LocalDate.of(today.getYear(), 9, 1)) && calendar.getYear() < today.getYear()) {
+            calendar = new Calendar(LocalDate.now().getYear());
+            calendar.init();
+            calendarDAO.save(calendar);
+        }
+
+        for (final Degree degree : degrees) {
+            for (final DegreeYear degreeYear : degree.getYears()) {
+                Period newActivePeriod = degreeYear.getNextPeriod(tomorrow);
+                if (newActivePeriod != null && newActivePeriod.getStart().isEqual(tomorrow)) {
+                    degreeYear.initStudents();
+                    degreeDAO.save(degreeYear.getDegree());
                 }
             }
         }
+
+        for (final Degree degree : degrees) {
+            for (final DegreeYear degreeYear : degree.getYears()) {
+                Set<Student> candidates = null;
+                // Em cada degreeYear, verifica se o currentPeriod ja terminou
+                Period activePeriod = degreeYear.getActivePeriod();
+                if (activePeriod != null) {
+                    if (activePeriod.getEnd().isBefore(today)) {
+                        // Se terminou, tira esse de activo
+                        activePeriod.setInactive();
+                        candidates = activePeriod.getCandidates();
+                        periodDAO.save(activePeriod);
+                    } else {
+                        // Se nao terminou, continua para o proximo degreeYear
+                        continue;
+                    }
+                }
+                // Depois verifica se há algum para entrar em vigor no dia actual, caso haja, coloca-o como activo
+                Period newActivePeriod = degreeYear.getNextPeriod(today);
+                if (newActivePeriod != null && newActivePeriod.getStart().isEqual(today)) {
+                    degreeYear.setActivePeriod(newActivePeriod);
+
+                    if (candidates != null) {
+                        newActivePeriod.setCandidates(candidates);
+                    } else {
+                        Period lastPeriod = degreeYear.getLastPeriod(today);
+                        if (lastPeriod != null) {
+                            newActivePeriod.setCandidates(lastPeriod.getCandidates());
+                        }
+                    }
+
+                    periodDAO.save(newActivePeriod);
+                }
+            }
+        }
+        // Aqui deve correr os tres metodos em ScheduledTasks se necessario.
     }
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
@@ -282,7 +315,6 @@ public class Controller {
     }
 
     // Este Endpoint pode ser usado para obter todos os estudantes em que se pode votar.
-    // Falta acrescentar os filtros
     // Para cada estudante, devolve: nome, id e foto
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/students", method = RequestMethod.GET)
     public @ResponseBody String getDegreeYearStudents(@PathVariable String degreeId, @PathVariable int year, @RequestParam(
@@ -294,8 +326,8 @@ public class Controller {
         if (start != null) {
             filteredStudents =
                     students.stream()
-                            .filter(s -> s.getName().toLowerCase().contains(start.toLowerCase())
-                                    || s.getUsername().toLowerCase().contains(start.toLowerCase())).collect(Collectors.toSet());
+                            .filter(s -> s.getName().toLowerCase().equals(start.toLowerCase())
+                                    || s.getUsername().toLowerCase().equals(start.toLowerCase())).collect(Collectors.toSet());
         }
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();

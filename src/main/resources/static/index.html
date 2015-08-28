@@ -22,11 +22,12 @@
 	<script src="js/formatDateService.js"></script>
 	<script src="js/historyService.js"></script>
 	
-	<link rel="stylesheet" type="text/css" href="/webjars/fenixedu-canvas/css/canvas.css" />
+	<link rel="stylesheet" type="text/css" href="/fenixedu-canvas/css/canvas.css" />
 </head>
 
 <body ng-app="delegados" ng-cloak="true"> <!-- cloak b0rken -->
-	<div ng-controller="navigationCtrl">
+	<br></br>
+	<div class="container" ng-controller="navigationCtrl">
 		<ul class="nav nav-tabs" ng-show="roles.indexOf('student') != -1 && roles.indexOf('management') != -1">
 		  <li class="active"><a href="#" data-toggle="tab" ng-click="selectStudentTab()">Estudante</a></li>
 		  <li><a href="#" data-toggle="tab" ng-click="selectManagementTab()">Pedagógico</a></li>
@@ -39,6 +40,6 @@
 		</div>
 	</div>
 	
-	<script src="webjars/fenixedu-canvas/js/bootstrap.min.js"></script>
+	<script src="/fenixedu-canvas/js/bootstrap.min.js"></script>
 </body>
 </html>
