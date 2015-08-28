@@ -266,9 +266,10 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.DELETE)
     public @ResponseBody String removeCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId) {
-        if (!getLoggedUsername().equals(istId)) {
-            return new Gson().toJson("");
-        }
+//Debug
+//        if (!getLoggedUsername().equals(istId)) {
+//            return new Gson().toJson("");
+//        }
 
         final Student candidate =
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year)
