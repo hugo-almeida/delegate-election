@@ -429,13 +429,13 @@ public class Controller {
         if (periodType.equals(PeriodType.Application.toString())) {
             final Period period = degreeYear.addPeriod(start, end, periodType);
             if (period != null) {
-                period.schedulePeriod(periodDAO, degreeDAO);
+                //period.schedulePeriod(periodDAO, degreeDAO);
                 periodDAO.save(period);
             }
         } else if (periodType.equals(PeriodType.Election.toString())) {
             final Period period = degreeYear.addPeriod(start, end, periodType);
             if (period != null) {
-                period.schedulePeriod(periodDAO, degreeDAO);
+                //period.schedulePeriod(periodDAO, degreeDAO);
                 periodDAO.save(period);
             }
         }
@@ -470,19 +470,19 @@ public class Controller {
                         } else {
                             continue;
                         }
-                        period.unschedulePeriod(periodDAO, degreeDAO);
-                        period.schedulePeriod(periodDAO, degreeDAO);
+//                        period.unschedulePeriod(periodDAO, degreeDAO);
+//                        period.schedulePeriod(periodDAO, degreeDAO);
                     } else {
                         System.out.println("Period Does Not Exist");
                         if (change.getPeriodType().toString().equals(PeriodType.Application.toString())) {
                             final Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
                             degreeYear.addPeriod(period);
-                            period.schedulePeriod(periodDAO, degreeDAO);
+                            //period.schedulePeriod(periodDAO, degreeDAO);
                             periodDAO.save(period);
                         } else if (change.getPeriodType().toString().equals(PeriodType.Election.toString())) {
                             final Period period = new ElectionPeriod(change.getStart(), change.getEnd(), degreeYear);
                             degreeYear.addPeriod(period);
-                            period.schedulePeriod(periodDAO, degreeDAO);
+                            //period.schedulePeriod(periodDAO, degreeDAO);
                             periodDAO.save(period);
                         }
                     }
@@ -507,7 +507,7 @@ public class Controller {
                 for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
                     final Period period = periodDAO.findById(change.getPeriodId());
                     if (period.getStart().isAfter(LocalDate.now())) {
-                        period.unschedulePeriod(periodDAO, degreeDAO);
+                        //period.unschedulePeriod(periodDAO, degreeDAO);
                         periodDAO.delete(change.getPeriodId());
                     }
                 }
@@ -546,8 +546,8 @@ public class Controller {
             period.setEnd(newEnd);
         }
 
-        period.unschedulePeriod(periodDAO, degreeDAO);
-        period.schedulePeriod(periodDAO, degreeDAO);
+//        period.unschedulePeriod(periodDAO, degreeDAO);
+//        period.schedulePeriod(periodDAO, degreeDAO);
 
         periodDAO.save(period);
         return new Gson().toJson("ok");
@@ -650,6 +650,32 @@ public class Controller {
         students = studentDAO.findByUsername(username, calendarDAO.findFirstByOrderByYearDesc().getYear());
         result.addProperty("aluno", students.iterator().hasNext());
         return new Gson().toJson(result);
+    }
+
+    /***************************** Commands *****************************/
+
+    public String createCalendar() {
+        LocalDate now = LocalDate.now();
+        Calendar lastCreatedCalendar = calendarDAO.findFirstByOrderByYearDesc();
+        if (lastCreatedCalendar != null) {
+            int lastCreatedYear = lastCreatedCalendar.getYear();
+            if (now.isBefore(LocalDate.of(lastCreatedYear + 1, 8, 31))) {
+                return "Calendar of " + lastCreatedYear + "/" + (lastCreatedYear + 1)
+                        + " already exists. Can only create a new Calendar after August";
+            }
+        }
+        if (now.isBefore(LocalDate.of(now.getYear(), 8, 31))) {
+            Calendar c = new Calendar(now.getYear() - 1);
+            c.init();
+            calendarDAO.save(c);
+            return "Calendar of " + (now.getYear() - 1) + "/" + now.getYear() + " created.";
+        } else {
+            Calendar c = new Calendar(now.getYear());
+            c.init();
+            calendarDAO.save(c);
+            return "Calendar of " + now.getYear() + "/" + (now.getYear() + 1) + " created.";
+        }
+
     }
 
     /***************************** OLD API *****************************/
