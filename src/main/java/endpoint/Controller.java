@@ -640,6 +640,23 @@ public class Controller {
         return new Gson().toJson(result);
     }
 
+    @RequestMapping(value = "periods/{periodId}/votes", method = RequestMethod.GET)
+    public @ResponseBody String periodVotes(@PathVariable int periodId) {
+        Period period = periodDAO.findById(periodId);
+        if (period == null) {
+            return new Gson().toJson("Periodo com esse Id não existe.");
+        }
+        if (period.getType().equals(PeriodType.Application)) {
+            return new Gson().toJson("Periodos de Candidaturas não têm votos.");
+        }
+        ElectionPeriod ePeriod = (ElectionPeriod) period;
+        JsonObject result = new JsonObject();
+        for (Student s : ePeriod.getCandidates()) {
+            result.addProperty(s.getUsername(), Integer.toString(ePeriod.getNumVotes(s.getUsername())));
+        }
+        return new Gson().toJson(result);
+    }
+
     @RequestMapping("/roles")
     public @ResponseBody String roles() {
         OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
