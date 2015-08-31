@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +21,8 @@ import core.Period;
 import core.PeriodDAO;
 import core.Student;
 import core.StudentDAO;
-import core.util.ActivatePeriod;
-import core.util.RetrieveStudentListTask;
+//import core.util.ActivatePeriod;
+//import core.util.RetrieveStudentListTask;
 
 @RestController
 public class TestController {
@@ -58,15 +57,15 @@ public class TestController {
     @RequestMapping("/timer-period")
     public String timerPeriod() {
 //        dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear()).addYear(5);
-        Period p = pd.findById(3);
+        final Period p = pd.findById(3);
 //                new ApplicationPeriod(LocalDate.of(2015, 7, 22), LocalDate.of(2015, 7, 23), dd.findByIdAndYear("2761663971465",
 //                        cd.findFirstByOrderByYearDesc().getYear()).getDegreeYear(5));
-        TimerTask timerTask = new ActivatePeriod(p, pd);
+//        TimerTask timerTask = new ActivatePeriod(p, pd);
         pd.save(p);
-        Timer timer = new Timer(true);
-        Date today = new Date();
-        Date tomorrow = new Date(today.getTime() + (1000 * 10));
-        timer.schedule(timerTask, tomorrow);
+        final Timer timer = new Timer(true);
+        final Date today = new Date();
+        final Date tomorrow = new Date(today.getTime() + (1000 * 10));
+//        timer.schedule(timerTask, tomorrow);
         System.out.println("Scheduled for time " + tomorrow.toString());
         return "Ok";
     }
@@ -74,14 +73,14 @@ public class TestController {
     @RequestMapping("/timer")
     public String timer() {
         dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear()).addYear(5);
-        TimerTask timerTask =
-                new RetrieveStudentListTask(dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear())
-                        .getDegreeYear(5), dd);
-        Timer timer = new Timer(true);
-        Date today = new Date();
-        Date tomorrow = new Date(today.getTime() + (1000 * 10));
-        timer.schedule(timerTask, tomorrow);
-        System.out.println("Scheduled for time " + tomorrow.toString());
+//        TimerTask timerTask =
+////                new RetrieveStudentListTask(dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear())
+////                        .getDegreeYear(5), dd);
+//        Timer timer = new Timer(true);
+//        Date today = new Date();
+//        Date tomorrow = new Date(today.getTime() + (1000 * 10));
+//        timer.schedule(timerTask, tomorrow);
+//        System.out.println("Scheduled for time " + tomorrow.toString());
         return "Ok";
     }
 
@@ -91,11 +90,16 @@ public class TestController {
         for (final Degree d : testCalendar.getDegrees()) {
             for (final DegreeYear dy : d.getYears()) {
                 if (dy.getDegreeYear() == 2) {
-                    final ApplicationPeriod p =
-                            new ApplicationPeriod(LocalDate.of(2015, Month.NOVEMBER, 14), LocalDate.of(2015, Month.NOVEMBER, 15),
-                                    dy);
+                    ApplicationPeriod p =
+                            new ApplicationPeriod(LocalDate.of(2015, Month.AUGUST, 3), LocalDate.of(2015, Month.AUGUST, 4), dy);
                     dy.addPeriod(p);
-                    dy.setActivePeriod(p);
+                    cd.save(testCalendar);
+                    p = new ApplicationPeriod(LocalDate.of(2015, Month.AUGUST, 5), LocalDate.of(2015, Month.AUGUST, 6), dy);
+                    dy.addPeriod(p);
+                    cd.save(testCalendar);
+                    p = new ApplicationPeriod(LocalDate.of(2015, Month.AUGUST, 7), LocalDate.of(2015, Month.AUGUST, 8), dy);
+                    dy.addPeriod(p);
+                    //dy.setActivePeriod(p);
                     cd.save(testCalendar);
                     return "Ok";
                 }
@@ -111,7 +115,7 @@ public class TestController {
             for (final DegreeYear dy : d.getYears()) {
                 if (dy.getDegreeYear() == 2) {
                     final ElectionPeriod p =
-                            new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 16), LocalDate.of(2015, Month.NOVEMBER, 17), dy);
+                            new ElectionPeriod(LocalDate.of(2015, Month.AUGUST, 26), LocalDate.of(2015, Month.SEPTEMBER, 10), dy);
                     dy.addPeriod(p);
                     dy.setActivePeriod(p);
                     cd.save(testCalendar);

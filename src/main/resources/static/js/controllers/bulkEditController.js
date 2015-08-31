@@ -5,18 +5,15 @@ angular.module('delegados').controller('bulkCtrl', ['$rootScope', '$scope', '$ht
 	sc.applicationEnd = new Date();
 	sc.electionStart = new Date();
 	sc.electionEnd = new Date();
-		
-	sc.selectedDegrees = function() {
-		console.log(sc.selection);
-//		console.log(rc.selection);
-		return sc.selection;
-	}
 	
+	sc.years = [false, false, false, false, false];
+		
 	sc.academicYear = function() {
-		return rc.currentYear;
+		log.log(bulkEdit.getYear());
+		return bulkEdit.getYear();
 	}
 	
 	sc.bulkEdit = function() {
-		bulkEdit.edit(sc.selection, sc.years, formatDate(sc.applicationStart), formatDate(sc.applicationEnd), formatDate(sc.electionStart), formatDate(sc.electionEnd));
+		bulkEdit.edit(sc.years, formatDate(sc.applicationStart), formatDate(sc.applicationEnd), formatDate(sc.electionStart), formatDate(sc.electionEnd));
 	}
 }]);

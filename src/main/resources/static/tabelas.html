@@ -3,7 +3,7 @@
 	<br></br>
 
 	<div class="row">
-		<button class="btn btn-primary" data-toggle="modal" data-target="#bulkModal" ng-disabled='selection.length == 0'>
+		<button class="btn btn-primary" data-toggle="modal" data-target="#bulkModal" ng-disabled='selection.length == 0' ng-click="setBulkEdit()">
 			<i class="glyphicon glyphicon-pencil"></i> Definir
 		</button>
 	
@@ -37,7 +37,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="degree in filteredDegrees | orderBy: 'degree'">
+				<tr ng-repeat="degree in filteredDegrees() | orderBy: 'degree'">
 					<td><input id="{{degree.degree}}" type="checkbox"
 						value="{{degree.degree}}"
 						ng-checked="selection.indexOf(degree.degree) > -1"
@@ -97,41 +97,32 @@
 	</div>
 	
 	<div id="editModal" class="modal fade" role="dialog" ng-controller="modalCtrl">
-		<div class="modal-dialog modal-lg">
+		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h3>
-						<strong>{{selectedPeriodOperation()}} Período de {{selectedPeriodType()}}</strong>
-						<br>
-						<small>Defina as datas de início e fim do período de {{selectedPeriodType()}}</small>
+						{{selectedPeriodOperation()}} Período de {{selectedPeriodType()}}
 					</h3>
+					<span>Defina as datas de início e fim do período de {{selectedPeriodType()}}</span>
 				    <button type="button" class="close" data-dismiss="modal"></button>
 				</div>
 				<div class="modal-body">
-	        		<table class="table">
-						<tr>
-							<th class="col-md-8">Curso</th>
-							<td class="col-md-12 col-md-12-offset-4">{{selectedDegree().degree}}</td>
-						</tr>
-						<tr>
-							<th>Ano Lectivo</th>
-							<td>{{selectedDegree().academicYear}}</td>
-						</tr>
-						<tr>
-							<th>Ano Curricular</th>
-							<td>{{selectedYear().degreeYear}}</td>
-						</tr>
-						<tr>
-							<th>Período de {{selectedPeriodType()}}</th>
-							<td>
+	        		<dl class="dl-entity-horizontal">
+							<dt>Curso</dt>
+							<dd>{{selectedDegree().degree}}</dd>
+							<dt>Ano Lectivo</dt>
+							<dd>{{selectedDegree().academicYear}}</dd>
+							<dt>Ano Curricular</dt>
+							<dd>{{selectedYear().degreeYear}}</dd>
+							<dt>Período de {{selectedPeriodType()}}</dt>
+							<dd>
 								<div class="input-group">
 									<input type="date" class="form-control" ng-model="start">
 								  	<span class="input-group-addon" id="basic-addon1">to</span>
 									<input type="date" class="form-control" ng-model="end">
 								</div>
-							</td>
-						</tr>
-					</table>
+							</dd>
+					</dl>
 	      		</div>
 	      		<div class="modal-footer">
 	        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
@@ -142,7 +133,7 @@
 	</div>
 	
 	<div id="bulkModal" class="modal fade" role="dialog" ng-controller="bulkCtrl">
-		<div class="modal-dialog modal-lg">
+		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"></button>
@@ -177,35 +168,35 @@
 									<li>
 										 <div class="checkbox">
 										 	<label>
-										    	<input type="checkbox" value="1" ng-model="years[1]">1º
+										    	<input type="checkbox" ng-model="years[1]">1º
 										   	</label>
 										 </div>
 									</li>
 									<li>
 										<div class="checkbox">
 										 	<label>
-										    	<input type="checkbox" value="2" ng-model="years[2]">2º
+										    	<input type="checkbox" ng-model="years[2]">2º
 										   	</label>
 										 </div>
 									</li>
 									<li>
 										<div class="checkbox">
 										 	<label>
-										    	<input type="checkbox" value="3" ng-model="years[3]">3º
+										    	<input type="checkbox" ng-model="years[3]">3º
 										   	</label>
 										 </div>
 									</li>
 									<li>
 										<div class="checkbox">
 										 	<label>
-										    	<input type="checkbox" value="4" ng-model="years[4]">4º
+										    	<input type="checkbox" ng-model="years[4]">4º
 										   	</label>
 										 </div>
 									</li>
 									<li>
 										<div class="checkbox">
 										 	<label>
-										    	<input type="checkbox" value="5" ng-model="years[5]">5º
+										    	<input type="checkbox" ng-model="years[5]">5º
 										   	</label>
 										 </div>
 									</li>
