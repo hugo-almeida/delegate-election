@@ -2,8 +2,6 @@ package endpoint;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Date;
-import java.util.Timer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,12 +15,9 @@ import core.Degree;
 import core.DegreeDAO;
 import core.DegreeYear;
 import core.ElectionPeriod;
-import core.Period;
 import core.PeriodDAO;
 import core.Student;
 import core.StudentDAO;
-//import core.util.ActivatePeriod;
-//import core.util.RetrieveStudentListTask;
 
 @RestController
 public class TestController {
@@ -44,6 +39,7 @@ public class TestController {
     }
 
     @RequestMapping("/test-calendar")
+    //@Bean
     public String testCalendar() {
         final Calendar c = new Calendar(2014);
         c.init();
@@ -56,26 +52,26 @@ public class TestController {
 
     @RequestMapping("/timer-period")
     public String timerPeriod() {
-//        dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear()).addYear(5);
-        final Period p = pd.findById(3);
-//                new ApplicationPeriod(LocalDate.of(2015, 7, 22), LocalDate.of(2015, 7, 23), dd.findByIdAndYear("2761663971465",
-//                        cd.findFirstByOrderByYearDesc().getYear()).getDegreeYear(5));
+////        dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear()).addYear(5);
+//        Period p = pd.findById(3);
+////                new ApplicationPeriod(LocalDate.of(2015, 7, 22), LocalDate.of(2015, 7, 23), dd.findByIdAndYear("2761663971465",
+////                        cd.findFirstByOrderByYearDesc().getYear()).getDegreeYear(5));
 //        TimerTask timerTask = new ActivatePeriod(p, pd);
-        pd.save(p);
-        final Timer timer = new Timer(true);
-        final Date today = new Date();
-        final Date tomorrow = new Date(today.getTime() + (1000 * 10));
+//        pd.save(p);
+//        Timer timer = new Timer(true);
+//        Date today = new Date();
+//        Date tomorrow = new Date(today.getTime() + (1000 * 10));
 //        timer.schedule(timerTask, tomorrow);
-        System.out.println("Scheduled for time " + tomorrow.toString());
+//        System.out.println("Scheduled for time " + tomorrow.toString());
         return "Ok";
     }
 
     @RequestMapping("/timer")
     public String timer() {
-        dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear()).addYear(5);
+//        dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear()).addYear(5);
 //        TimerTask timerTask =
-////                new RetrieveStudentListTask(dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear())
-////                        .getDegreeYear(5), dd);
+//                new RetrieveStudentListTask(dd.findByIdAndYear("2761663971465", cd.findFirstByOrderByYearDesc().getYear())
+//                        .getDegreeYear(5), dd);
 //        Timer timer = new Timer(true);
 //        Date today = new Date();
 //        Date tomorrow = new Date(today.getTime() + (1000 * 10));

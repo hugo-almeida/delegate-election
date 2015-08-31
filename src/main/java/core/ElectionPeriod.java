@@ -40,6 +40,18 @@ public class ElectionPeriod extends Period {
         return null;
     }
 
+    //Get number of votes on a given student
+    public int getNumVotes(String istId) {
+        int votes = 0;
+        for (Student s : super.candidates) {
+            String vote = getVote(s.getUsername());
+            if (vote.equals(istId)) {
+                votes++;
+            }
+        }
+        return votes;
+    }
+
     public Set<Vote> getVotes() {
         return votes;
     }

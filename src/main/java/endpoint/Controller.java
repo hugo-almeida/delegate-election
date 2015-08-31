@@ -299,9 +299,10 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.DELETE)
     public @ResponseBody String removeCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId) {
-        if (!getLoggedUsername().equals(istId)) {
-            return new Gson().toJson("");
-        }
+//Debug
+//        if (!getLoggedUsername().equals(istId)) {
+//            return new Gson().toJson("");
+//        }
 
         final Student candidate =
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year)
@@ -639,6 +640,23 @@ public class Controller {
         return new Gson().toJson(result);
     }
 
+    @RequestMapping(value = "periods/{periodId}/votes", method = RequestMethod.GET)
+    public @ResponseBody String periodVotes(@PathVariable int periodId) {
+        Period period = periodDAO.findById(periodId);
+        if (period == null) {
+            return new Gson().toJson("Periodo com esse Id não existe.");
+        }
+        if (period.getType().equals(PeriodType.Application)) {
+            return new Gson().toJson("Periodos de Candidaturas não têm votos.");
+        }
+        ElectionPeriod ePeriod = (ElectionPeriod) period;
+        JsonObject result = new JsonObject();
+        for (Student s : ePeriod.getCandidates()) {
+            result.addProperty(s.getUsername(), Integer.toString(ePeriod.getNumVotes(s.getUsername())));
+        }
+        return new Gson().toJson(result);
+    }
+
     @RequestMapping("/roles")
     public @ResponseBody String roles() {
         final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
@@ -649,6 +667,32 @@ public class Controller {
         students = studentDAO.findByUsername(username, calendarDAO.findFirstByOrderByYearDesc().getYear());
         result.addProperty("aluno", students.iterator().hasNext());
         return new Gson().toJson(result);
+    }
+
+    /***************************** Commands *****************************/
+
+    public String createCalendar() {
+        LocalDate now = LocalDate.now();
+        Calendar lastCreatedCalendar = calendarDAO.findFirstByOrderByYearDesc();
+        if (lastCreatedCalendar != null) {
+            int lastCreatedYear = lastCreatedCalendar.getYear();
+            if (now.isBefore(LocalDate.of(lastCreatedYear + 1, 8, 31))) {
+                return "Calendar of " + lastCreatedYear + "/" + (lastCreatedYear + 1)
+                        + " already exists. Can only create a new Calendar after August";
+            }
+        }
+        if (now.isBefore(LocalDate.of(now.getYear(), 8, 31))) {
+            Calendar c = new Calendar(now.getYear() - 1);
+            c.init();
+            calendarDAO.save(c);
+            return "Calendar of " + (now.getYear() - 1) + "/" + now.getYear() + " created.";
+        } else {
+            Calendar c = new Calendar(now.getYear());
+            c.init();
+            calendarDAO.save(c);
+            return "Calendar of " + now.getYear() + "/" + (now.getYear() + 1) + " created.";
+        }
+
     }
 
     /***************************** OLD API *****************************/
