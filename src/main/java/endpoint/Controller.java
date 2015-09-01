@@ -167,13 +167,11 @@ public class Controller {
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
     public @ResponseBody String getStudentDegrees(@PathVariable String istId) {
-
+        final String pega = "pega";
         final Set<DegreeYear> studentDegrees =
                 StreamSupport
-                        .stream(studentDAO.findAll().spliterator(), false)
-                        .filter(s -> s.getUsername().equals(istId)
-                                && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
-                        .map(Student::getDegreeYear).collect(Collectors.toSet());
+                        .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .spliterator(), false).map(Student::getDegreeYear).collect(Collectors.toSet());
 
         final GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY);
@@ -187,9 +185,8 @@ public class Controller {
 
         final Student student =
                 StreamSupport
-                        .stream(studentDAO.findAll().spliterator(), false)
-                        .filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId)
-                                && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
+                        .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .spliterator(), false).filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId))
                         .collect(Collectors.toList()).get(0);
 
         // Desta forma é possível obter o voto do último periodo também.
@@ -212,9 +209,8 @@ public class Controller {
 
         final Student student =
                 StreamSupport
-                        .stream(studentDAO.findAll().spliterator(), false)
-                        .filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId)
-                                && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
+                        .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .spliterator(), false).filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId))
                         .collect(Collectors.toList()).get(0);
         Student candidate;
         if (vote.equals("nil")) {
@@ -222,11 +218,9 @@ public class Controller {
         } else {
             candidate =
                     StreamSupport
-                            .stream(studentDAO.findAll().spliterator(), false)
-                            .filter(s -> s.getUsername().equals(vote)
-                                    && s.getDegreeYear().getDegree().getId().equals(degreeId)
-                                    && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc()
-                                            .getYear()).collect(Collectors.toList()).get(0);
+                            .stream(studentDAO.findByUsername(vote, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                    .spliterator(), false).filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId))
+                            .collect(Collectors.toList()).get(0);
         }
 
         //The active periods must be the same for both students
@@ -260,11 +254,10 @@ public class Controller {
         }
         final Student applicant =
                 StreamSupport
-                        .stream(studentDAO.findAll().spliterator(), false)
-                        .filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId)
-                                && s.getDegreeYear().getDegreeYear() == year
-                                && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
-                        .collect(Collectors.toList()).get(0);
+                        .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .spliterator(), false)
+                        .filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId)
+                                && s.getDegreeYear().getDegreeYear() == year).collect(Collectors.toList()).get(0);
 
         final Period period = applicant.getDegreeYear().getActivePeriod();
         try {
@@ -642,16 +635,16 @@ public class Controller {
 
     @RequestMapping(value = "periods/{periodId}/votes", method = RequestMethod.GET)
     public @ResponseBody String periodVotes(@PathVariable int periodId) {
-        Period period = periodDAO.findById(periodId);
+        final Period period = periodDAO.findById(periodId);
         if (period == null) {
             return new Gson().toJson("Periodo com esse Id não existe.");
         }
         if (period.getType().equals(PeriodType.Application)) {
             return new Gson().toJson("Periodos de Candidaturas não têm votos.");
         }
-        ElectionPeriod ePeriod = (ElectionPeriod) period;
-        JsonObject result = new JsonObject();
-        for (Student s : ePeriod.getCandidates()) {
+        final ElectionPeriod ePeriod = (ElectionPeriod) period;
+        final JsonObject result = new JsonObject();
+        for (final Student s : ePeriod.getCandidates()) {
             result.addProperty(s.getUsername(), Integer.toString(ePeriod.getNumVotes(s.getUsername())));
         }
         return new Gson().toJson(result);
@@ -672,22 +665,22 @@ public class Controller {
     /***************************** Commands *****************************/
 
     public String createCalendar() {
-        LocalDate now = LocalDate.now();
-        Calendar lastCreatedCalendar = calendarDAO.findFirstByOrderByYearDesc();
+        final LocalDate now = LocalDate.now();
+        final Calendar lastCreatedCalendar = calendarDAO.findFirstByOrderByYearDesc();
         if (lastCreatedCalendar != null) {
-            int lastCreatedYear = lastCreatedCalendar.getYear();
+            final int lastCreatedYear = lastCreatedCalendar.getYear();
             if (now.isBefore(LocalDate.of(lastCreatedYear + 1, 8, 31))) {
                 return "Calendar of " + lastCreatedYear + "/" + (lastCreatedYear + 1)
                         + " already exists. Can only create a new Calendar after August";
             }
         }
         if (now.isBefore(LocalDate.of(now.getYear(), 8, 31))) {
-            Calendar c = new Calendar(now.getYear() - 1);
+            final Calendar c = new Calendar(now.getYear() - 1);
             c.init();
             calendarDAO.save(c);
             return "Calendar of " + (now.getYear() - 1) + "/" + now.getYear() + " created.";
         } else {
-            Calendar c = new Calendar(now.getYear());
+            final Calendar c = new Calendar(now.getYear());
             c.init();
             calendarDAO.save(c);
             return "Calendar of " + now.getYear() + "/" + (now.getYear() + 1) + " created.";

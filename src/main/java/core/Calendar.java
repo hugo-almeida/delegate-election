@@ -39,8 +39,8 @@ public class Calendar {
     public void init() {
         final RestTemplate t = new RestTemplate();
         final Degree[] c = t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees", Degree[].class);
-        Set<Degree> toRemove = new HashSet<Degree>();
-        for (Degree element : c) {
+        final Set<Degree> toRemove = new HashSet<Degree>();
+        for (final Degree element : c) {
             if (element.getType().equals("Licenciatura Bolonha") || element.getType().equals("Mestrado Bolonha")
                     || element.getType().equals("Mestrado Integrado")) {
                 element.setCalendar(this);
@@ -55,10 +55,10 @@ public class Calendar {
 //            d = it.next();
 //        } while (!d.getAcronym().equals("MEIC-A"));
 //        d.initDegreeYears();
-        for (Degree d : degrees) {
-            //if (d.getAcronym().equals("MEE")/* || d.getAcronym().equals("MEC")*/) {
+        for (final Degree d : degrees) {
+//            if (d.getAcronym().equals("MEE") || d.getAcronym().equals("MEIC-A") || d.getAcronym().equals("MEIC-T")) {
             d.initDegreeYears();
-            //}
+//            }
         }
     }
 

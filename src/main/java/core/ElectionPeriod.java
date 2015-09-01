@@ -14,7 +14,7 @@ import javax.persistence.OneToMany;
 @DiscriminatorValue("Election")
 public class ElectionPeriod extends Period {
 
-    @OneToMany(mappedBy = "period", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "period", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     protected Set<Vote> votes;
 
     ElectionPeriod() {
@@ -43,8 +43,8 @@ public class ElectionPeriod extends Period {
     //Get number of votes on a given student
     public int getNumVotes(String istId) {
         int votes = 0;
-        for (Student s : super.candidates) {
-            String vote = getVote(s.getUsername());
+        for (final Student s : super.candidates) {
+            final String vote = getVote(s.getUsername());
             if (vote.equals(istId)) {
                 votes++;
             }

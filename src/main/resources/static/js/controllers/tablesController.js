@@ -97,9 +97,9 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		var selectedDegrees = [];
 		
 		for(selectionIndex in sc.selection) {
-			for(degIndex in sc.filteredDegrees) {
-				if(sc.selection[selectionIndex] == sc.filteredDegrees[degIndex].degree) {
-					selectedDegrees.push(sc.filteredDegrees[degIndex].degreeId);
+			for(degIndex in sc.filteredDegrees()) {
+				if(sc.selection[selectionIndex] == sc.filteredDegrees()[degIndex].degree) {
+					selectedDegrees.push(sc.filteredDegrees()[degIndex].degreeId);
 				}
 			}
 		}

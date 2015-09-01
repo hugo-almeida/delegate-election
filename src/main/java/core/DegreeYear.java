@@ -43,7 +43,7 @@ public class DegreeYear {
     @OneToMany(mappedBy = "degreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private final Set<Period> periods = new HashSet<Period>();
 
-    @OneToMany(mappedBy = "studentpk.degreeYear", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "studentpk.degreeYear", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Student> students = new HashSet<Student>();
 
     DegreeYear() {

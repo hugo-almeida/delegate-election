@@ -23,7 +23,7 @@ public class Student {
     @EmbeddedId
     private StudentPK studentpk = null;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "student_period", joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username"),
             @JoinColumn(name = "degree_name", referencedColumnName = "degree_name"),
             @JoinColumn(name = "degree_year", referencedColumnName = "degree_year"),

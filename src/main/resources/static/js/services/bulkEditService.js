@@ -1,4 +1,4 @@
-angular.module('delegados').factory('bulkEdit', ['$rootScope', '$log', '$http', function(rc, log, http) {
+angular.module('delegados').factory('bulkEdit', ['$rootScope', '$log', '$http', 'degrees', function(rc, log, http, degrees) {
 	var selectedPeriodOperation = 'none';
 	
 	var selectedDegrees = [];
@@ -60,9 +60,8 @@ angular.module('delegados').factory('bulkEdit', ['$rootScope', '$log', '$http', 
 		var requestUrl = 'periods';
 		http.put(requestUrl, request).success(function(data) {
 			log.log('success edit apply');
-			http.get('periods').success(function(data) {
-				result = data;
-			});
+		}).then(function(data) {
+			degrees.loadDegrees();
 		});
 	};
 	
