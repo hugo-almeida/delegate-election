@@ -7,7 +7,7 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 	
 	$http.get('user').success(function(data) {
 		if (data) {
-		
+			$log.log(data);
 			$rootScope.degree = null;
 			
 			$rootScope.authenticated = true;
@@ -45,7 +45,7 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 	$rootScope.reloadDegrees = function() {
 		$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
 			$rootScope.degrees = data;
-			
+			$log.log(data);
 			if($rootScope.degrees.length == 1) {
 				$scope.selection = 0;
 				$scope.setDegree();

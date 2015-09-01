@@ -45,43 +45,26 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 		return degree.electionPeriod;
 	}
 	
-	function loadCandidates(){ //Isto ta um poop
-		log.log(degree);
-		if(degree.applicationPeriod != null && degree.applicationPeriod.state == 'presente' || degree.applicationPeriod.state == 'futuro') {
-			http.get('periods/' + degree.applicationPeriod.applicationPeriodId + '/candidates').success(function(data) {
+	function loadCandidates(){
+		if(history.periods.length == 0)
+			return;
+		else {
+			http.get('periods/' + history.periods[0].periodId + '/candidates').success(function(data) {
 				if(!(candidates == 'No Period with that Id')) {
 					candidates = data;
 					var result = {usernames: []};
 					for (index in candidates) {
 						result.usernames.push(candidates[index].username); 
 					}
-					log.log(result);
-					http.post('periods/' + degree.applicationPeriod.applicationPeriodId + '/selfProposed', result)
+					http.post('periods/' + history.periods[0].periodId + '/selfProposed', result)
 						.success(function(data) {
-						log.log(data);
+						for(index in candidates) {
+							candidates[index].selfProposed = data['\"' + candidates[index].username + '\"'];
+						}
 					});
 				}
 			});
 		}
-		else if(degree.electionPeriod != null && degree.electionPeriod.state == 'presente' || degree.electionPeriod.state == 'passado') {
-			http.get('periods/' + degree.electionPeriod.electionPeriodId + '/candidates').success(function(data) {
-				if(!(candidates == 'No Period with that Id')) {
-					candidates = data;
-					var result = {usernames: []};
-					for (index in candidates) {
-						result.usernames.push(candidates[index].username); 
-					}
-					log.log(result);
-					result.usernames = result.username.substring(0, result.username.length - 1);
-					http.get('periods/' + degree.applicationPeriod.applicationPeriodId + '/students/ist168268', result)
-						.success(function(data) {
-						log.log(data);
-					});
-				}
-			});
-		}
-		
-		
 	}
 	
 	function loadInspectCandidates(id) {
@@ -94,9 +77,12 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	}
 	
 	function loadHistory(degreeId, year) {
-		http.get('degrees/' + degreeId + '/years/' + year + '/history').success(function(data) {
+		var promise = http.get('degrees/' + degreeId + '/years/' + year + '/history').success(function(data) {
 			history = data;
+			log.log(data.periods);
 		});
+		
+		return promise;
 	}
 	
 	return {

@@ -104,13 +104,13 @@ public class Controller {
             return;
         }
 
-        Set<Degree> degrees = calendar.getDegrees();
+        final Set<Degree> degrees = calendar.getDegrees();
         if (degrees == null) {
             return;
         }
 
-        LocalDate today = LocalDate.now();
-        LocalDate tomorrow = today.plus(1, ChronoUnit.DAYS);
+        final LocalDate today = LocalDate.now();
+        final LocalDate tomorrow = today.plus(1, ChronoUnit.DAYS);
 
         if (!today.isBefore(LocalDate.of(today.getYear(), 9, 1)) && calendar.getYear() < today.getYear()) {
             calendar = new Calendar(LocalDate.now().getYear());
@@ -120,7 +120,7 @@ public class Controller {
 
         for (final Degree degree : degrees) {
             for (final DegreeYear degreeYear : degree.getYears()) {
-                Period newActivePeriod = degreeYear.getNextPeriod(tomorrow);
+                final Period newActivePeriod = degreeYear.getNextPeriod(tomorrow);
                 if (newActivePeriod != null && newActivePeriod.getStart().isEqual(tomorrow)) {
                     degreeYear.initStudents();
                     degreeDAO.save(degreeYear.getDegree());
@@ -132,7 +132,7 @@ public class Controller {
             for (final DegreeYear degreeYear : degree.getYears()) {
                 Set<Student> candidates = null;
                 // Em cada degreeYear, verifica se o currentPeriod ja terminou
-                Period activePeriod = degreeYear.getActivePeriod();
+                final Period activePeriod = degreeYear.getActivePeriod();
                 if (activePeriod != null) {
                     if (activePeriod.getEnd().isBefore(today)) {
                         // Se terminou, tira esse de activo
@@ -145,14 +145,14 @@ public class Controller {
                     }
                 }
                 // Depois verifica se há algum para entrar em vigor no dia actual, caso haja, coloca-o como activo
-                Period newActivePeriod = degreeYear.getNextPeriod(today);
+                final Period newActivePeriod = degreeYear.getNextPeriod(today);
                 if (newActivePeriod != null && newActivePeriod.getStart().isEqual(today)) {
                     degreeYear.setActivePeriod(newActivePeriod);
 
                     if (candidates != null) {
                         newActivePeriod.setCandidates(candidates);
                     } else {
-                        Period lastPeriod = degreeYear.getLastPeriod(today);
+                        final Period lastPeriod = degreeYear.getLastPeriod(today);
                         if (lastPeriod != null) {
                             newActivePeriod.setCandidates(lastPeriod.getCandidates());
                         }
@@ -167,13 +167,11 @@ public class Controller {
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
     public @ResponseBody String getStudentDegrees(@PathVariable String istId) {
-
+        final String pega = "pega";
         final Set<DegreeYear> studentDegrees =
                 StreamSupport
-                        .stream(studentDAO.findAll().spliterator(), false)
-                        .filter(s -> s.getUsername().equals(istId)
-                                && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
-                        .map(Student::getDegreeYear).collect(Collectors.toSet());
+                        .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .spliterator(), false).map(Student::getDegreeYear).collect(Collectors.toSet());
 
         final GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY);
@@ -187,9 +185,8 @@ public class Controller {
 
         final Student student =
                 StreamSupport
-                        .stream(studentDAO.findAll().spliterator(), false)
-                        .filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId)
-                                && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
+                        .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .spliterator(), false).filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId))
                         .collect(Collectors.toList()).get(0);
 
         // Desta forma é possível obter o voto do último periodo também.
@@ -212,9 +209,8 @@ public class Controller {
 
         final Student student =
                 StreamSupport
-                        .stream(studentDAO.findAll().spliterator(), false)
-                        .filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId)
-                                && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
+                        .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .spliterator(), false).filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId))
                         .collect(Collectors.toList()).get(0);
         Student candidate;
         if (vote.equals("nil")) {
@@ -222,11 +218,9 @@ public class Controller {
         } else {
             candidate =
                     StreamSupport
-                            .stream(studentDAO.findAll().spliterator(), false)
-                            .filter(s -> s.getUsername().equals(vote)
-                                    && s.getDegreeYear().getDegree().getId().equals(degreeId)
-                                    && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc()
-                                            .getYear()).collect(Collectors.toList()).get(0);
+                            .stream(studentDAO.findByUsername(vote, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                    .spliterator(), false).filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId))
+                            .collect(Collectors.toList()).get(0);
         }
 
         //The active periods must be the same for both students
@@ -260,11 +254,10 @@ public class Controller {
         }
         final Student applicant =
                 StreamSupport
-                        .stream(studentDAO.findAll().spliterator(), false)
-                        .filter(s -> s.getUsername().equals(istId) && s.getDegreeYear().getDegree().getId().equals(degreeId)
-                                && s.getDegreeYear().getDegreeYear() == year
-                                && s.getDegreeYear().getDegree().getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
-                        .collect(Collectors.toList()).get(0);
+                        .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .spliterator(), false)
+                        .filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId)
+                                && s.getDegreeYear().getDegreeYear() == year).collect(Collectors.toList()).get(0);
 
         final Period period = applicant.getDegreeYear().getActivePeriod();
         try {
@@ -429,13 +422,13 @@ public class Controller {
         if (periodType.equals(PeriodType.Application.toString())) {
             final Period period = degreeYear.addPeriod(start, end, periodType);
             if (period != null) {
-                //period.schedulePeriod(periodDAO, degreeDAO);
+//                period.schedulePeriod(periodDAO, degreeDAO);
                 periodDAO.save(period);
             }
         } else if (periodType.equals(PeriodType.Election.toString())) {
             final Period period = degreeYear.addPeriod(start, end, periodType);
             if (period != null) {
-                //period.schedulePeriod(periodDAO, degreeDAO);
+//                period.schedulePeriod(periodDAO, degreeDAO);
                 periodDAO.save(period);
             }
         }
@@ -477,12 +470,12 @@ public class Controller {
                         if (change.getPeriodType().toString().equals(PeriodType.Application.toString())) {
                             final Period period = new ApplicationPeriod(change.getStart(), change.getEnd(), degreeYear);
                             degreeYear.addPeriod(period);
-                            //period.schedulePeriod(periodDAO, degreeDAO);
+//                            period.schedulePeriod(periodDAO, degreeDAO);
                             periodDAO.save(period);
                         } else if (change.getPeriodType().toString().equals(PeriodType.Election.toString())) {
                             final Period period = new ElectionPeriod(change.getStart(), change.getEnd(), degreeYear);
                             degreeYear.addPeriod(period);
-                            //period.schedulePeriod(periodDAO, degreeDAO);
+//                            period.schedulePeriod(periodDAO, degreeDAO);
                             periodDAO.save(period);
                         }
                     }
@@ -507,7 +500,7 @@ public class Controller {
                 for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
                     final Period period = periodDAO.findById(change.getPeriodId());
                     if (period.getStart().isAfter(LocalDate.now())) {
-                        //period.unschedulePeriod(periodDAO, degreeDAO);
+//             /           period.unschedulePeriod(periodDAO, degreeDAO);
                         periodDAO.delete(change.getPeriodId());
                     }
                 }
@@ -559,24 +552,24 @@ public class Controller {
         if (period == null) {
             return new Gson().toJson("No Period with that Id");
         }
-        Set<Student> candidates = period.getCandidates();
+        final Set<Student> candidates = period.getCandidates();
         //Necessário ir buscar estudantes não auto-propostos
         if (period.getType().toString().equals(PeriodType.Election.toString())) {
-            Set<Vote> votes = ((ElectionPeriod) period).getVotes();
+            final Set<Vote> votes = ((ElectionPeriod) period).getVotes();
             Student st = null;
-            for (Vote v : votes) {
+            for (final Vote v : votes) {
                 st =
                         studentDAO.findByUsernameAndDegreeAndCalendarYear(v.getVoted(), period.getDegreeYear().getDegree()
                                 .getId(), period.getDegreeYear().getCalendarYear());
                 candidates.add(st);
             }
         }
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
         return gson.toJson(candidates);
     }
 
-    @RequestMapping(value = "/periods/{periodId}/candidates", method = RequestMethod.POST)
+    @RequestMapping(value = "/periods/{periodId}/candidates/{istId}", method = RequestMethod.POST)
     public @ResponseBody String addCandidateToPeriod(@PathVariable int periodId, @PathVariable String istId) {
         final Period period = periodDAO.findById(periodId);
         if (period == null) {
@@ -617,18 +610,18 @@ public class Controller {
 
     @RequestMapping(value = "periods/{periodId}/selfProposed", method = RequestMethod.POST)
     public @ResponseBody String selfPropposed(@PathVariable int periodId, @RequestBody String studentJson) {
-        Period period = periodDAO.findById(periodId);
-        Set<Student> candidates = period.getCandidates();
-        JsonParser parser = new JsonParser();
-        JsonObject students = new JsonParser().parse(studentJson).getAsJsonObject();
-        JsonArray array = students.get("usernames").getAsJsonArray();
-        List<String> usernames = new ArrayList<String>();
+        final Period period = periodDAO.findById(periodId);
+        final Set<Student> candidates = period.getCandidates();
+        final JsonParser parser = new JsonParser();
+        final JsonObject students = new JsonParser().parse(studentJson).getAsJsonObject();
+        final JsonArray array = students.get("usernames").getAsJsonArray();
+        final List<String> usernames = new ArrayList<String>();
         for (int i = 0; i < array.size(); i++) {
             usernames.add(array.get(i).toString());
         }
-        JsonObject result = new JsonObject();
-        for (String s : usernames) {
-            Student st =
+        final JsonObject result = new JsonObject();
+        for (final String s : usernames) {
+            final Student st =
                     studentDAO.findByUsernameAndDegreeAndCalendarYear(s, period.getDegreeYear().getDegree().getId(), period
                             .getDegreeYear().getCalendarYear());
             if (candidates.contains(st)) {
@@ -642,16 +635,16 @@ public class Controller {
 
     @RequestMapping(value = "periods/{periodId}/votes", method = RequestMethod.GET)
     public @ResponseBody String periodVotes(@PathVariable int periodId) {
-        Period period = periodDAO.findById(periodId);
+        final Period period = periodDAO.findById(periodId);
         if (period == null) {
             return new Gson().toJson("Periodo com esse Id não existe.");
         }
         if (period.getType().equals(PeriodType.Application)) {
             return new Gson().toJson("Periodos de Candidaturas não têm votos.");
         }
-        ElectionPeriod ePeriod = (ElectionPeriod) period;
-        JsonObject result = new JsonObject();
-        for (Student s : ePeriod.getCandidates()) {
+        final ElectionPeriod ePeriod = (ElectionPeriod) period;
+        final JsonObject result = new JsonObject();
+        for (final Student s : ePeriod.getCandidates()) {
             result.addProperty(s.getUsername(), Integer.toString(ePeriod.getNumVotes(s.getUsername())));
         }
         return new Gson().toJson(result);
@@ -659,9 +652,9 @@ public class Controller {
 
     @RequestMapping("/roles")
     public @ResponseBody String roles() {
-        OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName().toLowerCase();
-        JsonObject result = new JsonObject();
+        final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
+        final String username = auth.getName().toLowerCase();
+        final JsonObject result = new JsonObject();
         result.addProperty("pedagogico", hasAccessToManagement());
         Iterable<Student> students = null;
         students = studentDAO.findByUsername(username, calendarDAO.findFirstByOrderByYearDesc().getYear());
@@ -672,22 +665,22 @@ public class Controller {
     /***************************** Commands *****************************/
 
     public String createCalendar() {
-        LocalDate now = LocalDate.now();
-        Calendar lastCreatedCalendar = calendarDAO.findFirstByOrderByYearDesc();
+        final LocalDate now = LocalDate.now();
+        final Calendar lastCreatedCalendar = calendarDAO.findFirstByOrderByYearDesc();
         if (lastCreatedCalendar != null) {
-            int lastCreatedYear = lastCreatedCalendar.getYear();
+            final int lastCreatedYear = lastCreatedCalendar.getYear();
             if (now.isBefore(LocalDate.of(lastCreatedYear + 1, 8, 31))) {
                 return "Calendar of " + lastCreatedYear + "/" + (lastCreatedYear + 1)
                         + " already exists. Can only create a new Calendar after August";
             }
         }
         if (now.isBefore(LocalDate.of(now.getYear(), 8, 31))) {
-            Calendar c = new Calendar(now.getYear() - 1);
+            final Calendar c = new Calendar(now.getYear() - 1);
             c.init();
             calendarDAO.save(c);
             return "Calendar of " + (now.getYear() - 1) + "/" + now.getYear() + " created.";
         } else {
-            Calendar c = new Calendar(now.getYear());
+            final Calendar c = new Calendar(now.getYear());
             c.init();
             calendarDAO.save(c);
             return "Calendar of " + now.getYear() + "/" + (now.getYear() + 1) + " created.";

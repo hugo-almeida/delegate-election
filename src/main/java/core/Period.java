@@ -48,14 +48,14 @@ public abstract class Period implements Serializable {
     @Column(name = "period_id")
     private int id;
 
-    @Column(name = "degree_name")
+    /*@Column(name = "degree_name")
     private String degreeName;
 
     @Column(name = "degree_year")
     private int degree_Year;
 
     @Column(name = "calendar_year")
-    private int calendarYear;
+    private int calendarYear;*/
 
     @Column(name = "start")
     @Convert(converter = LocalDatePersistenceConverter.class)
@@ -65,16 +65,16 @@ public abstract class Period implements Serializable {
     @Convert(converter = LocalDatePersistenceConverter.class)
     private LocalDate end;
 
-    @ManyToMany(mappedBy = "applicationPeriod", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "applicationPeriod", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     protected Set<Student> candidates;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumns({
-            @JoinColumn(name = "degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = false,
+            @JoinColumn(name = "degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = true,
                     updatable = false),
-            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year_pk_degree_year", insertable = false,
+            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year_pk_degree_year", insertable = true,
                     updatable = false),
-            @JoinColumn(name = "calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = false,
+            @JoinColumn(name = "calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = true,
                     updatable = false) })
     private DegreeYear degreeYear;
 
@@ -97,9 +97,9 @@ public abstract class Period implements Serializable {
         //this.periodPK = new PeriodPK(degreeYear.getDegreeName(), degreeYear.getDegreeYear(), degreeYear.getCalendarYear());
         this.start = start;
         this.end = end;
-        this.degreeName = degreeYear.getDegreeName();
-        this.degree_Year = degreeYear.getDegreeYear();
-        this.calendarYear = degreeYear.getCalendarYear();
+        /* this.degreeName = degreeYear.getDegreeName();
+         this.degree_Year = degreeYear.getDegreeYear();
+         this.calendarYear = degreeYear.getCalendarYear();*/
         this.degreeYear = degreeYear;
         this.active = false;
         this.candidates = new HashSet<Student>();
@@ -161,7 +161,7 @@ public abstract class Period implements Serializable {
 
     public void setCandidates(Set<Student> candidates) {
         this.candidates = candidates;
-        for (Student s : candidates) {
+        for (final Student s : candidates) {
             s.addPeriod(this);
         }
     }

@@ -41,7 +41,7 @@ public class TestController {
     @RequestMapping("/test-calendar")
     //@Bean
     public String testCalendar() {
-        final Calendar c = new Calendar(2014);
+        final Calendar c = new Calendar(2015);
         c.init();
 //        Calendar c2 = new Calendar(2015);
 //        c2.init();
@@ -86,11 +86,16 @@ public class TestController {
         for (final Degree d : testCalendar.getDegrees()) {
             for (final DegreeYear dy : d.getYears()) {
                 if (dy.getDegreeYear() == 2) {
-                    final ApplicationPeriod p =
-                            new ApplicationPeriod(LocalDate.of(2015, Month.NOVEMBER, 14), LocalDate.of(2015, Month.NOVEMBER, 15),
-                                    dy);
+                    ApplicationPeriod p =
+                            new ApplicationPeriod(LocalDate.of(2015, Month.AUGUST, 3), LocalDate.of(2015, Month.AUGUST, 4), dy);
                     dy.addPeriod(p);
-                    dy.setActivePeriod(p);
+                    cd.save(testCalendar);
+                    p = new ApplicationPeriod(LocalDate.of(2015, Month.AUGUST, 5), LocalDate.of(2015, Month.AUGUST, 6), dy);
+                    dy.addPeriod(p);
+                    cd.save(testCalendar);
+                    p = new ApplicationPeriod(LocalDate.of(2015, Month.AUGUST, 7), LocalDate.of(2015, Month.AUGUST, 8), dy);
+                    dy.addPeriod(p);
+                    //dy.setActivePeriod(p);
                     cd.save(testCalendar);
                     return "Ok";
                 }
@@ -106,7 +111,7 @@ public class TestController {
             for (final DegreeYear dy : d.getYears()) {
                 if (dy.getDegreeYear() == 2) {
                     final ElectionPeriod p =
-                            new ElectionPeriod(LocalDate.of(2015, Month.NOVEMBER, 16), LocalDate.of(2015, Month.NOVEMBER, 17), dy);
+                            new ElectionPeriod(LocalDate.of(2015, Month.AUGUST, 26), LocalDate.of(2015, Month.SEPTEMBER, 10), dy);
                     dy.addPeriod(p);
                     dy.setActivePeriod(p);
                     cd.save(testCalendar);

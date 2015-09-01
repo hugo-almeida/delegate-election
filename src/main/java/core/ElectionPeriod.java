@@ -14,7 +14,7 @@ import javax.persistence.OneToMany;
 @DiscriminatorValue("Election")
 public class ElectionPeriod extends Period {
 
-    @OneToMany(mappedBy = "period", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "period", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     protected Set<Vote> votes;
 
     ElectionPeriod() {
@@ -23,16 +23,16 @@ public class ElectionPeriod extends Period {
     public ElectionPeriod(LocalDate start, LocalDate end, DegreeYear degreeYear) {
         super(start, end, degreeYear);
         votes = new HashSet<Vote>();
-        if (degreeYear.getActivePeriod() != null) {
-            if (degreeYear.getActivePeriod().getCandidates() != null) {
-                super.setCandidates(degreeYear.getActivePeriod().getCandidates());
-            }
-        }
+        /*     if (degreeYear.getActivePeriod() != null) {
+                 if (degreeYear.getActivePeriod().getCandidates() != null) {
+                     super.setCandidates(degreeYear.getActivePeriod().getCandidates());
+                 }
+             }*/
     }
 
     // Get the vote from a given student
     public String getVote(String s) {
-        for (Vote v : votes) {
+        for (final Vote v : votes) {
             if (v.getVoter().equals(s)) {
                 return v.getVoted();
             }
@@ -43,8 +43,8 @@ public class ElectionPeriod extends Period {
     //Get number of votes on a given student
     public int getNumVotes(String istId) {
         int votes = 0;
-        for (Student s : super.candidates) {
-            String vote = getVote(s.getUsername());
+        for (final Student s : super.candidates) {
+            final String vote = getVote(s.getUsername());
             if (vote.equals(istId)) {
                 votes++;
             }

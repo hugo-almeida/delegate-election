@@ -1,47 +1,65 @@
 <div ng-controller="detailsCtrl">
+
+	<button class="btn btn-default" ng-click="debugAddCandidates()">debug add candidates</button>
 	<div>
 		<!-- Default panel contents -->
 		<h3>Detalhes</h3>
 		
 		<!-- Table -->
 		<div class="row">
-			<table class="table">
-				<tr>
-					<th class="col-md-2">Curso</th>
-					<td class="col-md-10">{{history().degreeName}}</td>
-				</tr>
-				<tr>
-					<th>Ano Lectivo</th>
-					<td>{{currentYear}}</td>
-				</tr>
-				<tr>
-					<th>Ano Curricular</th>
-					<td>{{history().degreeYear}}</td>
-				</tr>
-				<tr>
-					<th>Candidaturas</th>
-					<td>{{getCurrentApplication().applicationPeriodStart}} – {{getCurrentApplication().applicationPeriodEnd}}
+			<dl class="dl-entity-horizontal">
+					<dt>Curso</dt>
+					<dd>{{history().degreeName}}</dd>
+					<dt>Ano Lectivo</dt>
+					<dd>{{currentYear}}</dd>
+					<dt>Ano Curricular</dt>
+					<dd>{{history().degreeYear}}</dd>
+					<dt>Candidaturas</dt>
+					<dd>{{getCurrentApplication().applicationPeriodStart}} – {{getCurrentApplication().applicationPeriodEnd}}
 						<span ng-show="getCurrentApplication().state == 'presente'"> - A decorrer</span>
 						<span ng-show="getCurrentApplication().state == 'passado'"> - Terminado</span>
 						<div ng-hide="isEmpty(getCurrentApplication()) || getCurrentApplication().state == 'futuro'">{{getCurrentApplication().candidateCount}} candidatos</div>
-					</td>
-				</tr>
-				<tr>
-					<th >Votação</th>
-					<td>{{getCurrentElection().electionPeriodStart}} – {{getCurrentElection().electionPeriodEnd}}			
+					</dd>
+					<dt >Votação</dt>
+					<dd>{{getCurrentElection().electionPeriodStart}} – {{getCurrentElection().electionPeriodEnd}}			
 						<span ng-show="getCurrentElection().state == 'presente'"> - A decorrer</span>
 						<span ng-show="getCurrentElection().state == 'passado'"> - Terminado</span>
 						<div ng-hide="isEmpty(getCurrentElection()) ||getCurrentElection().state == 'futuro'">{{getCurrentElection().voteCount}} votos</div>
-					</td>
-				</tr>
-			</table>
+					</dd>
+			</dl>
 		</div>
 	</div>
 	
 	<h3>Candidatos</h3>
-	<button ng-show="getCurrentApplication().state == 'presente' || getCurrentElection().state == 'presente'" class="btn btn-primary">
+	<button ng-show="getCurrentApplication().state == 'presente' || getCurrentElection().state == 'presente'" class="btn btn-primary" ng-click="toggleAdd()">
 		Adicionar
 	</button>
+
+	<div class="row" ng-show="add">
+		<br>
+		<div class="col-md-3 input-group">
+		    <span class="input-group-addon">
+		        <i class="glyphicon glyphicon-search"></i>
+		    </span>
+		    <input type="text" class="form-control" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"/>
+		</div>
+		<table class="table table-hover" ng-show="!isEmpty(students)">
+			<thead>
+				<tr>
+					<th>Nome</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="student in students">
+					<td>
+						{{student.name}}
+						<span class="detail">{{student.username}}</span>
+						<button ng-show="true" class="btn btn-default btn-xs pull-right" ng-click="addCandidate(student.username)">Adicionar</button>
+					</td>	
+				</tr>
+			</tbody>
+		</table>
+	</div>
 	
 	<div ng-hide="getCandidates().length >= 1" class="empty">
 		<p>
@@ -52,36 +70,57 @@
 	<div class="row" ng-hide="getCandidates().length < 1">
 		<table class="table table-hover">
 			<thead>
-			<tr>
-				<th class="col-md-6"><strong>Nome</strong></th>
-				<th class="col-md-2"><strong>Auto-proposto</strong></th>
-				<th><strong>Nº de Votos</strong></th>
-			</tr>
-		</thead>
+				<tr>
+					<th class="col-md-6"><strong>Nome</strong></th>
+					<th class="col-md-2" ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'"><strong>Auto-proposto</strong></th>
+					<th ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'"><strong>Nº de Votos</strong></th>
+				</tr>
+			</thead>
 			<tbody>
 				<tr ng-repeat="candidate in getCandidates() track by $index | orderBy: candidate.voteCount">
-					<td><i class="avatar" ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user"></i><strong>
+					<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user avatar"></i><strong>
 						<img class="avatar" ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}">
-						 {{candidate.name}}</strong><span class="detail">{{candidate.username}}</span></td>
-					<td>sim</td>
-					<td>num votos 
-						<span class="pull-right">
+						 {{candidate.name}}<span class="detail">{{candidate.username}}</span></td>
+					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">{{candidate.selfProposed}}</td>
+					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">num votos 
+						<span class="pull-right" ng-show="getCurrentElection().state == 'passado'">
 							<button class="btn btn-default btn-xs" ng-click="assign(candidate.username)">Atribuir</button>
 						</span>
 					</td>
 				</tr>
 			</tbody>
+			<tfoot>
+				<tr class="new">
+					<td ng-hide="getCurrentElection().state">
+						<i class="icon icon-search"></i>
+						<input type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"/>
+						<table class="table table-hover" ng-show="!isEmpty(students)" style="margin: 0 0 0 -10px; border: 1px solid #ddd;">
+							<tbody>
+								<tr ng-repeat="student in students">
+									<td>
+										{{student.name}}
+										<span class="detail" style="vertical-align: -webkit-baseline-middle; display: inline-table;">{{student.username}}</span>
+										<button ng-show="true" class="btn btn-default btn-xs pull-right" ng-click="addCandidate(student.username)">Adicionar</button>
+									</td>	
+								</tr>
+							</tbody>
+						</table>
+					</td>
+					<td ng-show="getCurrentElection().state" colspan="3">
+					</td>
+				</tr>
+			</tfoot>
 		</table>
 	</div>
 	
 	<h3>Histórico</h3>
-	<div ng-show="isEmpty(history())" class="empty">
+	<div ng-show="isEmpty(history().periods)" class="empty">
 		<p>
 			<i class="glyphicon glyphicon-calendar"></i><span>Sem histórico</span>
 		</p>
 	</div>
 	
-	<div ng-hide="isEmpty(history())" class="row">
+	<div ng-hide="isEmpty(history().periods)" class="row">
 		<table class="table table-hover">
 			<thead>
 			<tr>
@@ -109,14 +148,13 @@
 	</div>
 	
 	<div id="historyModal" class="modal fade" role="dialog" ng-controller="historyCtrl">
-		<div class="modal-dialog modal-lg">
+		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h3>
-						<strong>Histórico</strong>
-						<br>
-						<small>{{history().degreeName}} - {{inspectedPeriod().academicYear}}</small>
+						Histórico
 					</h3>
+					<span class="detail">{{history().degreeName}} - {{inspectedPeriod().academicYear}}</span>
 				    <button type="button" class="close" data-dismiss="modal"></button>
 				</div>
 				<div class="modal-body">
@@ -124,30 +162,22 @@
 					
 					<!-- Table -->
 					<div class="row">
-						<table class="table">
-							<tr>
-								<th class="col-md-2">Curso</th>
-								<td class="col-md-10">{{history().degreeName}}</td>
-							</tr>
-							<tr>
-								<th>Ano Lectivo</th>
-								<td>{{inspectedPeriod().academicYear}}</td>
-							</tr>
-							<tr>
-								<th>Ano Curricular</th>
-								<td>{{history().degreeYear}}</td>
-							</tr>
-							<tr>
-								<th ng-show="inspectedPeriod().periodType == 'APPLICATION'">Candidaturas</th>
-								<th ng-show="inspectedPeriod().periodType == 'ELECTION'">Votação</th>
-								<td>{{inspectedPeriod().start}} – {{inspectedPeriod().end}}
+						<dl class="dl-entity-horizontal">
+								<dt>Curso</dt>
+								<dd>{{history().degreeName}}</dd>
+								<dt>Ano Lectivo</dt>
+								<dd>{{inspectedPeriod().academicYear}}</dd>
+								<dt>Ano Curricular</dt>
+								<dd>{{history().degreeYear}}</dd>
+								<dt ng-show="inspectedPeriod().periodType == 'APPLICATION'">Candidaturas</dt>
+								<dt ng-show="inspectedPeriod().periodType == 'ELECTION'">Votação</dt>
+								<dd>{{inspectedPeriod().start}} – {{inspectedPeriod().end}}
 									<div>{{inspectedPeriod().info}} 
 										<span ng-show="inspectedPeriod().periodType == 'APPLICATION'">candidatos</span>
 										<span ng-show="inspectedPeriod().periodType == 'ELECTION'">votos</span>
 									</div>							
-								</td>
-							</tr>
-						</table>
+								</dd>
+						</dl>
 					</div>
 					
 					<h3>Candidatos</h3>
@@ -163,17 +193,17 @@
 							<thead>
 							<tr>
 								<th class="col-md-8"><strong>Nome</strong></th>
-								<th class="col-md-2"><strong>Auto-proposto</strong></th>
-								<th><strong>Nº de Votos</strong></th>
+								<th class="col-md-2" ng-show="inspectedPeriod.periodType=='ELECTION'"><strong>Auto-proposto</strong></th>
+								<th ng-show="inspectedPeriod.periodType=='ELECTION'"><strong>Nº de Votos</strong></th>
 							</tr>
 						</thead>
 							<tbody>
 								<tr ng-repeat="candidate in candidates() track by $index | orderBy: candidate.voteCount">
-									<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user"></i><strong>
-										<img ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}" height="28" width="28">
-										 {{candidate.name}}</strong><small>{{candidate.username}}</small></td>
-									<td>sim</td>
-									<td>num votos 
+									<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user avatar"></i><strong>
+										<img class="avatar" ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}">
+										 {{candidate.name}}<span class="detail">{{candidate.username}}</span></td>
+									<td ng-show="inspectedPeriod.periodType=='ELECTION'">sim</td>
+									<td ng-show="inspectedPeriod.periodType=='ELECTION'">num votos 
 									</td>
 								</tr>
 							</tbody>
