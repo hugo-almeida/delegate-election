@@ -47,6 +47,8 @@ public class DegreeYear {
     @OneToMany(mappedBy = "studentpk.degreeYear", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Student> students = new HashSet<Student>();
 
+    private boolean studentsLoaded = false;
+
     DegreeYear() {
 
     }
@@ -87,6 +89,7 @@ public class DegreeYear {
             }
         }
         students.addAll(Arrays.asList(degreeYearStudents));
+        studentsLoaded = true;
     }
 
     public int getDegreeYear() {
@@ -308,5 +311,9 @@ public class DegreeYear {
             }
         }
         return next;
+    }
+
+    public boolean areStudentsLoaded() {
+        return studentsLoaded;
     }
 }

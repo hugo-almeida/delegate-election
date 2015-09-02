@@ -17,6 +17,27 @@ import javax.persistence.Table;
 @Table(name = "degree")
 public class Degree {
 
+    public enum DegreeType {
+        Bachelor {
+            @Override
+            public String toString() {
+                return "Licenciatura Bolonha";
+            }
+        },
+        Master {
+            @Override
+            public String toString() {
+                return "Mestrado Bolonha";
+            }
+        },
+        Integrated {
+            @Override
+            public String toString() {
+                return "Mestrado Integrado";
+            }
+        }
+    }
+
     @EmbeddedId
     @Column(name = "degree_id")
     private CalendarDegreePK calendarDegreePK;
@@ -61,15 +82,15 @@ public class Degree {
     }
 
     public void initDegreeYears() {
-        if (type.equals("Mestrado Bolonha")) {
+        if (type.equals(DegreeType.Master.toString())) {
             for (int i = 1; i <= 2; i++) {
                 years.add(new DegreeYear(i, this));
             }
-        } else if (type.equals("Licenciatura Bolonha")) {
+        } else if (type.equals(DegreeType.Bachelor.toString())) {
             for (int i = 1; i <= 3; i++) {
                 years.add(new DegreeYear(i, this));
             }
-        } else if (type.equals("Mestrado Integrado")) {
+        } else if (type.equals(DegreeType.Integrated.toString())) {
             for (int i = 1; i <= 5; i++) {
                 years.add(new DegreeYear(i, this));
             }
@@ -109,9 +130,9 @@ public class Degree {
         return years;
     }
 
-    public void addYear(int i) {
-        years.add(new DegreeYear(i, this));
-    }
+//    public void addYear(int i) {
+//        years.add(new DegreeYear(i, this));
+//    }
 
     public String print() {
         return "Name: " + name + " Type: " + type + " Teste Integrado: " + type.equals("Mestrado Integrado");
