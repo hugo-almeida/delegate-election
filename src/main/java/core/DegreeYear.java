@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.JsonObject;
@@ -53,9 +54,10 @@ public class DegreeYear {
     public DegreeYear(int year, Degree d) {
         this.degreeDegreeYearPK = new DegreeDegreeYearPK(d.getAcronym(), year, d.getYear());
         this.degree = d;
-        initStudents(); // Development only.
+//        initStudents(); // Development only.
     }
 
+    @Transactional
     public void initStudents() {
         final String accessToken =
                 "ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
@@ -245,6 +247,7 @@ public class DegreeYear {
         if (start.isAfter(end)) {
             return null;
         }
+//Debug
 //        if (start.isBefore(LocalDate.now()) || end.isBefore(LocalDate.now())) {
 //            return null;
 //        }

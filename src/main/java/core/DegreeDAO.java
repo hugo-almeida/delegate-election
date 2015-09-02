@@ -13,4 +13,7 @@ public interface DegreeDAO extends CrudRepository<Degree, CalendarDegreePK> {
     @Override
     public Iterable<Degree> findAll();
 
+    @Query("select u from Degree u where u.acronym = ?1 and u.calendarDegreePK.calendarYear = ?2")
+    public Degree findByAcronymAndYear(String acronym, int year);
+
 }

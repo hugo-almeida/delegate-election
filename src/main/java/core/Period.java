@@ -76,7 +76,7 @@ public abstract class Period implements Serializable {
                     updatable = false),
             @JoinColumn(name = "calendar_year", referencedColumnName = "degree_year_pk_calendar_year", insertable = true,
                     updatable = false) })
-    private DegreeYear degreeYear;
+    protected DegreeYear degreeYear;
 
     @Column(name = "active")
     private boolean active;
