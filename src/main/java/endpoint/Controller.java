@@ -925,7 +925,7 @@ public class Controller {
 
         //Periodo no Futuro
         DegreeYear degreeYear =
-                degreeDAO.findByAcronymAndYear("LEAN", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(1);
+                degreeDAO.findByAcronymAndYear("LEAN", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
         LocalDate start = LocalDate.of(2015, 9, 20);
         LocalDate end = LocalDate.of(2015, 9, 25);
         Period p = degreeYear.addPeriod(start, end, "APPLICATION");
