@@ -226,6 +226,9 @@ public abstract class Period implements Serializable {
     @PreUpdate
     public void checkActivation() {
         if (!start.isAfter(LocalDate.now()) && !end.isBefore(LocalDate.now())) {
+            if (!degreeYear.areStudentsLoaded()) {
+                degreeYear.initStudents();
+            }
             degreeYear.setActivePeriod(this);
             Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
             if (lastPeriod != null) {
