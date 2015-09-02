@@ -39,4 +39,16 @@ public class DegreeDegreeYearPK implements Serializable {
         return calendarYear;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof DegreeDegreeYearPK)) {
+            return false;
+        }
+        DegreeDegreeYearPK pk = (DegreeDegreeYearPK) o;
+        if (degreeName.equals(pk.getDegreeName()) && degreeYear == pk.getDegreeYear() && calendarYear == pk.getDegreeYear()) {
+            return true;
+        }
+        return false;
+    }
+
 }
