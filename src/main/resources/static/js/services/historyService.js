@@ -46,9 +46,10 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	}
 	
 	function loadCandidates(){
-		if(history.periods.length == 0)
+		if(history.periods.length == 0) {
+			candidates = [];
 			return;
-		else {
+		}else {
 			http.get('periods/' + history.periods[0].periodId + '/candidates').success(function(data) {
 				if(!(candidates == 'No Period with that Id')) {
 					candidates = data;

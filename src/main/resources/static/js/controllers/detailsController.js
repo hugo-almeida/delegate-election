@@ -1,4 +1,4 @@
-angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '$http', '$log', 'history',
+angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '$http', '$log', 'history', 
                                                           function(rc, sc, http, log, history)  {
 	
 	sc.loaded = false;
@@ -41,15 +41,20 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 	}
 	
 	sc.loadStudents = function(query) {
-		if(query != null && query != '' && query.length >= 2){
-			/*http.get('https://fenix.tecnico.ulisboa.pt/api/bennu-core/users/find?begins='+query)
-			.success(function(data) { 
-				sc.students = data;
-			});*/
-			http.get('degrees/2761663971606/years/2/students?begins='+query)	//for testing purposes only
-			.success(function(data) { 
-				sc.students = data;
-			});
+		if(query != null) {
+			if(query.length >= 2){
+				/*http.get('https://fenix.tecnico.ulisboa.pt/api/bennu-core/users/find?begins='+query)
+				.success(function(data) { 
+					sc.students = data;
+				});*/
+				http.get('degrees/2761663971606/years/2/students?begins='+query)	//for testing purposes only
+				.success(function(data) { 
+					sc.students = data;
+				});
+			}
+			else {
+				sc.students = [];
+			}
 		}
 	}
 	
@@ -59,12 +64,8 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 			log.log(data);
 		}).then(function(data) {
 			history.loadCandidates();
-		});
-	}
-	
-	sc.debugAddCandidates = function() {
-		http.post('periods/1/candidates/ist168268').success(function(data) {
-			log.log(data);
+			sc.query = '';
+			sc.students = [];
 		});
 	}
 }]);
