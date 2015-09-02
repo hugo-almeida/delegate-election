@@ -1,7 +1,6 @@
 package core.util;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +78,7 @@ public class ScheduledTasks {
         }
     }
 
-    @Scheduled(cron = "0 0 23 * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void retrieveStudents() {
         Calendar calendar = calendarDAO.findFirstByOrderByYearDesc();
         if (calendar == null) {
@@ -91,13 +90,10 @@ public class ScheduledTasks {
             return;
         }
 
-        LocalDate today = LocalDate.now();
-        LocalDate tomorrow = today.plus(1, ChronoUnit.DAYS);
-
         for (final Degree degree : degrees) {
             for (final DegreeYear degreeYear : degree.getYears()) {
-                Period newActivePeriod = degreeYear.getNextPeriod(tomorrow);
-                if (newActivePeriod != null && newActivePeriod.getStart().isEqual(tomorrow)) {
+                Period activePeriod = degreeYear.getActivePeriod();
+                if (activePeriod != null && !degreeYear.areStudentsLoaded()) {
                     degreeYear.initStudents();
                     degreeDAO.save(degreeYear.getDegree());
                 }

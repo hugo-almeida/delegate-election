@@ -39,7 +39,7 @@ public class Calendar {
     public void init() {
         final RestTemplate t = new RestTemplate();
         final Degree[] c = t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees", Degree[].class);
-        final Set<Degree> toRemove = new HashSet<Degree>();
+
         for (final Degree element : c) {
             if (element.getType().equals("Licenciatura Bolonha") || element.getType().equals("Mestrado Bolonha")
                     || element.getType().equals("Mestrado Integrado")) {
@@ -48,26 +48,19 @@ public class Calendar {
                 degrees.add(element);
             }
         }
-//        degrees.iterator().next().initDegreeYears();
-//        Degree d = null;
-//        Iterator<Degree> it = degrees.iterator();
-//        do {
-//            d = it.next();
-//        } while (!d.getAcronym().equals("MEIC-A"));
-//        d.initDegreeYears();
+
         for (final Degree d : degrees) {
-//            if (d.getAcronym().equals("MEE") || d.getAcronym().equals("MEIC-A") || d.getAcronym().equals("MEIC-T")) {
             d.initDegreeYears();
-//            }
         }
     }
 
-    public void addDegree(Degree d) {
-        degrees.add(d);
-    }
-
-    public void setYear(int year) {
-        this.year = year;
+    public void addDegree(Degree degree) {
+        for (Degree d : degrees) {
+            if (d.getId().equals(degree.getId())) {
+                return;
+            }
+        }
+        degrees.add(degree);
     }
 
     public Set<Degree> getDegrees() {

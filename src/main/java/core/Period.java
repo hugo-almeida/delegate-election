@@ -20,6 +20,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 @Entity
@@ -50,10 +52,10 @@ public abstract class Period implements Serializable {
 
     /*@Column(name = "degree_name")
     private String degreeName;
-
+    
     @Column(name = "degree_year")
     private int degree_Year;
-
+    
     @Column(name = "calendar_year")
     private int calendarYear;*/
 
@@ -218,6 +220,18 @@ public abstract class Period implements Serializable {
             getCandidates().remove(s);
         }
         s.removePeriod(this);
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void checkActivation() {
+        if (!start.isAfter(LocalDate.now()) && !end.isBefore(LocalDate.now())) {
+            degreeYear.setActivePeriod(this);
+            Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
+            if (lastPeriod != null) {
+                setCandidates(lastPeriod.getCandidates());
+            }
+        }
     }
 
 }
