@@ -29,7 +29,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.web.csrf.CsrfFilter;
@@ -47,12 +49,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import adapter.DegreeAdapter;
 import adapter.DegreeChange;
 import adapter.DegreePeriodAdapter;
@@ -61,6 +57,14 @@ import adapter.DegreeYearHistoryAdapter;
 import adapter.HibernateProxyTypeAdapter;
 import adapter.PeriodChange;
 import adapter.StudentAdapter;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import core.ApplicationPeriod;
 import core.Calendar;
 import core.CalendarDAO;
@@ -80,7 +84,7 @@ import core.Vote;
 public class Controller {
 
     private static final String ACCESS_TOKEN =
-            "ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
+            "ODUxOTE1MzUzMDk2MTkzOjI5NmJkNDViNzc4MTZiMzAyMDYyNzQxNTgxZTUzOGEyYzUzNDI5ODMxMzFmOGM0MTJkMDk1ZmIwN2NkMzVlMDM3YzUyOWQxMGU0M2Y0YTNiMWFmYjU4ZWRhOThmNTc3N2U0MGE5N2U2MzY5MTdhMGZlMDlmYTlhYjBlMDc5ZTQ4";
     @Autowired
     StudentDAO studentDAO;
 
@@ -163,10 +167,10 @@ public class Controller {
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET)
     public @ResponseBody String getStudentDegrees(@PathVariable String istId) {
-        final String pega = "pega";
-        final Set<DegreeYear> studentDegrees = StreamSupport
-                .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear()).spliterator(), false)
-                .map(Student::getDegreeYear).collect(Collectors.toSet());
+        final Set<DegreeYear> studentDegrees =
+                StreamSupport
+                        .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .spliterator(), false).map(Student::getDegreeYear).collect(Collectors.toSet());
 
         final GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY);
@@ -181,8 +185,8 @@ public class Controller {
         final Student student =
                 StreamSupport
                         .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
-                                .spliterator(), false)
-                        .filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId)).collect(Collectors.toList()).get(0);
+                                .spliterator(), false).filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId))
+                        .collect(Collectors.toList()).get(0);
 
         // Desta forma é possível obter o voto do último periodo também.
         final String voted = student.getDegreeYear().getCurrentElectionPeriod().getVote(istId);
@@ -205,8 +209,8 @@ public class Controller {
         final Student student =
                 StreamSupport
                         .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
-                                .spliterator(), false)
-                        .filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId)).collect(Collectors.toList()).get(0);
+                                .spliterator(), false).filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId))
+                        .collect(Collectors.toList()).get(0);
         Student candidate;
         if (vote.equals("nil")) {
             candidate = null;
@@ -214,9 +218,8 @@ public class Controller {
             candidate =
                     StreamSupport
                             .stream(studentDAO.findByUsername(vote, calendarDAO.findFirstByOrderByYearDesc().getYear())
-                                    .spliterator(), false)
-                            .filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId)).collect(Collectors.toList())
-                            .get(0);
+                                    .spliterator(), false).filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId))
+                            .collect(Collectors.toList()).get(0);
         }
 
         //The active periods must be the same for both students
@@ -235,8 +238,9 @@ public class Controller {
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.GET)
     public @ResponseBody String getCandidates(@PathVariable String degreeId, @PathVariable int year) {
-        final Set<Student> candidates = degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear())
-                .getDegreeYear(year).getCandidates();
+        final Set<Student> candidates =
+                degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year)
+                        .getCandidates();
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
         return gson.toJson(candidates);
@@ -247,10 +251,12 @@ public class Controller {
         if (!getLoggedUsername().equals(istId) && !hasAccessToManagement()) {
             return new Gson().toJson("");
         }
-        final Student applicant = StreamSupport
-                .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear()).spliterator(), false)
-                .filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId) && s.getDegreeYear().getDegreeYear() == year)
-                .collect(Collectors.toList()).get(0);
+        final Student applicant =
+                StreamSupport
+                        .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear())
+                                .spliterator(), false)
+                        .filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId)
+                                && s.getDegreeYear().getDegreeYear() == year).collect(Collectors.toList()).get(0);
 
         final Period period = applicant.getDegreeYear().getActivePeriod();
         try {
@@ -284,8 +290,7 @@ public class Controller {
     }
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.DELETE)
-    public @ResponseBody String removeCandidate(@PathVariable String degreeId, @PathVariable int year,
-            @PathVariable String istId) {
+    public @ResponseBody String removeCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId) {
 //Debug
 //        if (!getLoggedUsername().equals(istId)) {
 //            return new Gson().toJson("");
@@ -304,14 +309,17 @@ public class Controller {
     // Este Endpoint pode ser usado para obter todos os estudantes em que se pode votar.
     // Para cada estudante, devolve: nome, id e foto
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/students", method = RequestMethod.GET)
-    public @ResponseBody String getDegreeYearStudents(@PathVariable String degreeId, @PathVariable int year,
-            @RequestParam(value = "begins", required = false) String start) {
-        final Set<Student> students = degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear())
-                .getDegreeYear(year).getStudents();
+    public @ResponseBody String getDegreeYearStudents(@PathVariable String degreeId, @PathVariable int year, @RequestParam(
+            value = "begins", required = false) String start) {
+        final Set<Student> students =
+                degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year)
+                        .getStudents();
         Set<Student> filteredStudents = students;
         if (start != null) {
-            filteredStudents = students.stream().filter(s -> s.getName().toLowerCase().equals(start.toLowerCase())
-                    || s.getUsername().toLowerCase().equals(start.toLowerCase())).collect(Collectors.toSet());
+            filteredStudents =
+                    students.stream()
+                            .filter(s -> s.getName().toLowerCase().equals(start.toLowerCase())
+                                    || s.getUsername().toLowerCase().equals(start.toLowerCase())).collect(Collectors.toSet());
         }
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
@@ -325,8 +333,9 @@ public class Controller {
             return new Gson().toJson("");
         }
 
-        final Student student = studentDAO.findByUsernameAndDegreeAndCalendarYear(istId, degreeId,
-                calendarDAO.findFirstByOrderByYearDesc().getYear());
+        final Student student =
+                studentDAO.findByUsernameAndDegreeAndCalendarYear(istId, degreeId, calendarDAO.findFirstByOrderByYearDesc()
+                        .getYear());
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
         return gson.toJson(student);
@@ -379,8 +388,10 @@ public class Controller {
             return new Gson().toJson("");
         }
 
-        final Set<Degree> degrees = StreamSupport.stream(degreeDAO.findAll().spliterator(), false)
-                .filter(d -> d.getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear()).collect(Collectors.toSet());
+        final Set<Degree> degrees =
+                StreamSupport.stream(degreeDAO.findAll().spliterator(), false)
+                        .filter(d -> d.getYear() == calendarDAO.findFirstByOrderByYearDesc().getYear())
+                        .collect(Collectors.toSet());
         final GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Degree.class, new DegreeYearAdapter()).create();
         final Gson gson = gsonBuilder.create();
@@ -438,9 +449,9 @@ public class Controller {
         for (final DegreeChange degreeChange : degrees) {
             for (final Integer year : degreeChange.getPeriods().keySet()) {
                 for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
-                    final DegreeYear degreeYear = degreeDAO
-                            .findByIdAndYear(degreeChange.getDegreeId(), calendarDAO.findFirstByOrderByYearDesc().getYear())
-                            .getDegreeYear(year);
+                    final DegreeYear degreeYear =
+                            degreeDAO.findByIdAndYear(degreeChange.getDegreeId(),
+                                    calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
                     if (degreeYear == null) {
                         continue;
                     }
@@ -549,8 +560,9 @@ public class Controller {
             final Set<Vote> votes = ((ElectionPeriod) period).getVotes();
             Student st = null;
             for (final Vote v : votes) {
-                st = studentDAO.findByUsernameAndDegreeAndCalendarYear(v.getVoted(), period.getDegreeYear().getDegree().getId(),
-                        period.getDegreeYear().getCalendarYear());
+                st =
+                        studentDAO.findByUsernameAndDegreeAndCalendarYear(v.getVoted(), period.getDegreeYear().getDegree()
+                                .getId(), period.getDegreeYear().getCalendarYear());
                 candidates.add(st);
             }
         }
@@ -611,8 +623,9 @@ public class Controller {
         }
         final JsonObject result = new JsonObject();
         for (final String s : usernames) {
-            final Student st = studentDAO.findByUsernameAndDegreeAndCalendarYear(s, period.getDegreeYear().getDegree().getId(),
-                    period.getDegreeYear().getCalendarYear());
+            final Student st =
+                    studentDAO.findByUsernameAndDegreeAndCalendarYear(s, period.getDegreeYear().getDegree().getId(), period
+                            .getDegreeYear().getCalendarYear());
             if (candidates.contains(st)) {
                 result.addProperty(s, true);
             } else {
@@ -641,8 +654,19 @@ public class Controller {
 
     @RequestMapping("/roles")
     public @ResponseBody String roles() {
-        final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
-        final String username = auth.getName().toLowerCase();
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username;
+        final Map<String, Object> userDetails;
+        if (auth instanceof OAuth2Authentication) {
+            final OAuth2Authentication oauth = (OAuth2Authentication) auth;
+            userDetails = (Map<String, Object>) oauth.getUserAuthentication().getDetails();
+            username = (String) userDetails.get("username");
+        } else {
+            final JsonObject jo = (JsonObject) auth.getPrincipal();
+            final JsonElement je = jo.get("username");
+            username = je.getAsString();
+        }
+
         final JsonObject result = new JsonObject();
         result.addProperty("pedagogico", hasAccessToManagement());
         Iterable<Student> students = null;
@@ -743,17 +767,16 @@ public class Controller {
     /***************************** OLD API *****************************/
     @RequestMapping("/user")
     public @ResponseBody String user() {
-
-        final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
-        final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
-
-        /*   final OAuth2AuthenticationDetails authDetails = (OAuth2AuthenticationDetails) auth.getDetails();
-           authDetails.getTokenValue();*/
-
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         final Gson gson = new Gson();
-        final String json = gson.toJson(userDetails);
 
-        return json;
+        if (auth instanceof OAuth2Authentication) {
+            final OAuth2Authentication oauth = (OAuth2Authentication) auth;
+            final Map<String, Object> userDetails = (Map<String, Object>) oauth.getUserAuthentication().getDetails();
+            return gson.toJson(userDetails);
+        } else {
+            return gson.toJson(auth.getPrincipal());
+        }
     }
 
     @RequestMapping(value = "/get-user", method = RequestMethod.POST)
@@ -773,12 +796,48 @@ public class Controller {
         return gson.toJson(result);
     }
 
+    @RequestMapping(value = "/mock/{id}")
+    public @ResponseBody String mock(@PathVariable String id) {
+        final RestTemplate t = new RestTemplate();
+
+        final String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
+        final HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.set("__username__", id);
+        final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
+        final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
+        final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
+
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth instanceof OAuth2Authentication) {
+            final OAuth2Authentication oauth = (OAuth2Authentication) auth;
+            oauth.setDetails(result);
+            final UsernamePasswordAuthenticationToken upat =
+                    new UsernamePasswordAuthenticationToken(oauth.getDetails(), null, oauth.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(upat);
+        } else {
+            final UsernamePasswordAuthenticationToken upat =
+                    new UsernamePasswordAuthenticationToken(result, null, auth.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(upat);
+        }
+        return "ok";
+    }
+
     /************************************* MVC ***************************************/
 
     private String getLoggedUsername() {
-        final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
-        final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
-        return (String) userDetails.get("username");
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username;
+        final Map<String, Object> userDetails;
+        if (auth instanceof OAuth2Authentication) {
+            final OAuth2Authentication oauth = (OAuth2Authentication) auth;
+            userDetails = (Map<String, Object>) oauth.getUserAuthentication().getDetails();
+            username = (String) userDetails.get("username");
+        } else {
+            final JsonObject jo = (JsonObject) auth.getPrincipal();
+            final JsonElement je = jo.get("username");
+            username = je.getAsString();
+        }
+        return username;
     }
 
     private boolean hasAccessToManagement() {
@@ -799,9 +858,19 @@ public class Controller {
             userset.add(s);
         }
 
-        final OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
-        final Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
-        return userset.contains(userDetails.get("username"));
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username;
+        final Map<String, Object> userDetails;
+        if (auth instanceof OAuth2Authentication) {
+            final OAuth2Authentication oauth = (OAuth2Authentication) auth;
+            userDetails = (Map<String, Object>) oauth.getUserAuthentication().getDetails();
+            username = (String) userDetails.get("username");
+        } else {
+            final JsonObject jo = (JsonObject) auth.getPrincipal();
+            final JsonElement je = jo.get("username");
+            username = je.getAsString();
+        }
+        return userset.contains(username);
     }
 
     /*********************************** CONFIG *****************************************/
@@ -810,8 +879,13 @@ public class Controller {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.logout().and().antMatcher("/**").authorizeRequests()
-                    .antMatchers("/index.html", "/", "/login", "/test-calendar", "/get-user").permitAll().and()
+            http.logout()
+                    .and()
+                    .antMatcher("/**")
+                    .authorizeRequests()
+                    .antMatchers("/index.html", "/", "/login", "/test-calendar", "/get-user")
+                    .permitAll()
+                    .and()
                     .authorizeRequests()
                     .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user", "/get-candidates", "/apply",
                             "/deapply", "get-students", "/students/**", "/degrees/**", "/pedagogico", "/periods", "/estudante")
@@ -870,12 +944,12 @@ public class Controller {
         end = LocalDate.of(2015, 8, 28);
         p = degreeYear.addPeriod(start, end, "APPLICATION");
         p = periodDAO.save(p);
-        Set<Student> st = p.getDegreeYear().getStudents();
-        Iterator<Student> it = st.iterator();
+        final Set<Student> st = p.getDegreeYear().getStudents();
+        final Iterator<Student> it = st.iterator();
         p.addCandidate(it.next());
         p.addCandidate(it.next());
         p.addCandidate(it.next());
-        Set<Student> candidates = p.getCandidates();
+        final Set<Student> candidates = p.getCandidates();
         periodDAO.save(p);
 
         start = LocalDate.of(2015, 9, 1);
@@ -890,17 +964,17 @@ public class Controller {
         end = LocalDate.of(2015, 8, 22);
         p = degreeYear.addPeriod(start, end, "APPLICATION");
 
-        Set<Student> st2 = p.getDegreeYear().getStudents();
-        Iterator<Student> it2 = st2.iterator();
-        Student s1 = it2.next();
-        Student s2 = it2.next();
-        Student s3 = it2.next();
-        Student s4 = it2.next();
+        final Set<Student> st2 = p.getDegreeYear().getStudents();
+        final Iterator<Student> it2 = st2.iterator();
+        final Student s1 = it2.next();
+        final Student s2 = it2.next();
+        final Student s3 = it2.next();
+        final Student s4 = it2.next();
         p = periodDAO.save(p);
         p.addCandidate(s1);
         p.addCandidate(s2);
         p.addCandidate(s3);
-        Set<Student> candidates2 = p.getCandidates();
+        final Set<Student> candidates2 = p.getCandidates();
         periodDAO.save(p);
         start = LocalDate.of(2015, 8, 24);
         end = LocalDate.of(2015, 8, 28);
@@ -908,9 +982,9 @@ public class Controller {
         p.addCandidate(s1);
         p.addCandidate(s2);
         p.addCandidate(s3);
-        Period x = periodDAO.save(p);
+        final Period x = periodDAO.save(p);
         //ElectionPeriod ePeriod = (ElectionPeriod) p;
-        ElectionPeriod ePeriod = (ElectionPeriod) periodDAO.findById(x.getId());
+        final ElectionPeriod ePeriod = (ElectionPeriod) periodDAO.findById(x.getId());
         ePeriod.vote(s1, s2);
         ePeriod.vote(s2, s2);
         ePeriod.vote(s3, s1);

@@ -14,7 +14,9 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	sc.loadDegrees = function() {
 		degrees.loadDegrees().then(function(data) {
 			sc.loaded = true;
-			sc.currentYear = degrees.getDegrees()[0].academicYear;
+			if(degrees.getDegrees()){
+				sc.currentYear = degrees.getDegrees()[0].academicYear;
+			}
 		})
 		
 	};

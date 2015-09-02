@@ -29,7 +29,7 @@
 <body ng-app="delegados" ng-cloak="true"> <!-- cloak b0rken -->
 	<br></br>
 	<div class="container" ng-controller="navigationCtrl">
-		<ul class="nav nav-tabs" ng-show="roles.indexOf('student') != -1 && roles.indexOf('management') != -1">
+		<ul class="nav nav-tabs" ng-show="roles.aluno && roles.pedagogico">
 		  <li class="active"><a href="#" data-toggle="tab" ng-click="selectStudentTab()">Estudante</a></li>
 		  <li><a href="#" data-toggle="tab" ng-click="selectManagementTab()">Pedagógico</a></li>
 		</ul>

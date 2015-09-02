@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -46,6 +47,8 @@ public class DegreeYearHistoryAdapter implements JsonSerializer<DegreeYear> {
 //                return 0;
             }
         });
+
+        Collections.reverse(periods);
 
         for (final Period p : periods) {
             if (p.getStart().isAfter(LocalDate.now())) {

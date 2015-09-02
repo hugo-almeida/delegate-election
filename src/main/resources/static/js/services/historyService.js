@@ -63,7 +63,18 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 							candidates[index].selfProposed = data['\"' + candidates[index].username + '\"'];
 						}
 					});
+					http.get('periods/' + history.periods[0].periodId + '/votes', result).success(function(data) {
+						for(index in candidates) {
+							candidates[index].votes = data[candidates[index].username];
+						}
+					});
 				}
+			}).then(function(data) {
+				log.log(candidates);
+				candidates = candidates.sort(function(a, b){
+					return a - b;
+				});
+				log.log(candidates);
 			});
 		}
 	}

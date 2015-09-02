@@ -101,7 +101,7 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 		if($rootScope.degree != null) {
 			$http.get('/degrees/' + $rootScope.degree.id + '/years/' + $rootScope.degree.curricularYear + '/periods')
 				.success(function(data) {
-					if (data.applicationStart != '' && data.applicationEnd != '') {
+					if (data.applicationStart && data.applicationEnd) {
 						$log.log('exists');
 						$scope.start = data.applicationStart;
 						$scope.end = data.applicationEnd;
@@ -119,24 +119,24 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 	/***
 	 * DEBUG
 	 */
-	$scope.debugVotePeriod = function() {
-		$rootScope.votePeriod = !$rootScope.votePeriod;
-	}
-	
-	$rootScope.toggleDebug = function() {
-		$rootScope.debug = !$rootScope.debug;
-	}
-	
-	
-	$scope.specialLogin = function(){		//debug
-		$rootScope.loaded = false;
-		$http.post('get-user', $scope.special_username)
-			.success(function(data) {
-				$rootScope.credentials = data;
-				$rootScope.id = data.name;
-			});
-		$rootScope.authenticated = true;
-	}
-	
+//	$scope.debugVotePeriod = function() {
+//		$rootScope.votePeriod = !$rootScope.votePeriod;
+//	}
+//	
+//	$rootScope.toggleDebug = function() {
+//		$rootScope.debug = !$rootScope.debug;
+//	}
+//	
+//	
+//	$scope.specialLogin = function(){		//debug
+//		$rootScope.loaded = false;
+//		$http.post('get-user', $scope.special_username)
+//			.success(function(data) {
+//				$rootScope.credentials = data;
+//				$rootScope.id = data.name;
+//			});
+//		$rootScope.authenticated = true;
+//	}
+//	
 }]);
 

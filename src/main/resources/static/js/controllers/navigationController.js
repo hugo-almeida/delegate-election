@@ -3,13 +3,17 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 	
 	$scope.selected = "none";
 	
-	$scope.roles = ['student', 'management'];
+	$scope.roles = [];
 	
-	if($scope.roles.indexOf('student') != -1) {
-		$scope.selected = 'student';
-	} else if($scope.roles.indexOf('management') != -1) {
-		$scope.selected = 'management';
-	}
+	$http.get('roles').success(function(data) {
+		$scope.roles = data;
+		if($scope.roles.aluno != false) {
+			$scope.selected = 'student';
+		} else if($scope.roles.pedagogico != false) {
+			$scope.selected = 'management';
+		}
+		$log.log($scope.selected);
+	});
 	
 	$scope.selectStudentTab = function() {
 		$scope.selected = "student";

@@ -60,7 +60,7 @@ public class DegreeYear {
     @Transactional
     public void initStudents() {
         final String accessToken =
-                "ODUxOTE1MzUzMDk2MTkzOjg1NDJmMDMwN2Y5ZDZiZWY4NTQxZThhM2NlMzkyZjQwYzE3MzNmOWM0NzJlYzM4NDM2ZjJlZjFkYzMyNjM2ZTc2ZDkxNTdlNjZmNjM4OGUzMGMxYTU4ZTk5YzYzNWFiMDMxN2RhOTA2MWI0MDExN2Y3NTAwNGRmMTFlOTk5N2Q0";
+                "ODUxOTE1MzUzMDk2MTkzOjI5NmJkNDViNzc4MTZiMzAyMDYyNzQxNTgxZTUzOGEyYzUzNDI5ODMxMzFmOGM0MTJkMDk1ZmIwN2NkMzVlMDM3YzUyOWQxMGU0M2Y0YTNiMWFmYjU4ZWRhOThmNTc3N2U0MGE5N2U2MzY5MTdhMGZlMDlmYTlhYjBlMDc5ZTQ4";
 
         final RestTemplate t = new RestTemplate();
         final Student[] degreeYearStudents =

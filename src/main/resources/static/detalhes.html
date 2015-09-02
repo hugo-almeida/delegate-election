@@ -50,12 +50,12 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="candidate in getCandidates() track by $index | orderBy: candidate.voteCount">
+				<tr ng-repeat="candidate in getCandidates() track by $index">
 					<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user avatar"></i>
 						<img class="avatar" ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}">
 						 {{candidate.name}}<span class="detail">{{candidate.username}}</span></td>
 					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">{{candidate.selfProposed}}</td>
-					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">num votos 
+					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">{{candidate.votes}}
 						<span class="pull-right" ng-show="getCurrentElection().state == 'passado'">
 							<button class="btn btn-default btn-xs" ng-click="assign(candidate.username)">Atribuir</button>
 						</span>
