@@ -20,8 +20,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 @Entity
@@ -222,19 +220,19 @@ public abstract class Period implements Serializable {
         s.removePeriod(this);
     }
 
-    @PrePersist
-    @PreUpdate
-    public void checkActivation() {
-        if (!start.isAfter(LocalDate.now()) && !end.isBefore(LocalDate.now())) {
-            if (!degreeYear.areStudentsLoaded()) {
-                degreeYear.initStudents();
-            }
-            degreeYear.setActivePeriod(this);
-            Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
-            if (lastPeriod != null) {
-                setCandidates(lastPeriod.getCandidates());
-            }
-        }
-    }
+//    @PrePersist
+//    @PreUpdate
+//    public void checkActivation() {
+//        if (!start.isAfter(LocalDate.now()) && !end.isBefore(LocalDate.now())) {
+//            if (!degreeYear.areStudentsLoaded()) {
+//                degreeYear.initStudents();
+//            }
+//            degreeYear.setActivePeriod(this);
+//            Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
+//            if (lastPeriod != null) {
+//                setCandidates(lastPeriod.getCandidates());
+//            }
+//        }
+//    }
 
 }
