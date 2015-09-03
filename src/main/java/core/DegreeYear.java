@@ -56,7 +56,7 @@ public class DegreeYear {
     public DegreeYear(int year, Degree d) {
         this.degreeDegreeYearPK = new DegreeDegreeYearPK(d.getAcronym(), year, d.getYear());
         this.degree = d;
-        initStudents(); // Development only.
+        //initStudents(); // Development only.
     }
 
     @Transactional
