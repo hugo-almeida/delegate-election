@@ -20,6 +20,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 @Entity
@@ -156,11 +158,12 @@ public abstract class Period implements Serializable {
     }
 
     public Set<Student> getCandidates() {
+        candidates.size();
         return this.candidates;
     }
 
     public void setCandidates(Set<Student> candidates) {
-        this.candidates = candidates;
+        this.candidates = new HashSet<Student>(candidates);
         for (final Student s : candidates) {
             s.addPeriod(this);
         }
@@ -224,20 +227,20 @@ public abstract class Period implements Serializable {
         s.removePeriod(this);
     }
 
-//    @PrePersist
-//    @PreUpdate
-//    public void checkActivation() {
-//        if (!start.isAfter(LocalDate.now()) && !end.isBefore(LocalDate.now())) {
-//            if (!degreeYear.areStudentsLoaded()) {
-//                degreeYear.initStudents();
-//            }
-//            degreeYear.setActivePeriod(this);
-//            Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
-//            if (lastPeriod != null) {
-//                setCandidates(lastPeriod.getCandidates());
-//            }
-//        }
-//    }
+    @PrePersist
+    @PreUpdate
+    public void checkActivation() {
+        if (!start.isAfter(LocalDate.now()) && !end.isBefore(LocalDate.now())) {
+            if (!degreeYear.areStudentsLoaded()) {
+                degreeYear.initStudents();
+            }
+            degreeYear.setActivePeriod(this);
+            Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
+            if (lastPeriod != null) {
+                setCandidates(lastPeriod.getCandidates());
+            }
+        }
+    }
 
     // Isto apenas serve para os Unit Tests (já que estes não vão à db.. mas deviam)
     // Pode ser removido se passar a existir uma lista de periodos no DegreeYear
