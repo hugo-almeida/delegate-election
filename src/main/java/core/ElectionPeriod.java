@@ -42,14 +42,13 @@ public class ElectionPeriod extends Period {
 
     //Get number of votes on a given student
     public int getNumVotes(String istId) {
-        int votes = 0;
-        for (final Student s : super.candidates) {
-            final String vote = getVote(s.getUsername());
-            if (vote.equals(istId)) {
-                votes++;
+        int nVotes = 0;
+        for (Vote v : votes) {
+            if (v.getVoted().equals(istId)) {
+                nVotes++;
             }
         }
-        return votes;
+        return nVotes;
     }
 
     public Set<Vote> getVotes() {
