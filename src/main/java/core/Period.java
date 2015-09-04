@@ -209,6 +209,10 @@ public abstract class Period implements Serializable {
     abstract public PeriodType getType();
 
     public void addCandidate(Student s) {
+        // Só se pode adicionar candidatos a periodos activos
+        if (!isActive()) {
+            return;
+        }
         getCandidates().add(s);
         s.addPeriod(this);
     }
@@ -234,5 +238,11 @@ public abstract class Period implements Serializable {
 //            }
 //        }
 //    }
+
+    // Isto apenas serve para os Unit Tests (já que estes não vão à db.. mas deviam)
+    // Pode ser removido se passar a existir uma lista de periodos no DegreeYear
+    void setId(int id) {
+        this.id = id;
+    }
 
 }

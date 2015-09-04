@@ -1,5 +1,6 @@
 package core;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -24,12 +25,13 @@ public class Student {
     private StudentPK studentpk = null;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "student_period", joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username"),
-            @JoinColumn(name = "degree_name", referencedColumnName = "degree_name"),
-            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year"),
-            @JoinColumn(name = "calendar_year", referencedColumnName = "calendar_year") }, inverseJoinColumns = { @JoinColumn(
-            name = "period_id", referencedColumnName = "period_id") })
-    private Set<Period> applicationPeriod;
+    @JoinTable(name = "student_period",
+            joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username"),
+                    @JoinColumn(name = "degree_name", referencedColumnName = "degree_name"),
+                    @JoinColumn(name = "degree_year", referencedColumnName = "degree_year"),
+                    @JoinColumn(name = "calendar_year", referencedColumnName = "calendar_year") },
+            inverseJoinColumns = { @JoinColumn(name = "period_id", referencedColumnName = "period_id") })
+    private final Set<Period> applicationPeriod = new HashSet<Period>();
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumns({

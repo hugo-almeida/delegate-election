@@ -144,7 +144,6 @@ public class DegreeYear {
                 return;
             }
         }
-
         periods.add(period);
     }
 
@@ -287,7 +286,7 @@ public class DegreeYear {
 
     public Period getLastPeriod(LocalDate now) {
         Period last = null;
-        for (final Period p : periods) {
+        for (Period p : periods) {
             if (p.getEnd().isBefore(now)) {
                 if (last == null) {
                     last = p;
@@ -301,7 +300,7 @@ public class DegreeYear {
 
     public Period getNextPeriod(LocalDate now) {
         Period next = null;
-        for (final Period p : periods) {
+        for (Period p : periods) {
             if (!p.getStart().isBefore(now)) {
                 if (next == null) {
                     next = p;
