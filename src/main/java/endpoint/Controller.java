@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -224,8 +225,9 @@ public class Controller {
 
         //The active periods must be the same for both students
         final Period period = student.getDegreeYear().getActivePeriod();
+        ElectionPeriod ePeriod;
         try {
-            final ElectionPeriod ePeriod = (ElectionPeriod) period;
+            ePeriod = (ElectionPeriod) period;
             ePeriod.vote(student, candidate);
         } catch (final ClassCastException e) {
             // Se o cast não foi possivel, o periodo actual nao e de eleicao
@@ -233,6 +235,7 @@ public class Controller {
             return gson.toJson("");
         }
         studentDAO.save(student);
+        periodDAO.save(ePeriod);
         return getStudent(vote, degreeId);
     }
 
@@ -612,18 +615,18 @@ public class Controller {
 
     @RequestMapping(value = "periods/{periodId}/selfProposed", method = RequestMethod.POST)
     public @ResponseBody String selfPropposed(@PathVariable int periodId, @RequestBody String studentJson) {
-        final Period period = periodDAO.findById(periodId);
-        final Set<Student> candidates = period.getCandidates();
-        final JsonParser parser = new JsonParser();
-        final JsonObject students = new JsonParser().parse(studentJson).getAsJsonObject();
-        final JsonArray array = students.get("usernames").getAsJsonArray();
-        final List<String> usernames = new ArrayList<String>();
+        Period period = periodDAO.findById(periodId);
+        Set<Student> candidates = period.getCandidates();
+        JsonParser parser = new JsonParser();
+        JsonObject students = new JsonParser().parse(studentJson).getAsJsonObject();
+        JsonArray array = students.get("usernames").getAsJsonArray();
+        List<String> usernames = new ArrayList<String>();
         for (int i = 0; i < array.size(); i++) {
-            usernames.add(array.get(i).toString());
+            usernames.add(array.get(i).getAsString());
         }
-        final JsonObject result = new JsonObject();
-        for (final String s : usernames) {
-            final Student st =
+        JsonObject result = new JsonObject();
+        for (String s : usernames) {
+            Student st =
                     studentDAO.findByUsernameAndDegreeAndCalendarYear(s, period.getDegreeYear().getDegree().getId(), period
                             .getDegreeYear().getCalendarYear());
             if (candidates.contains(st)) {
@@ -646,8 +649,22 @@ public class Controller {
         }
         final ElectionPeriod ePeriod = (ElectionPeriod) period;
         final JsonObject result = new JsonObject();
-        for (final Student s : ePeriod.getCandidates()) {
-            result.addProperty(s.getUsername(), Integer.toString(ePeriod.getNumVotes(s.getUsername())));
+        Map<String, Integer> votos = new HashMap<String, Integer>();
+        for (Student st : ePeriod.getCandidates()) {
+            votos.put(st.getUsername(), 0);
+        }
+        for (Vote v : ePeriod.getVotes()) {
+            String voted = v.getVoted();
+            if (votos.containsKey(voted)) {
+                int nVotos = votos.get(voted);
+                nVotos++;
+                votos.put(voted, nVotos);
+            } else {
+                votos.put(voted, 1);
+            }
+        }
+        for (String s : votos.keySet()) {
+            result.addProperty(s, votos.get(s));
         }
         return new Gson().toJson(result);
     }
