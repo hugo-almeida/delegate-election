@@ -41,7 +41,7 @@ public class TestController {
     @RequestMapping("/test-calendar")
     //@Bean
     public String testCalendar() {
-        final Calendar c = new Calendar(2015);
+        final Calendar c = new Calendar(2016);
         c.init();
 //        Calendar c2 = new Calendar(2015);
 //        c2.init();

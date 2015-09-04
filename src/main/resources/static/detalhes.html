@@ -64,7 +64,7 @@
 			</tbody>
 			<tfoot>
 				<tr class="new">
-					<td ng-hide="history().periods[0].periodType=='ELECTION'">
+					<td ng-show="getCurrentApplication().state && getCurrentApplication().state =='presente'">
 						<i class="icon icon-search"></i>
 						<input type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"/>
 						<table class="table table-hover" ng-show="!isEmpty(students)" style="margin: 0 0 0 -10px; border: 1px solid #ddd;">
@@ -79,7 +79,20 @@
 							</tbody>
 						</table>
 					</td>
-					<td ng-show="history().periods[0].periodType=='ELECTION'" colspan="3">
+					<td ng-show="getCurrentElection().state && getCurrentElection().state =='presente'" colspan="3">
+						<i class="icon icon-search"></i>
+						<input type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"/>
+						<table class="table table-hover" ng-show="!isEmpty(students)" style="margin: 0 0 0 -10px; border: 1px solid #ddd;">
+							<tbody>
+								<tr ng-repeat="student in students">
+									<td>
+										{{student.name}}
+										<span class="detail" style="vertical-align: -webkit-baseline-middle; display: inline-table;">{{student.username}}</span>
+										<button ng-show="true" class="btn btn-default btn-xs pull-right" ng-click="addCandidate(student.username)">Adicionar</button>
+									</td>	
+								</tr>
+							</tbody>
+						</table>
 					</td>
 				</tr>
 			</tfoot>
@@ -166,8 +179,8 @@
 							<thead>
 							<tr>
 								<th class="col-md-8"><strong>Nome</strong></th>
-								<th class="col-md-2" ng-show="inspectedPeriod.periodType=='ELECTION'"><strong>Auto-proposto</strong></th>
-								<th ng-show="inspectedPeriod.periodType=='ELECTION'"><strong>Nº de Votos</strong></th>
+								<th class="col-md-2" ng-show="inspectedPeriod().periodType=='ELECTION'"><strong>Auto-proposto</strong></th>
+								<th ng-show="inspectedPeriod().periodType=='ELECTION'"><strong>Nº de Votos</strong></th>
 							</tr>
 						</thead>
 							<tbody>
@@ -175,8 +188,8 @@
 									<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user avatar"></i>
 										<img class="avatar" ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}">
 										 {{candidate.name}}<span class="detail">{{candidate.username}}</span></td>
-									<td ng-show="inspectedPeriod.periodType=='ELECTION'">sim</td>
-									<td ng-show="inspectedPeriod.periodType=='ELECTION'">num votos 
+									<td ng-show="inspectedPeriod().periodType=='ELECTION'">{{candidate.selfProposed}}</td>
+									<td ng-show="inspectedPeriod().periodType=='ELECTION'">{{candidate.votes}}
 									</td>
 								</tr>
 							</tbody>

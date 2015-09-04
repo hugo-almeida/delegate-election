@@ -1,4 +1,6 @@
 angular.module('delegados').factory('history', ['$log', '$http', function(log, http){
+	var academicYear = "";
+	
 	var degree = {}
 	
 	var history = {};
@@ -37,6 +39,14 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 		loadCandidates();
 	}
 	
+	function setAcademicYear(year) {
+		log.log('setter');
+		log.log('year: ' + year);
+		log.log('prev: ' + academicYear);
+		academicYear = year;
+		log.log('new: ' + academicYear);
+	}
+	
 	function getCurrentApplication() {
 		return degree.applicationPeriod;
 	}
@@ -49,9 +59,17 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 		if(history.periods.length == 0) {
 			candidates = [];
 			return;
-		}else {
+		} 
+		else if(history.periods[0].academicYear != academicYear) {
+			candidates = [];
+			log.log(history.periods[0].academicYear);
+			log.log(academicYear);
+			log.log(history.periods[0].academicYear != degree.academicYear);
+			return;
+		}
+		else {
 			http.get('periods/' + history.periods[0].periodId + '/candidates').success(function(data) {
-				if(!(candidates == 'No Period with that Id')) {
+				if(!(data == 'No Period with that Id')) {
 					candidates = data;
 					var result = {usernames: []};
 					for (index in candidates) {
@@ -60,7 +78,7 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 					http.post('periods/' + history.periods[0].periodId + '/selfProposed', result)
 						.success(function(data) {
 						for(index in candidates) {
-							candidates[index].selfProposed = data['\"' + candidates[index].username + '\"'];
+							candidates[index].selfProposed = data[candidates[index].username];
 						}
 					});
 					http.get('periods/' + history.periods[0].periodId + '/votes', result).success(function(data) {
@@ -81,9 +99,23 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	
 	function loadInspectCandidates(id) {
 		http.get('periods/' + id + '/candidates').success(function(data) {
-			if(!(candidates == 'No Period with that Id')) {
+			if(!(data == 'No Period with that Id')) {
 				inspectCandidates = data;
-				return data;
+				var result = {usernames: []};
+				for (index in inspectCandidates) {
+					result.usernames.push(inspectCandidates[index].username); 
+				}
+				http.post('periods/' + id + '/selfProposed', result)
+					.success(function(data) {
+					for(index in inspectCandidates) {
+						inspectCandidates[index].selfProposed = data[inspectCandidates[index].username];
+					}
+				});
+				http.get('periods/' + id + '/votes', result).success(function(data) {
+					for(index in inspectCandidates) {
+						inspectCandidates[index].votes = data[inspectCandidates[index].username];
+					}
+				});
 			}
 		});
 	}
@@ -105,6 +137,7 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 		getCurrentApplication: getCurrentApplication,
 		getCurrentElection: getCurrentElection,
 		setDegree: setDegree,
+		setAcademicYear: setAcademicYear,
 		loadHistory: loadHistory,
 		loadCandidates: loadCandidates,
 		loadInspectCandidates: loadInspectCandidates,

@@ -233,7 +233,9 @@ public class Controller {
             return gson.toJson("");
         }
         studentDAO.save(student);
-        return getStudent(vote, degreeId);
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        return gson.toJson(candidate);
     }
 
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.GET)
@@ -924,44 +926,38 @@ public class Controller {
     public @ResponseBody String setDemo() {
 
 //        //Periodo no Futuro
-//        DegreeYear degreeYear =
-//                degreeDAO.findByAcronymAndYear("LEAN", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
-//        LocalDate start = LocalDate.of(2015, 9, 20);
-//        LocalDate end = LocalDate.of(2015, 9, 25);
-//        Period p = degreeYear.addPeriod(start, end, "APPLICATION");
-//        periodDAO.save(p);
-//
-//        //Periodo Candidatura Activo
-//        degreeYear = degreeDAO.findByAcronymAndYear("LEE", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
-//        start = LocalDate.of(2015, 9, 1);
-//        end = LocalDate.of(2015, 9, 7);
-//        p = degreeYear.addPeriod(start, end, "APPLICATION");
-//        periodDAO.save(p);
+        DegreeYear degreeYear =
+                degreeDAO.findByAcronymAndYear("LEAN", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
+        LocalDate start = LocalDate.of(2015, 9, 20);
+        LocalDate end = LocalDate.of(2015, 9, 25);
+        Period p = degreeYear.addPeriod(start, end, "APPLICATION");
+        periodDAO.save(p);
+
+        //Periodo Candidatura Activo
+        degreeYear = degreeDAO.findByAcronymAndYear("LEE", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
+        start = LocalDate.of(2015, 9, 1);
+        end = LocalDate.of(2015, 9, 7);
+        p = degreeYear.addPeriod(start, end, "APPLICATION");
+        periodDAO.save(p);
 
         //Periodo Votação Activo
-        DegreeYear degreeYear =
-                degreeDAO.findByAcronymAndYear("LEGI", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
-//        start = LocalDate.of(2015, 8, 24);
-//        end = LocalDate.of(2015, 8, 28);
-//        p = degreeYear.addPeriod(start, end, "APPLICATION");
-//        p = periodDAO.save(p);
-//        Set<Student> st = p.getDegreeYear().getStudents();
-//        Iterator<Student> it = st.iterator();
-//        p.addCandidate(it.next());
-//        p.addCandidate(it.next());
-//        p.addCandidate(it.next());
-//        Set<Student> candidates = p.getCandidates();
-//        periodDAO.save(p);
-        LocalDate start = LocalDate.of(2015, 9, 1);
-        LocalDate end = LocalDate.of(2015, 9, 7);
-        Period p = degreeYear.addPeriod(start, end, "ELECTION");
-        periodDAO.save(p);
+        degreeYear = degreeDAO.findByAcronymAndYear("LEGI", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
+        start = LocalDate.of(2015, 8, 24);
+        end = LocalDate.of(2015, 8, 28);
+        p = degreeYear.addPeriod(start, end, "APPLICATION");
+        p = periodDAO.save(p);
         Set<Student> st = p.getDegreeYear().getStudents();
         Iterator<Student> it = st.iterator();
         p.addCandidate(it.next());
         p.addCandidate(it.next());
         p.addCandidate(it.next());
-
+        Set<Student> candidates = p.getCandidates();
+        periodDAO.save(p);
+        start = LocalDate.of(2015, 9, 1);
+        end = LocalDate.of(2015, 9, 7);
+        p = degreeYear.addPeriod(start, end, "ELECTION");
+        periodDAO.save(p);
+        p.setCandidates(candidates);
         periodDAO.save(p);
 
         //Periodo Votação Terminado
@@ -970,17 +966,17 @@ public class Controller {
         end = LocalDate.of(2015, 8, 22);
         p = degreeYear.addPeriod(start, end, "APPLICATION");
 
-        Set<Student> st2 = p.getDegreeYear().getStudents();
-        Iterator<Student> it2 = st2.iterator();
-        Student s1 = it2.next();
-        Student s2 = it2.next();
-        Student s3 = it2.next();
-        Student s4 = it2.next();
+        final Set<Student> st2 = p.getDegreeYear().getStudents();
+        final Iterator<Student> it2 = st2.iterator();
+        final Student s1 = it2.next();
+        final Student s2 = it2.next();
+        final Student s3 = it2.next();
+        final Student s4 = it2.next();
         p = periodDAO.save(p);
         p.addCandidate(s1);
         p.addCandidate(s2);
         p.addCandidate(s3);
-        Set<Student> candidates2 = p.getCandidates();
+        final Set<Student> candidates2 = p.getCandidates();
         periodDAO.save(p);
         start = LocalDate.of(2015, 8, 24);
         end = LocalDate.of(2015, 8, 28);
@@ -988,9 +984,9 @@ public class Controller {
         p.addCandidate(s1);
         p.addCandidate(s2);
         p.addCandidate(s3);
-        Period x = periodDAO.save(p);
+        final Period x = periodDAO.save(p);
         //ElectionPeriod ePeriod = (ElectionPeriod) p;
-        ElectionPeriod ePeriod = (ElectionPeriod) periodDAO.findById(x.getId());
+        final ElectionPeriod ePeriod = (ElectionPeriod) periodDAO.findById(x.getId());
         ePeriod.vote(s1, s2);
         ePeriod.vote(s2, s2);
         ePeriod.vote(s3, s1);
