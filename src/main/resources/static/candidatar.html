@@ -18,7 +18,7 @@
 	
 	<h3>Candidatos</h3>
 	<div ng-show="loaded==true">
-		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#applyModal" ng-show="!applied">
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#applyModal" ng-show="!applied && loaded">
 			<i class="glyphicon glyphicon-plus"></i>
 			Candidata-te
 		</button>
@@ -31,8 +31,7 @@
 			<tbody>
 				<tr ng-repeat="candidato in candidatos | orderBy:'name'">
 					<td>
-						<img class="avatar" ng-show="!isEmpty(candidato.photo)" class="center-block" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}"></img>
-						<i class="avatar" ng-show="isEmpty(candidato.photo)" class="glyphicon glyphicon-user"></i>
+						<img class="avatar" class="center-block" ng-src="{{imgURL+candidato.username}}""></img>
 						{{candidato.name}}
 						<span class="detail">{{candidato.username}}</span>
 						<button type="button" class="pull-right close" ng-show="candidato.username == credentials.username" ng-click="unapply()"></button>

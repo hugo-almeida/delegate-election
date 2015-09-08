@@ -25,6 +25,7 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 	}
 	
 	sc.getCurrentApplication = function()  {
+		log.log(history.getCurrentApplication());
 		return history.getCurrentApplication();
 	}
 	
@@ -67,5 +68,14 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 			sc.query = '';
 			sc.students = [];
 		});
+	}
+	
+	sc.colSpan = function() {
+		if(getCurrentApplication().state && getCurrentApplication().state =='presente') {
+			return 1;
+		}
+		else if (getCurrentElection().state && getCurrentElection().state =='presente') {
+			return 3;
+		}
 	}
 }]);

@@ -1,4 +1,4 @@
-<div ng-controller="detailsCtrl">
+<div class="container" ng-controller="detailsCtrl">
 
 	<div>
 		<!-- Default panel contents -->
@@ -17,7 +17,7 @@
 					<dd>{{getCurrentApplication().applicationPeriodStart}} – {{getCurrentApplication().applicationPeriodEnd}}
 						<span ng-show="getCurrentApplication().state == 'presente'"> - A decorrer</span>
 						<span ng-show="getCurrentApplication().state == 'passado'"> - Terminado</span>
-						<div ng-hide="isEmpty(getCurrentApplication()) || getCurrentApplication().state == 'futuro'">{{getCandidates().length}} candidatos</div>
+						<div ng-hide="isEmpty(getCurrentApplication()) || getCurrentApplication().state == 'futuro'">{{getCurrentApplication().candidateCount}} candidatos</div>
 					</dd>
 					<dt >Votação</dt>
 					<dd>{{getCurrentElection().electionPeriodStart}} – {{getCurrentElection().electionPeriodEnd}}			
@@ -30,9 +30,29 @@
 	</div>
 	
 	<h3>Candidatos</h3>
-	<button ng-show="getCurrentApplication().state == 'presente' || getCurrentElection().state == 'presente'" class="btn btn-primary" ng-click="triggerFocus()">
-		Adicionar
-	</button>
+<!-- 	<button ng-show="getCurrentApplication().state == 'presente' || getCurrentElection().state == 'presente'" class="btn btn-primary" ng-click="triggerFocus()"> -->
+<!-- 		Adicionar -->
+<!-- 	</button> -->
+	
+	<div ng-show="getCurrentApplication().state == 'presente' || getCurrentElection().state == 'presente'" class="row"> 
+		<div class="dropdown pull-right">
+			<i class="icon icon-search"></i>
+			<input id="dLabel" type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }" 
+				data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"/>
+			<table class="table table-hover dropdown-menu" ng-show="!isEmpty(students)" 
+				style="margin: 0 0 0 -10px; border: 1px solid #ddd;"  aria-labelledby="dLabel">
+				<tbody>
+					<tr ng-repeat="student in students">
+						<td>
+							{{student.name}}
+							<span class="detail" style="vertical-align: -webkit-baseline-middle; display: inline-table;">{{student.username}}</span>
+							<button ng-show="true" class="btn btn-default btn-xs pull-right" ng-click="addCandidate(student.username)">Adicionar</button>
+						</td>	
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 
 	<div ng-hide="getCandidates().length >= 1" class="empty">
 		<p>
@@ -50,10 +70,11 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="candidate in getCandidates() track by $index">
-					<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user avatar"></i>
-						<img class="avatar" ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}">
-						 {{candidate.name}}<span class="detail">{{candidate.username}}</span></td>
+				<tr ng-repeat="candidate in getCandidates() | orderBy:'-votes'">
+					<td>
+						<img class="avatar" ng-src="{{imgURL+candidate.username}}">
+						 {{candidate.name}}<span class="detail">{{candidate.username}}</span>
+					</td>
 					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">{{candidate.selfProposed}}</td>
 					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">{{candidate.votes}}
 						<span class="pull-right" ng-show="getCurrentElection().state == 'passado'">
@@ -62,43 +83,60 @@
 					</td>
 				</tr>
 			</tbody>
-			<tfoot>
-				<tr class="new">
-					<td ng-show="getCurrentApplication().state && getCurrentApplication().state =='presente'">
-						<i class="icon icon-search"></i>
-						<input type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"/>
-						<table class="table table-hover" ng-show="!isEmpty(students)" style="margin: 0 0 0 -10px; border: 1px solid #ddd;">
-							<tbody>
-								<tr ng-repeat="student in students">
-									<td>
-										{{student.name}}
-										<span class="detail" style="vertical-align: -webkit-baseline-middle; display: inline-table;">{{student.username}}</span>
-										<button ng-show="true" class="btn btn-default btn-xs pull-right" ng-click="addCandidate(student.username)">Adicionar</button>
-									</td>	
-								</tr>
-							</tbody>
-						</table>
-					</td>
-					<td ng-show="getCurrentElection().state && getCurrentElection().state =='presente'" colspan="3">
-						<i class="icon icon-search"></i>
-						<input type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"/>
-						<table class="table table-hover" ng-show="!isEmpty(students)" style="margin: 0 0 0 -10px; border: 1px solid #ddd;">
-							<tbody>
-								<tr ng-repeat="student in students">
-									<td>
-										{{student.name}}
-										<span class="detail" style="vertical-align: -webkit-baseline-middle; display: inline-table;">{{student.username}}</span>
-										<button ng-show="true" class="btn btn-default btn-xs pull-right" ng-click="addCandidate(student.username)">Adicionar</button>
-									</td>	
-								</tr>
-							</tbody>
-						</table>
-					</td>
-				</tr>
-			</tfoot>
+<!-- 			<tfoot> -->
+<!-- 				<tr class="new"> -->
+<!-- 					<td ng-show="(getCurrentApplication().state && getCurrentApplication().state =='presente') || (getCurrentElection().state && getCurrentElection().state =='presente')" colspan="colSpan()"> -->
+<!-- 						<div class="dropdown"> -->
+<!-- 							<i class="icon icon-search"></i> -->
+<!-- 							<input id="dLabel" type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"  -->
+<!-- 								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"/> -->
+<!-- 							<table class="table table-hover dropdown-menu" ng-show="!isEmpty(students)"  -->
+<!-- 								style="margin: 0 0 0 -10px; border: 1px solid #ddd;"  aria-labelledby="dLabel"> -->
+<!-- 								<tbody> -->
+<!-- 									<tr ng-repeat="student in students"> -->
+<!-- 										<td> -->
+<!-- 											{{student.name}} -->
+<!-- 											<span class="detail" style="vertical-align: -webkit-baseline-middle; display: inline-table;">{{student.username}}</span> -->
+<!-- 											<button ng-show="true" class="btn btn-default btn-xs pull-right" ng-click="addCandidate(student.username)">Adicionar</button> -->
+<!-- 										</td>	 -->
+<!-- 									</tr> -->
+<!-- 								</tbody> -->
+<!-- 							</table> -->
+<!-- 						</div> -->
+<!-- 					</td> -->
+<!-- 					<td ng-show="getCurrentElection().state && getCurrentElection().state =='presente'" colspan="3"> -->
+<!-- 						<div class="dropdown"> -->
+<!-- 							<i class="icon icon-search"></i> -->
+<!-- 							<input id="dLabel" type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"  -->
+<!-- 								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"/> -->
+<!-- 							<table class="table table-hover dropdown-menu" ng-show="!isEmpty(students)"  -->
+<!-- 								style="margin: 0 0 0 -10px; border: 1px solid #ddd;" aria-labelledby="dLabel"> -->
+<!-- 								<tbody> -->
+<!-- 									<tr ng-repeat="student in students"> -->
+<!-- 										<td> -->
+<!-- 											{{student.name}} -->
+<!-- 											<span class="detail" style="vertical-align: -webkit-baseline-middle; display: inline-table;">{{student.username}}</span> -->
+<!-- 											<button ng-show="true" class="btn btn-default btn-xs pull-right" ng-click="addCandidate(student.username)">Adicionar</button> -->
+<!-- 										</td>	 -->
+<!-- 									</tr> -->
+<!-- 								</tbody> -->
+<!-- 							</table> -->
+<!-- 						</div> -->
+<!--			</td> -->
+<!-- 				</tr> -->
+<!-- 			</tfoot> -->
 		</table>
 	</div>
 	
+<!-- 	<div class="dropdown"> -->
+<!-- 					<input id="dLabel" type="text" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> -->
+<!-- 					<table class="table table-hover dropdown-menu" aria-labelledby="dLabel"> -->
+<!-- 					    <tr> -->
+<!-- 					    	<td>hi!</td> -->
+<!-- 					    </tr> -->
+<!-- 					</table> -->
+<!-- 					</div> -->
+					
 	<h3>Histórico</h3>
 	<div ng-show="isEmpty(history().periods)" class="empty">
 		<p>
@@ -184,10 +222,11 @@
 							</tr>
 						</thead>
 							<tbody>
-								<tr ng-repeat="candidate in candidates() track by $index | orderBy: candidate.voteCount">
-									<td><i ng-show="isEmpty(candidate.photo)"  class="glyphicon glyphicon-user avatar"></i>
-										<img class="avatar" ng-show="!isEmpty(candidate.photo)"  ng-src="data:{{candidate.photo.type}};base64,{{candidate.photo.data}}">
-										 {{candidate.name}}<span class="detail">{{candidate.username}}</span></td>
+								<tr ng-repeat="candidate in candidates() | orderBy:'-votes'">
+									<td>
+										<img class="avatar"  ng-src="{{imgURL+candidate.username}}">
+										 {{candidate.name}}<span class="detail">{{candidate.username}}</span>
+									</td>
 									<td ng-show="inspectedPeriod().periodType=='ELECTION'">{{candidate.selfProposed}}</td>
 									<td ng-show="inspectedPeriod().periodType=='ELECTION'">{{candidate.votes}}
 									</td>

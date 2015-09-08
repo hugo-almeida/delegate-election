@@ -9,22 +9,24 @@
 		
 		<div ng-show="authenticated"> <!-- missing student check -->
 			
-			<div ng-show="degress.length > 1">
-				<div class="panel panel-default">
-					<div class="panel-heading">Nome</div>
-					<div class="table-responsive">
+			<div ng-show="degrees.length > 1">
 						<table class="table">
+							<thead>
+								<tr>
+									<th>
+										Nome
+									</th>
+								</tr>
+							</thead>
+							<tbody>
 							<tr ng-repeat="deg in degrees">
 								<td class="col-md-1">
 									<input type="radio" ng-model="$parent.selection" value="{{$index}}">
-								</td>
-								<td>
-									<strong>{{deg.name}}</strong>
+									{{deg.name}}
 								</td>
 							</tr>
+							</tbody>
 						</table>
-					</div>
-				</div>
 				<button class="btn btn-primary" ng-click="setDegree()">Seleccionar</button> 
 			</div>
 

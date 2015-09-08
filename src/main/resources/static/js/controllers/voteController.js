@@ -3,6 +3,8 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		
 		sc.selected = '';
 		
+		rc.voto = "";
+		
 		sc.selection = function() {
 			log.log(sc.selected);
 			if(sc.selected == 'other') {
@@ -37,6 +39,7 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 				sc.feedback = true;
 				rc.voted = true;
 				rc.voto = data;
+				log.log(rc.voto);
 			});
 		}
 		

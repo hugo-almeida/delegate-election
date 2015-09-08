@@ -46,6 +46,7 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 		$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
 			$rootScope.degrees = data;
 			$log.log(data);
+			$log.log($rootScope.degrees);
 			if($rootScope.degrees.length == 1) {
 				$scope.selection = 0;
 				$scope.setDegree();
@@ -82,7 +83,9 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 	}
 	
 	$scope.setDegree = function() {
+		$rootScope.loaded = false;
 		$rootScope.degree = $rootScope.degrees[$scope.selection];
+		$rootScope.candidatos=[];
 		$rootScope.reloadCandidates();
 		$scope.setSubtitle();
 	}

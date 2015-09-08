@@ -1,6 +1,9 @@
 angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope', '$http', '$log',
                                                           function($rootScope, $scope, $http, $log)  {
 	
+	$rootScope.imgURL = "https://fenix.tecnico.ulisboa.pt/user/photo/";
+	
+	
 	$scope.selected = "none";
 	
 	$scope.roles = [];

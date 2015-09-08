@@ -31,8 +31,7 @@
 				</thead>
 				<tbody>
 					<td ng-show="voto != 'null'">
-						<i class="avatar" ng-show="isEmpty(voto.photo)" class="glyphicon glyphicon-user"></i>
-						<img class="avatar" ng-show="!isEmpty(voto.photo)" ng-src="data:{{voto.photo.type}};base64,{{voto.photo.data}}">
+						<img class="avatar" ng-src="{{imgURL+voto.username}}">
 						{{voto.name}}
 						<span class="detail">{{voto.username}}</span>
 					</td>
@@ -53,8 +52,7 @@
 				<tr ng-repeat="candidato in candidatos | orderBy:'username'">
 					<td>
 						<input type="radio" ng-model="$parent.selected" value="{{candidato.username}}" name="voted"> <!-- $parent needed because ng-repeat creates its own scope -->
-						<i class="avatar" ng-show="isEmpty(candidato.photo)" class="glyphicon glyphicon-user"></i>
-						<img class="avatar" ng-show="!isEmpty(candidato.photo)" ng-src="data:{{candidato.photo.type}};base64,{{candidato.photo.data}}">
+						<img class="avatar" ng-src="{{imgURL+candidato.username}}">
 						{{candidato.name}}
 						<span class="detail">{{candidato.username}}</span>
 					</td>
@@ -83,8 +81,7 @@
 									<tr ng-repeat="student in students | orderBy:'username'"  ng-hide="query==null || query==''">
 										<td>
 											<input type="radio" name="otherVoted" ng-model="$parent.otherSelected" value="{{student.username}}">
-											<i class="avatar" ng-show="isEmpty(student.photo)" class="glyphicon glyphicon-user"></i>
-											<img class="avatar" ng-show="!isEmpty(student.photo)" ng-src="data:{{student.photo.type}};base64,{{student.photo.data}}">
+											<img class="avatar" ng-src="{{imgURL+student.username}}">
 											{{student.name}}
 											<span class="detail">{{student.username}}</span>
 										</td>
