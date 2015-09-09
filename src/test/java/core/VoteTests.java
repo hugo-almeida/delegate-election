@@ -22,6 +22,7 @@ public class VoteTests {
 
     @After
     public void tearDown() {
+
     }
 
     @Test
