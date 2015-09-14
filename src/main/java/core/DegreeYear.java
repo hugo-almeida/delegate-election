@@ -315,4 +315,8 @@ public class DegreeYear {
     public boolean areStudentsLoaded() {
         return studentsLoaded;
     }
+
+    public void addStudent(Student newStudent) {
+        students.add(newStudent);
+    }
 }

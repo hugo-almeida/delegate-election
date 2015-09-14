@@ -28,6 +28,9 @@ public class ScheduledTasks {
     @Autowired
     PeriodDAO periodDAO;
 
+    // Isto assume que a app está sempre a correr.
+    // TODO Excepções não devem impedir a continuação do método
+
 //    @Scheduled(cron = "0/5 * * * * *")
     @Scheduled(cron = "0 0 0 * * *")
     public void updateCurrentPeriods() {
