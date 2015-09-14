@@ -66,17 +66,16 @@ public class AccessTokenHandler {
             throw new Exception("Exception reading from .yml at AccessTokenHandler");
         }
 
-        if (accessToken == null) {
-            RestTemplate t = new RestTemplate();
-            String infoUrl =
-                    "https://fenix.tecnico.ulisboa.pt/oauth/access_token?client_id=" + clientId + "&client_secret="
-                            + clientSecret + "&grant_type=client_credentials";
-            HttpHeaders requestHeaders = new HttpHeaders();
-            HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
-            HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.POST, requestEntity, String.class);
-            JsonObject json = new JsonParser().parse(response.getBody()).getAsJsonObject();
-            accessToken = json.get("access_token").getAsString();
-        }
+        RestTemplate t = new RestTemplate();
+        String infoUrl =
+                "https://fenix.tecnico.ulisboa.pt/oauth/access_token?client_id=" + clientId + "&client_secret=" + clientSecret
+                        + "&grant_type=client_credentials";
+        HttpHeaders requestHeaders = new HttpHeaders();
+        HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
+        HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.POST, requestEntity, String.class);
+        JsonObject json = new JsonParser().parse(response.getBody()).getAsJsonObject();
+        accessToken = json.get("access_token").getAsString();
+
         return accessToken;
     }
 
@@ -87,7 +86,7 @@ public class AccessTokenHandler {
             try {
                 degrees = t.getForObject(base_domain + "/api/fenix/v1/degrees", Degree[].class);
             } catch (Exception e) {
-                //Repeat
+                e.printStackTrace();
             }
         } while (degrees == null);
         return degrees;
@@ -102,7 +101,7 @@ public class AccessTokenHandler {
                         t.getForObject(base_domain + "/api/fenix/v1/degrees/" + degreeId + "/students?curricularYear="
                                 + degreeYear + "&access_token=" + accessToken, Student[].class);
             } catch (Exception e) {
-                //New Token and repeat
+                //e.printStackTrace();
                 getNewAccessToken();
             }
         } while (students == null);

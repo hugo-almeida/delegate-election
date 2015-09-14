@@ -522,7 +522,7 @@ public class Controller {
 
         if (period.getStart().isAfter(LocalDate.now())) {
             dy.removePeriod(period);
-            periodDAO.save(period);
+            periodDAO.delete(period);
             return new Gson().toJson("deleted period " + periodId);
         }
 //        final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -594,7 +594,10 @@ public class Controller {
                 st =
                         studentDAO.findByUsernameAndDegreeAndCalendarYear(v.getVoted(), period.getDegreeYear().getDegree()
                                 .getId(), period.getDegreeYear().getCalendarYear());
-                candidates.add(st);
+                if (st != null) {
+                    candidates.add(st);
+                }
+                st = null;
             }
         }
         final GsonBuilder gsonBuilder = new GsonBuilder();
