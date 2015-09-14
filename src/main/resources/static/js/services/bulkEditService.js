@@ -19,7 +19,7 @@ angular.module('delegados').factory('bulkEdit', ['$rootScope', '$log', '$http', 
 	
 	function setSelectedDegrees(degrees) {
 		selectedDegrees = degrees;
-		log.log(selectedDegrees);
+//		log.log(selectedDegrees);
 	}
 	
 	function edit(years, applicationStart, applicationEnd, electionStart, electionEnd) {
@@ -29,7 +29,7 @@ angular.module('delegados').factory('bulkEdit', ['$rootScope', '$log', '$http', 
 					 applicationPeriodStart:applicationStart,
 					 applicationPeriodEnd:applicationEnd};
 		
-		console.log(selectedDegrees);
+//		console.log(selectedDegrees);
 		
 		selectedDegrees.forEach(function(degree) {
 			var degreeJson = {};
@@ -59,7 +59,7 @@ angular.module('delegados').factory('bulkEdit', ['$rootScope', '$log', '$http', 
 //		log.log('start: ' + start + ' end ' + end);
 		var requestUrl = 'periods';
 		http.put(requestUrl, request).success(function(data) {
-			log.log('success edit apply');
+//			log.log('success edit apply');
 		}).then(function(data) {
 			degrees.loadDegrees();
 		});

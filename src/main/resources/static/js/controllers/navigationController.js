@@ -1,8 +1,13 @@
-angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope', '$http', '$log',
-                                                          function($rootScope, $scope, $http, $log)  {
+angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope', '$http', '$log', '$translate',
+                                                          function($rootScope, $scope, $http, $log, $translate)  {
 	
-	$rootScope.imgURL = "https://fenix.tecnico.ulisboa.pt/user/photo/";
+	$rootScope.imgURL = function(username) { 
+		return "https://fenix.tecnico.ulisboa.pt/user/photo/" + username;
+	}
 	
+	$scope.changeLanguage = function (langKey) {
+	    $translate.use(langKey);
+	  };
 	
 	$scope.selected = "none";
 	
@@ -15,7 +20,7 @@ angular.module('delegados').controller('navigationCtrl', ['$rootScope', '$scope'
 		} else if($scope.roles.pedagogico != false) {
 			$scope.selected = 'management';
 		}
-		$log.log($scope.selected);
+//		$log.log($scope.selected);
 	});
 	
 	$scope.selectStudentTab = function() {

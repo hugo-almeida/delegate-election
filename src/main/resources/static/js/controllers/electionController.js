@@ -7,7 +7,7 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 	
 	$http.get('user').success(function(data) {
 		if (data) {
-			$log.log(data);
+//			$log.log(data);
 			$rootScope.degree = null;
 			
 			$rootScope.authenticated = true;
@@ -27,7 +27,7 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 		$rootScope.authenticated = false;
 	});
 	
-	$scope.subTitle = 'Início'
+	$scope.subTitle = 'START'
 		
 	$rootScope.debug = true;
 	
@@ -38,6 +38,8 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 	$rootScope.loaded = false;
 	
 	$rootScope.nextPeriod = false;
+	
+	$rootScope.showEmpty = false;
 
 	/***
 	 * DEGREES
@@ -45,8 +47,8 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 	$rootScope.reloadDegrees = function() {
 		$http.get('students/'+$rootScope.credentials.username+'/degrees').success(function(data){
 			$rootScope.degrees = data;
-			$log.log(data);
-			$log.log($rootScope.degrees);
+//			$log.log(data);
+//			$log.log($rootScope.degrees);
 			if($rootScope.degrees.length == 1) {
 				$scope.selection = 0;
 				$scope.setDegree();
@@ -61,28 +63,30 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 		.success(function(data) { 
 			$rootScope.candidatos = data;
 		});
-		$log.log('got candidates');
+//		$log.log('got candidates');
 		$http.get('degrees/'+$rootScope.degree.id+'/years/'+$rootScope.degree.curricularYear+'/candidates/'+$rootScope.credentials.username)
 		.success(function(data) { 
 			if(data != '') {
 				$rootScope.applied = true;
 			}
 		});
-		$log.log('checked application');
+//		$log.log('checked application');
 		$http.get('students/'+$rootScope.credentials.username+'/degrees/'+$rootScope.degree.id+'/votes')
 		.success(function(data) { 
 			if(data != '') {
+				
 				$rootScope.voted = true;
 				$rootScope.voto = data;
 			}
 			$rootScope.loaded = true;	
 		}).error(function(data) {		
 			$rootScope.loaded = true;	
-		});						
-		$log.log('checked voted');
+		});
+//		$log.log('checked voted');
 	}
 	
 	$scope.setDegree = function() {
+		$rootScope.showEmpty = true;
 		$rootScope.loaded = false;
 		$rootScope.degree = $rootScope.degrees[$scope.selection];
 		$rootScope.candidatos=[];
@@ -92,23 +96,23 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 	
 	$scope.setSubtitle = function() {
 		if($rootScope.degree.currentPeriod.type == 'APPLICATION') {
-			$scope.subTitle = 'Candidatura';
+			$scope.subTitle = 'APPLICATION';
 		}
 		else if($rootScope.degree.currentPeriod.type == 'ELECTION')  {
-			$scope.subTitle = 'Votação';
+			$scope.subTitle = 'ELECTION';
 		}
 	}
 	
 	$scope.checkNextPeriod = function() {
-		$log.log('checking next period')
+//		$log.log('checking next period')
 		if($rootScope.degree != null) {
 			$http.get('/degrees/' + $rootScope.degree.id + '/years/' + $rootScope.degree.curricularYear + '/periods')
 				.success(function(data) {
 					if (data.applicationStart && data.applicationEnd) {
-						$log.log('exists');
+//						$log.log('exists');
 						$scope.start = data.applicationStart;
 						$scope.end = data.applicationEnd;
-						$log.log('start: ' + $scope.start + ' end: ' + $scope.end);
+//						$log.log('start: ' + $scope.start + ' end: ' + $scope.end);
 						$rootScope.nextPeriod = true;
 					}
 				});

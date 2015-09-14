@@ -17,8 +17,8 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	
 	function inspectPeriod(index) {
 		inspect = history.periods[index];
-		log.log(history.periods[index]);
-		log.log(inspect);
+//		log.log(history.periods[index]);
+//		log.log(inspect);
 		loadInspectCandidates(inspect.periodId);
 	}
 	
@@ -40,11 +40,11 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	}
 	
 	function setAcademicYear(year) {
-		log.log('setter');
-		log.log('year: ' + year);
-		log.log('prev: ' + academicYear);
+//////		log.log('setter');
+////		log.log('year: ' + year);
+//		log.log('prev: ' + academicYear);
 		academicYear = year;
-		log.log('new: ' + academicYear);
+//		log.log('new: ' + academicYear);
 	}
 	
 	function getCurrentApplication() {
@@ -62,9 +62,9 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 		} 
 		else if(history.periods[0].academicYear != academicYear) {
 			candidates = [];
-			log.log(history.periods[0].academicYear);
-			log.log(academicYear);
-			log.log(history.periods[0].academicYear != degree.academicYear);
+//			log.log(history.periods[0].academicYear);
+//			log.log(academicYear);
+//			log.log(history.periods[0].academicYear != degree.academicYear);
 			return;
 		}
 		else {
@@ -88,11 +88,11 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 					});
 				}
 			}).then(function(data) {
-				log.log(candidates);
+//				log.log(candidates);
 				candidates = candidates.sort(function(a, b){
 					return a - b;
 				});
-				log.log(candidates);
+//				log.log(candidates);
 			});
 		}
 	}
@@ -123,7 +123,7 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	function loadHistory(degreeId, year) {
 		var promise = http.get('degrees/' + degreeId + '/years/' + year + '/history').success(function(data) {
 			history = data;
-			log.log(data.periods);
+//			log.log(data.periods);
 		});
 		
 		return promise;

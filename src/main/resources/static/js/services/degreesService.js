@@ -39,13 +39,13 @@ angular.module('delegados').factory('degrees', ['$log', '$http', function(log, h
 			filteredDegrees = degrees.filter(isMesInt);
 			break;
 		}
-		log.log(filter);
+//		log.log(filter);
 	}
 	
 	function loadDegrees(){
 		var promise = http.get('periods').success(function(data){
 			degrees = data;
-			log.log(degrees);
+//			log.log(degrees);
 			filterDegrees(lastFilter);
 		});
 		return promise;
