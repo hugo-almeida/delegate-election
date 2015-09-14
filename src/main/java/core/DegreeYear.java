@@ -147,6 +147,10 @@ public class DegreeYear {
         periods.add(period);
     }
 
+    public void removePeriod(Period p) {
+        periods.remove(p);
+    }
+
     public Set<Period> getInactivePeriods() {
         final Set<Period> inactive = new HashSet<Period>();
         for (final Period p : periods) {

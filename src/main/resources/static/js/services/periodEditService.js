@@ -42,47 +42,51 @@ angular.module('delegados').factory('periodEdit', ['$log', '$http', 'degrees', f
 	function edit(start, end) {
 		var dates = {start:start, end:end};
 		
-//		log.log('start: ' + start + ' end ' + end);
 		if(selectedPeriodOperation == 'Estender') {
-//			log.log('editing ' + selectedPeriodType);
 			
 			var requestUrl = 'periods/';
 			if(selectedPeriodType == 'Votação') {
-//				log.log('vote');
 				requestUrl += selectedYear.electionPeriod.electionPeriodId;
 			}
 			else if(selectedPeriodType == 'Candidatura') {
-//				log.log('apply');
 				requestUrl += selectedYear.applicationPeriod.applicationPeriodId;
 			}
 			
 			http.put(requestUrl, dates).success(function(data) {
-//				log.log('success edit apply');
 				degrees.loadDegrees();
 			});
 		}
 		else if(selectedPeriodOperation == 'Criar') {
-//			log.log(selectedDegree);
 			
 			var changes = {degreeId:selectedDegree.degreeId, degreeYear:selectedYear.degreeYear, periodType:'', start:start, end:end};
 			
-//			log.log('creating ' + selectedPeriodType);
 			if(selectedPeriodType == 'Votação') {
-//				log.log('vote');
-//				log.log(dates);
 				changes.periodType = 'ELECTION';
 			}
 			else if(selectedPeriodType == 'Candidatura') {
-//				log.log('apply');
-//				log.log(dates);
 				changes.periodType = 'APPLICATION'
 			}
 			
 			http.post('periods', changes).success(function(data) {
-//				log.log('success edit apply');
 				degrees.loadDegrees();
 			});
 		}
+	};
+	
+	function remove() {
+		
+		var requestUrl = 'periods/';
+		
+		if(selectedPeriodType == 'Votação') {
+			requestUrl += selectedYear.electionPeriod.electionPeriodId;
+		}
+		else if(selectedPeriodType == 'Candidatura') {
+			requestUrl += selectedYear.applicationPeriod.applicationPeriodId;
+		}
+		
+		http.delete(requestUrl).success(function(data) {
+			degrees.loadDegrees();
+		});
 	};
 	
 	return {
@@ -94,6 +98,7 @@ angular.module('delegados').factory('periodEdit', ['$log', '$http', 'degrees', f
 		setSelectedPeriodOperation: setSelectedPeriodOperation,
 		setSelectedDegree: setSelectedDegree,
 		setSelectedYear: setSelectedYear,
-		edit: edit
+		edit: edit,
+		remove: remove
 	};
 }]);
