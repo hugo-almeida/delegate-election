@@ -82,7 +82,7 @@ public class ScheduledTasks {
     }
 
     @Scheduled(cron = "0 0 * * * *")
-    public void retrieveStudents() {
+    public void retrieveStudents() throws Exception {
         Calendar calendar = calendarDAO.findFirstByOrderByYearDesc();
         if (calendar == null) {
             return;

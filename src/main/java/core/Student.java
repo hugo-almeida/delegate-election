@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,12 +24,11 @@ public class Student {
     private StudentPK studentpk = null;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "student_period",
-            joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username"),
-                    @JoinColumn(name = "degree_name", referencedColumnName = "degree_name"),
-                    @JoinColumn(name = "degree_year", referencedColumnName = "degree_year"),
-                    @JoinColumn(name = "calendar_year", referencedColumnName = "calendar_year") },
-            inverseJoinColumns = { @JoinColumn(name = "period_id", referencedColumnName = "period_id") })
+    @JoinTable(name = "student_period", joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username"),
+            @JoinColumn(name = "degree_name", referencedColumnName = "degree_name"),
+            @JoinColumn(name = "degree_year", referencedColumnName = "degree_year"),
+            @JoinColumn(name = "calendar_year", referencedColumnName = "calendar_year") }, inverseJoinColumns = { @JoinColumn(
+            name = "period_id", referencedColumnName = "period_id") })
     private final Set<Period> applicationPeriod = new HashSet<Period>();
 
 //    @ManyToOne(fetch = FetchType.LAZY)
@@ -44,11 +42,6 @@ public class Student {
 //    private DegreeYear degreeYear;
 
     private String name;
-    private String email;
-
-    private String photoType = null;
-    @Column(length = 100000)
-    private String photoBytes = null;
 
     Student() {
 
@@ -58,9 +51,6 @@ public class Student {
         this.name = name;
         this.username = username;
         this.studentpk = new StudentPK(username);
-        this.email = email;
-        this.photoType = photoType;
-        this.photoBytes = photoBytes;
     }
 
     public String getName() {
@@ -69,18 +59,6 @@ public class Student {
 
     public String getUsername() {
         return studentpk.getUsername();
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhotoType() {
-        return photoType;
-    }
-
-    public String getPhotoBytes() {
-        return photoBytes;
     }
 
     public DegreeYear getDegreeYear() {
@@ -102,18 +80,6 @@ public class Student {
         if (this.applicationPeriod.contains(p)) {
             this.applicationPeriod.remove(p);
         }
-    }
-
-    public void setEmail(String e) {
-        email = e;
-    }
-
-    public void setPhotoType(String type) {
-        photoType = type;
-    }
-
-    public void setPhotoBytes(String bytes) {
-        photoBytes = bytes;
     }
 
 }

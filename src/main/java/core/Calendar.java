@@ -10,12 +10,25 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
+
+import endpoint.AccessTokenHandler;
 
 @Entity
 @Table(name = "calendar")
 public class Calendar {
+
+    @Autowired
+    @Transient
+    Environment env;
+
+    @Autowired
+    @Transient
+    AccessTokenHandler ath;
 
     @Id
     @Column(name = "year")
@@ -38,7 +51,7 @@ public class Calendar {
 
     public void init() {
         final RestTemplate t = new RestTemplate();
-        final Degree[] c = t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees", Degree[].class);
+        final Degree[] c = ath.getDegrees();
 
         for (final Degree element : c) {
             if (element.getType().equals("Licenciatura Bolonha") || element.getType().equals("Mestrado Bolonha")

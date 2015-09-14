@@ -14,21 +14,28 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
-import org.springframework.http.HttpEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import core.Period.PeriodType;
+import endpoint.AccessTokenHandler;
 
 @Entity
 @Table(name = "DegreeYear")
 public class DegreeYear {
+
+    @Autowired
+    @Transient
+    Environment env;
+
+    @Autowired
+    @Transient
+    AccessTokenHandler ath;
 
     @EmbeddedId
     private DegreeDegreeYearPK degreeDegreeYearPK;
@@ -60,33 +67,18 @@ public class DegreeYear {
     }
 
     @Transactional
-    public void initStudents() {
+    public void initStudents() throws Exception {
         final String accessToken =
                 "ODUxOTE1MzUzMDk2MTkzOjI5NmJkNDViNzc4MTZiMzAyMDYyNzQxNTgxZTUzOGEyYzUzNDI5ODMxMzFmOGM0MTJkMDk1ZmIwN2NkMzVlMDM3YzUyOWQxMGU0M2Y0YTNiMWFmYjU4ZWRhOThmNTc3N2U0MGE5N2U2MzY5MTdhMGZlMDlmYTlhYjBlMDc5ZTQ4";
 
         final RestTemplate t = new RestTemplate();
-        final Student[] degreeYearStudents =
-                t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees/" + degree.getId()
-                        + "/students?curricularYear=" + getDegreeYear() + "&access_token=" + accessToken, Student[].class);
+        final Student[] degreeYearStudents = ath.getStudents(degree.getId(), getDegreeYear());
 
         final String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + accessToken;
 
         final HttpHeaders requestHeaders = new HttpHeaders();
         for (final Student student : degreeYearStudents) {
             student.setDegreeYear(this);
-
-            requestHeaders.set("__username__", student.getUsername());
-            final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
-
-            final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
-            final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
-            if (!result.get("email").isJsonNull()) {
-                student.setEmail(result.get("email").toString());
-            }
-            if (!result.get("photo").isJsonNull()) {
-                student.setPhotoType(result.getAsJsonObject("photo").get("type").toString());
-                student.setPhotoBytes(result.getAsJsonObject("photo").get("data").toString());
-            }
         }
         students.addAll(Arrays.asList(degreeYearStudents));
         studentsLoaded = true;

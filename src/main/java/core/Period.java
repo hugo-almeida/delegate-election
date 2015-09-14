@@ -229,7 +229,7 @@ public abstract class Period implements Serializable {
 
     @PrePersist
     @PreUpdate
-    public void checkActivation() {
+    public void checkActivation() throws Exception {
         if (!start.isAfter(LocalDate.now()) && !end.isBefore(LocalDate.now())) {
             if (!degreeYear.areStudentsLoaded()) {
                 degreeYear.initStudents();
