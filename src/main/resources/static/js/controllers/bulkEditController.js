@@ -9,7 +9,7 @@ angular.module('delegados').controller('bulkCtrl', ['$rootScope', '$scope', '$ht
 	sc.years = [false, false, false, false, false];
 		
 	sc.academicYear = function() {
-		log.log(bulkEdit.getYear());
+//		log.log(bulkEdit.getYear());
 		return bulkEdit.getYear();
 	}
 	

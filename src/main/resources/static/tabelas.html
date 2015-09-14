@@ -60,6 +60,12 @@
 								<li ng-show="!isEmpty(year.electionPeriod)" data-toggle="modal" data-target="#editModal"
 									ng-click="setSelectionDetails('Votação', 'Estender', degree, year)">
 									<a href="#">Estender - Votação</a></li>
+								<li ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state=='futuro'" data-toggle="modal" data-target="#removeModal"
+									ng-click="setSelectionDetails('Candidatura', 'Remover', degree, year)">
+									<a href="#">Remover - Candidatura</a></li>
+								<li ng-show="!isEmpty(year.electionPeriod) && year.electionPeriod.state=='futuro'" data-toggle="modal" data-target="#removeModal"
+									ng-click="setSelectionDetails('Votação', 'Remover', degree, year)">
+									<a href="#">Remover - Votação</a></li>
 								<li><a href="#" ng-click="showDetails(degree, $index+1)">Detalhes</a></li>
 							</ul>
 						</div>
@@ -119,6 +125,34 @@
 	      		<div class="modal-footer">
 	        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 	        			<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="edit()">Confirmar</button>
+	      		</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="removeModal" class="modal fade" role="dialog" ng-controller="removeModalCtrl">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>
+						Remover Período de {{selectedPeriodType()}}
+					</h3>
+					<span>Tem a certeza que deseja remover o período de {{selectedPeriodType()}}</span>
+				    <button type="button" class="close" data-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+	        		<dl class="dl-entity-horizontal">
+							<dt>Curso</dt>
+							<dd>{{selectedDegree().degree}}</dd>
+							<dt>Ano Lectivo</dt>
+							<dd>{{selectedDegree().academicYear}}</dd>
+							<dt>Ano Curricular</dt>
+							<dd>{{selectedYear().degreeYear}}</dd>
+					</dl>
+	      		</div>
+	      		<div class="modal-footer">
+	        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+	        			<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="remove()">Confirmar</button>
 	      		</div>
 			</div>
 		</div>

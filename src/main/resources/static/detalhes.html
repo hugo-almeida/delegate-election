@@ -35,7 +35,8 @@
 <!-- 	</button> -->
 	
 	<div ng-show="getCurrentApplication().state == 'presente' || getCurrentElection().state == 'presente'" class="row"> 
-		<div class="dropdown pull-right">
+		<button class="btn btn-primary pull-right" ng-hide="add" ng-click="setAdd(true)"><span class="glyphicon glyphicon-plus"></span>Adicionar</button> 
+		<div class="dropdown pull-right" ng-show="add">
 			<i class="icon icon-search"></i>
 			<input id="dLabel" type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }" 
 				data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"/>
@@ -72,10 +73,13 @@
 			<tbody>
 				<tr ng-repeat="candidate in getCandidates() | orderBy:'-votes'">
 					<td>
-						<img class="avatar" ng-src="{{imgURL+candidate.username}}">
+						<img class="avatar" ng-src="{{imgURL(candidate.username)}}">
 						 {{candidate.name}}<span class="detail">{{candidate.username}}</span>
 					</td>
-					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">{{candidate.selfProposed}}</td>
+					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">
+						<span ng-show="candidate.selfProposed"><i class="glyphicon glyphicon-check"></i></span>
+						<span ng-hide="candidate.selfProposed"></span>
+					</td>
 					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">{{candidate.votes}}
 						<span class="pull-right" ng-show="getCurrentElection().state == 'passado'">
 							<button class="btn btn-default btn-xs" ng-click="assign(candidate.username)">Atribuir</button>
@@ -224,7 +228,7 @@
 							<tbody>
 								<tr ng-repeat="candidate in candidates() | orderBy:'-votes'">
 									<td>
-										<img class="avatar"  ng-src="{{imgURL+candidate.username}}">
+										<img class="avatar"  ng-src="{{imgURL(candidate.username)}}">
 										 {{candidate.name}}<span class="detail">{{candidate.username}}</span>
 									</td>
 									<td ng-show="inspectedPeriod().periodType=='ELECTION'">{{candidate.selfProposed}}</td>
@@ -242,5 +246,5 @@
 		</div>
 	</div>
 	
-	<button class="btn btn-default" ng-click="hideDetails()">Voltar</button>
+	<button class="btn btn-default" ng-click="hideDetails(); setAdd(false)">Voltar</button>
 </div>

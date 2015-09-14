@@ -20,12 +20,12 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 	};
 	
 	sc.inspectPeriod = function(index) {
-		log.log(index);	
+//		log.log(index);	
 		history.inspectPeriod(index);
 	}
 	
 	sc.getCurrentApplication = function()  {
-		log.log(history.getCurrentApplication());
+//		log.log(history.getCurrentApplication());
 		return history.getCurrentApplication();
 	}
 	
@@ -38,7 +38,7 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 	}
 	
 	sc.assign = function(username) {
-		log.log('assigning ' + username + ' as delegado stub');
+//		log.log('assigning ' + username + ' as delegado stub');
 	}
 	
 	sc.loadStudents = function(query) {
@@ -52,6 +52,11 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 				.success(function(data) { 
 					sc.students = data;
 				});
+//				http.get('students?begins='+query)
+//				.success(function(data) { 
+//					sc.students = data;
+//					log.log(data);
+//				});
 			}
 			else {
 				sc.students = [];
@@ -59,10 +64,16 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 		}
 	}
 	
+	sc.add = false;
+	
+	sc.setAdd = function(bool) {
+		sc.add = bool;
+	}
+	
 	sc.addCandidate = function(istid) {
-		log.log(sc.getCurrentApplication());
+//		log.log(sc.getCurrentApplication());
 		http.post('periods/' + sc.getCurrentApplication().applicationPeriodId + '/candidates/' + istid).success(function(data) {
-			log.log(data);
+//			log.log(data);
 		}).then(function(data) {
 			history.loadCandidates();
 			sc.query = '';

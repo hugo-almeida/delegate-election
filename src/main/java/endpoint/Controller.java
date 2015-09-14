@@ -511,27 +511,35 @@ public class Controller {
         return new Gson().toJson("ok");
     }
 
-    @RequestMapping(value = "/periods", method = RequestMethod.DELETE)
-    public @ResponseBody String removePeriods(@RequestBody String periodsJson) {
+    @RequestMapping(value = "/periods/{periodId}", method = RequestMethod.DELETE)
+    public @ResponseBody String removePeriods(@PathVariable int periodId) {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
         }
 
-        final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
-        final DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
-        for (final DegreeChange degreeChange : degrees) {
-            for (final Integer year : degreeChange.getPeriods().keySet()) {
-                for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
-                    final Period period = periodDAO.findById(change.getPeriodId());
-                    if (period.getStart().isAfter(LocalDate.now())) {
-//             /           period.unschedulePeriod(periodDAO, degreeDAO);
-                        periodDAO.delete(change.getPeriodId());
-                    }
-                }
-            }
+        final Period period = periodDAO.findById(periodId);
+        DegreeYear dy = period.getDegreeYear();
+
+        if (period.getStart().isAfter(LocalDate.now())) {
+            dy.removePeriod(period);
+            periodDAO.save(period);
+            return new Gson().toJson("deleted period " + periodId);
         }
-        return new Gson().toJson("ok");
+//        final GsonBuilder gsonBuilder = new GsonBuilder();
+//        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
+//        final DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
+//        for (final DegreeChange degreeChange : degrees) {
+//            for (final Integer year : degreeChange.getPeriods().keySet()) {
+//                for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
+//                    final Period period = periodDAO.findById(change.getPeriodId());
+//                    if (period.getStart().isAfter(LocalDate.now())) {
+////             /           period.unschedulePeriod(periodDAO, degreeDAO);
+//                        periodDAO.delete(change.getPeriodId());
+//                    }
+//                }
+//            }
+//        }
+        return new Gson().toJson("didn't delete period " + periodId);
     }
 
     // recebe Json com 2 datas: start e end

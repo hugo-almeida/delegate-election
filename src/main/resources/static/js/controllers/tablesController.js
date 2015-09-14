@@ -33,7 +33,7 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		sc.selection = [];
 		sc.allSelected = false;
 		degrees.filterDegrees(filter);
-		log.log(filter);
+//		log.log(filter);
 	}
 	
 	sc.toggleSelection = function(degree) {
@@ -109,6 +109,6 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 		
 		bulkEdit.setSelectedDegrees(selectedDegrees);
 		bulkEdit.setYear(sc.currentYear);
-		log.log(bulkEdit.getYear());
+//		log.log(bulkEdit.getYear());
 	}
 }]);

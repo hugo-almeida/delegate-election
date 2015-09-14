@@ -1,5 +1,12 @@
-angular.module('delegados', ['ngRoute']).
+angular.module('delegados', ['ngRoute', 'pascalprecht.translate']).
 	config(function($httpProvider, $routeProvider, $locationProvider) {
 		
 		$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+}).config(function($translateProvider) {
+		$translateProvider.useStaticFilesLoader({
+		  prefix: '/languages/',
+		  suffix: '.json'
+		});
+		//$translateProvider.useLocalStorage();/
+		$translateProvider.preferredLanguage('ptPT');
 });

@@ -6,7 +6,7 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 		rc.voto = "";
 		
 		sc.selection = function() {
-			log.log(sc.selected);
+//			log.log(sc.selected);
 			if(sc.selected == 'other') {
 				for(var i = 0; i < sc.students.length; i++) {
 				    if (sc.students[i].username == sc.otherSelected) {
@@ -39,7 +39,7 @@ angular.module('delegados').controller('voteCtrl', ['$rootScope', '$scope', '$ht
 				sc.feedback = true;
 				rc.voted = true;
 				rc.voto = data;
-				log.log(rc.voto);
+//				log.log(rc.voto);
 			});
 		}
 		
