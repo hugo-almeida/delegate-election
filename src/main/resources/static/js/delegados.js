@@ -1,4 +1,4 @@
-angular.module('delegados', ['ngRoute', 'pascalprecht.translate']).
+angular.module('delegados', ['ngRoute', 'pascalprecht.translate', 'ui.bootstrap']).
 	config(function($httpProvider, $routeProvider, $locationProvider) {
 		
 		$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';

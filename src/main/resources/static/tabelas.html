@@ -114,11 +114,17 @@
 							<dd>{{selectedYear().degreeYear}}</dd>
 							<dt>Período de {{selectedPeriodType()}}</dt>
 							<dd>
-								<div class="input-group">
-									<input type="date" class="form-control" ng-model="start">
-								  	<span class="input-group-addon" id="basic-addon1">to</span>
-									<input type="date" class="form-control" ng-model="end">
-								</div>
+					            <div class="input-group">
+					              <input type="text" class="form-control" datepicker-popup="dd/MM/yyyy" ng-model="start" is-open="status.startOpened" min-date="minDate" max-date="maxDate" ng-required="true" current-text="Hoje" clear-text="Limpar" close-text="Fechar" />
+					              <span class="input-group-btn">
+					                <button type="button" class="btn btn-default" ng-click="openStart($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+					              </span>
+					              <span class="input-group-addon"> a </span>
+					              <input type="text" class="form-control" datepicker-popup="dd/MM/yyyy" ng-model="end" is-open="status.endOpened" min-date="minDate" max-date="maxDate" ng-required="true" current-text="Hoje" clear-text="Limpar" close-text="Fechar" />
+					              <span class="input-group-btn">
+					                <button type="button" class="btn btn-default" ng-click="openEnd($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+					              </span>
+					            </div>
 							</dd>
 					</dl>
 	      		</div>
@@ -233,20 +239,32 @@
 							<label class="control-label col-sm-4">Período de candidatura</label>
 							<div class="col-sm-8">
 								<div class="input-group">
-									<input type="date" class="form-control" ng-model="applicationStart">
-								  	<span class="input-group-addon" id="basic-addon1">to</span>
-									<input type="date" class="form-control" ng-model="applicationEnd">
-								</div>
+					              <input type="text" class="form-control" datepicker-popup="dd/MM/yyyy" ng-model="applicationStart" is-open="status.AppStartOpened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" current-text="Hoje" clear-text="Limpar" close-text="Fechar" />
+					              <span class="input-group-btn">
+					                <button type="button" class="btn btn-default" ng-click="openAppStart($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+					              </span>
+					              <span class="input-group-addon"> a </span>
+					              <input type="text" class="form-control" datepicker-popup="dd/MM/yyyy" ng-model="applicationEnd" is-open="status.AppEndOpened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" current-text="Hoje" clear-text="Limpar" close-text="Fechar" />
+					              <span class="input-group-btn">
+					                <button type="button" class="btn btn-default" ng-click="openAppEnd($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+					              </span>
+					            </div>
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="control-label col-sm-4">Período de votação</label>
 							<div class="col-sm-8">
 								<div class="input-group">
-									<input type="date" class="form-control" ng-model="electionStart">
-								  	<span class="input-group-addon" id="basic-addon1">to</span>
-									<input type="date" class="form-control" ng-model="electionEnd">
-								</div>
+					              <input type="text" class="form-control" datepicker-popup="dd/MM/yyyy" ng-model="electionStart" is-open="status.ElecStartOpened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" current-text="Hoje" clear-text="Limpar" close-text="Fechar" />
+					              <span class="input-group-btn">
+					                <button type="button" class="btn btn-default" ng-click="openElecStart($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+					              </span>
+					              <span class="input-group-addon"> a </span>
+					              <input type="text" class="form-control" datepicker-popup="dd/MM/yyyy" ng-model="electionEnd" is-open="status.ElecEndOpened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" current-text="Hoje" clear-text="Limpar" close-text="Fechar" />
+					              <span class="input-group-btn">
+					                <button type="button" class="btn btn-default" ng-click="openElecEnd($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+					              </span>
+					            </div>
 							</div>
 						</div>
 					</form>
