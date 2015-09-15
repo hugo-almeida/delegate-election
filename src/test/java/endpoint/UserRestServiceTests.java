@@ -4,6 +4,8 @@ import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.equalTo;
 
+import java.time.LocalDate;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,11 +17,13 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.jayway.restassured.module.mockmvc.RestAssuredMockMvc;
 
+import core.ApplicationPeriod;
 import core.Calendar;
 import core.CalendarDAO;
 import core.Degree;
 import core.Degree.DegreeType;
 import core.DegreeYear;
+import core.ElectionPeriod;
 import core.Student;
 import core.StudentDAO;
 
@@ -37,11 +41,16 @@ public class UserRestServiceTests {
     @Autowired
     WebApplicationContext webApplicationContext;
 
-    Student studentOne;
-    Student studentTwo;
-    Degree degreeOne;
-    Degree degreeTwo;
-    DegreeYear firstDegreeYear;
+    private Student studentOne;
+    private Student studentTwo;
+    private Degree degreeOne;
+    private Degree degreeTwo;
+    private Student studentFour;
+    private Student studentThree;
+
+    private DegreeYear firstDegreeYear;
+
+    private DegreeYear secondDegreeYear;
 
     @Before
     public void setUp() {
@@ -56,9 +65,26 @@ public class UserRestServiceTests {
         degreeTwo.initDegreeYears();
 
         firstDegreeYear = degreeOne.getDegreeYear(1);
+        secondDegreeYear = degreeOne.getDegreeYear(2);
+
+        firstDegreeYear
+                .addPeriod(new ApplicationPeriod(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), firstDegreeYear));
+
+        secondDegreeYear
+                .addPeriod(new ElectionPeriod(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), firstDegreeYear));
 
         studentOne = new Student("Student1", "id1", "email1@email.com", "", "");
         studentTwo = new Student("Student2", "id2", "email2@email.com", "", "");
+        studentThree = new Student("Student3", "id3", "email3@email.com", "", "");
+        studentFour = new Student("Student4", "id4", "email4@email.com", "", "");
+
+        studentOne.setDegreeYear(firstDegreeYear);
+        firstDegreeYear.addStudent(studentOne);
+
+        studentTwo.setDegreeYear(secondDegreeYear);
+        secondDegreeYear.addStudent(studentTwo);
+        studentFour.setDegreeYear(secondDegreeYear);
+        secondDegreeYear.addStudent(studentFour);
 
         calendarRepository.save(calendar);
 
@@ -67,25 +93,25 @@ public class UserRestServiceTests {
 
     @Test
     public void studentWithNoDegressTest() {
-        studentTwo.setDegreeYear(firstDegreeYear);
-        firstDegreeYear.addStudent(studentTwo);
-
-        calendarRepository.save(calendarRepository.findFirstByOrderByYearDesc());
-
-        when().get("/students/{istId}/degrees", studentOne.getUsername()).then().assertThat().statusCode(200).body("$",
+        when().get("/students/{istId}/degrees", studentThree.getUsername()).then().assertThat().statusCode(200).body("$",
                 emptyIterable());
     }
 
     // Not working
     @Test
     public void studentWithOneDegressTest() {
-        studentOne.setDegreeYear(firstDegreeYear);
-        firstDegreeYear.addStudent(studentOne);
-
-        calendarRepository.save(calendarRepository.findFirstByOrderByYearDesc());
-
         when().get("/students/{istId}/degrees", studentOne.getUsername()).then().assertThat().statusCode(200).body("$[0].id",
                 equalTo(degreeOne.getId()));
+    }
+
+    @Test
+    public void votingStudentTest() {
+
+    }
+
+    @Test
+    public void nonVotingStudentTest() {
+
     }
 
 }
