@@ -177,7 +177,8 @@ public class Controller {
         return gson.toJson(studentDegrees);
     }
 
-    @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.GET)
+    @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.GET,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String getVote(@PathVariable String istId, @PathVariable String degreeId) {
 
         final Student student =
@@ -198,7 +199,8 @@ public class Controller {
         return getUser(voted);
     }
 
-    @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.POST)
+    @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.POST,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String addVote(@PathVariable String istId, @PathVariable String degreeId, @RequestBody String vote) {
         if (!getLoggedUsername().equals(istId)) {
             return new Gson().toJson("");
@@ -230,7 +232,7 @@ public class Controller {
         } catch (final ClassCastException e) {
             // Se o cast não foi possivel, o periodo actual nao e de eleicao
             final Gson gson = new Gson();
-            return gson.toJson("");
+            return new Gson().toJson("");
         }
         studentDAO.save(student);
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -238,7 +240,8 @@ public class Controller {
         return gson.toJson(candidate);
     }
 
-    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.GET)
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.GET,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String getCandidates(@PathVariable String degreeId, @PathVariable int year) {
         final Set<Student> candidates = degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear())
                 .getDegreeYear(year).getCandidates();
@@ -247,10 +250,11 @@ public class Controller {
         return gson.toJson(candidates);
     }
 
-    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.POST)
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates", method = RequestMethod.POST,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String addCandidate(@PathVariable String degreeId, @PathVariable int year, @RequestBody String istId) {
         if (!getLoggedUsername().equals(istId) && !hasAccessToManagement()) {
-            return new Gson().toJson("");
+            return new Gson().toJson("fail");
         }
         final Student applicant = StreamSupport
                 .stream(studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear()).spliterator(), false)
@@ -273,7 +277,8 @@ public class Controller {
     }
 
     //Se a resposta for vazia, não se candidatou a este curso. Talvez seja mais simples retornar false ou true?
-    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.GET,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String getCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId) {
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
@@ -281,14 +286,15 @@ public class Controller {
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year)
                         .getCandidates().stream().filter(c -> c.getUsername().equals(istId)).collect(Collectors.toList());
         if (s.isEmpty()) {
-            return gson.toJson("");
+            return new Gson().toJson("");
         }
         final Student candidate = s.get(0);
 
         return gson.toJson(candidate);
     }
 
-    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.DELETE,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String removeCandidate(@PathVariable String degreeId, @PathVariable int year,
             @PathVariable String istId) {
 //Debug
@@ -296,9 +302,13 @@ public class Controller {
 //            return new Gson().toJson("");
 //        }
 
-        final Student candidate =
+        final List<Student> candidateList =
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year)
-                        .getCandidates().stream().filter(c -> c.getUsername().equals(istId)).collect(Collectors.toList()).get(0);
+                        .getCandidates().stream().filter(c -> c.getUsername().equals(istId)).collect(Collectors.toList());
+        if (candidateList.size() < 1) {
+            return new Gson().toJson("fail");
+        }
+        Student candidate = candidateList.get(0);
         ((ApplicationPeriod) candidate.getDegreeYear().getActivePeriod()).removeCandidates(candidate);
         studentDAO.save(candidate);
         final Gson g = new Gson();
@@ -308,7 +318,8 @@ public class Controller {
 
     // Este Endpoint pode ser usado para obter todos os estudantes em que se pode votar.
     // Para cada estudante, devolve: nome, id e foto
-    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/students", method = RequestMethod.GET)
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/students", method = RequestMethod.GET,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String getDegreeYearStudents(@PathVariable String degreeId, @PathVariable int year,
             @RequestParam(value = "begins", required = false) String start) {
         final Set<Student> students = degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear())
@@ -338,8 +349,8 @@ public class Controller {
     }
 
     /***************************** Manager API *****************************/
-    @RequestMapping(value = "/students/{istId}", method = RequestMethod.GET)
-    public @ResponseBody String getStudent(@PathVariable String istId, @PathVariable String degreeId) {
+    @RequestMapping(value = "/students/{istId}", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    public @ResponseBody String getStudent(@PathVariable String istId, @RequestBody String degreeId) {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
         }
@@ -351,7 +362,8 @@ public class Controller {
         return gson.toJson(student);
     }
 
-    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/votes", method = RequestMethod.GET)
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/votes", method = RequestMethod.GET,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String getVotes(@PathVariable String degreeId, @PathVariable int year) {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
@@ -366,7 +378,8 @@ public class Controller {
         return gson.toJson(voteCount);
     }
 
-    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/history", method = RequestMethod.GET)
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/history", method = RequestMethod.GET,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String getHistoy(@PathVariable String degreeId, @PathVariable int year) {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
@@ -379,7 +392,8 @@ public class Controller {
         return gson.toJson(degreeYear);
     }
 
-    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/periods", method = RequestMethod.GET)
+    @RequestMapping(value = "/degrees/{degreeId}/years/{year}/periods", method = RequestMethod.GET,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String getPeriods(@PathVariable String degreeId, @PathVariable int year) {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
@@ -392,7 +406,7 @@ public class Controller {
         return gson.toJson(degreeYear);
     }
 
-    @RequestMapping(value = "/periods", method = RequestMethod.GET)
+    @RequestMapping(value = "/periods", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     public @ResponseBody String getPeriods() {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
@@ -407,7 +421,7 @@ public class Controller {
     }
 
     // Permitir criar apenas periodos futuros
-    @RequestMapping(value = "/periods", method = RequestMethod.POST)
+    @RequestMapping(value = "/periods", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
     public @ResponseBody String addPeriod(@RequestBody String periodJson) {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
@@ -445,7 +459,7 @@ public class Controller {
 
     // Permitir alterar apenas periodos futuros
     // Permitir criar
-    @RequestMapping(value = "/periods", method = RequestMethod.PUT)
+    @RequestMapping(value = "/periods", method = RequestMethod.PUT, produces = "application/json; charset=utf-8")
     public @ResponseBody String updatePeriods(@RequestBody String periodsJson) {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
@@ -496,7 +510,7 @@ public class Controller {
         return new Gson().toJson("ok");
     }
 
-    @RequestMapping(value = "/periods/{periodId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/periods/{periodId}", method = RequestMethod.DELETE, produces = "application/json; charset=utf-8")
     public @ResponseBody String removePeriods(@PathVariable int periodId) {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
@@ -507,7 +521,8 @@ public class Controller {
 
         if (period.getStart().isAfter(LocalDate.now())) {
             dy.removePeriod(period);
-            periodDAO.save(period);
+            degreeDAO.save(dy.getDegree());
+            periodDAO.delete(period);
             return new Gson().toJson("deleted period " + periodId);
         }
 //        final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -528,7 +543,7 @@ public class Controller {
     }
 
     // recebe Json com 2 datas: start e end
-    @RequestMapping(value = "/periods/{periodId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/periods/{periodId}", method = RequestMethod.PUT, produces = "application/json; charset=utf-8")
     public @ResponseBody String updatePeriod(@PathVariable int periodId, @RequestBody String dates) {
         if (!hasAccessToManagement()) {
             return new Gson().toJson("");
@@ -564,7 +579,8 @@ public class Controller {
         return new Gson().toJson("ok");
     }
 
-    @RequestMapping(value = "/periods/{periodId}/candidates", method = RequestMethod.GET)
+    @RequestMapping(value = "/periods/{periodId}/candidates", method = RequestMethod.GET,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String getCandidatesFromPeriod(@PathVariable int periodId) {
         final Period period = periodDAO.findById(periodId);
         if (period == null) {
@@ -586,7 +602,8 @@ public class Controller {
         return gson.toJson(candidates);
     }
 
-    @RequestMapping(value = "/periods/{periodId}/candidates/{istId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/periods/{periodId}/candidates/{istId}", method = RequestMethod.POST,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String addCandidateToPeriod(@PathVariable int periodId, @PathVariable String istId) {
         final Period period = periodDAO.findById(periodId);
         if (period == null) {
@@ -625,7 +642,8 @@ public class Controller {
         return new Gson().toJson("ok");
     }
 
-    @RequestMapping(value = "periods/{periodId}/selfProposed", method = RequestMethod.POST)
+    @RequestMapping(value = "periods/{periodId}/selfProposed", method = RequestMethod.POST,
+            produces = "application/json; charset=utf-8")
     public @ResponseBody String selfPropposed(@PathVariable int periodId, @RequestBody String studentJson) {
         Period period = periodDAO.findById(periodId);
         Set<Student> candidates = period.getCandidates();
@@ -649,7 +667,7 @@ public class Controller {
         return new Gson().toJson(result);
     }
 
-    @RequestMapping(value = "periods/{periodId}/votes", method = RequestMethod.GET)
+    @RequestMapping(value = "periods/{periodId}/votes", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     public @ResponseBody String periodVotes(@PathVariable int periodId) {
         final Period period = periodDAO.findById(periodId);
         if (period == null) {
@@ -680,7 +698,7 @@ public class Controller {
         return new Gson().toJson(result);
     }
 
-    @RequestMapping("/roles")
+    @RequestMapping(value = "/roles", produces = "application/json; charset=utf-8")
     public @ResponseBody String roles() {
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username;
