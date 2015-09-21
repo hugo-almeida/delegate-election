@@ -82,4 +82,17 @@ public class Student {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Student)) {
+            return false;
+        }
+        Student s = (Student) o;
+        if (s.getUsername().equals(this.getUsername())) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

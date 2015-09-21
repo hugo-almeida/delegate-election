@@ -1,8 +1,10 @@
 package core;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -16,12 +18,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-
 import core.Period.PeriodType;
 import endpoint.AccessTokenHandler;
 
@@ -29,11 +25,6 @@ import endpoint.AccessTokenHandler;
 @Table(name = "DegreeYear")
 public class DegreeYear {
 
-    @Autowired
-    @Transient
-    Environment env;
-
-    @Autowired
     @Transient
     AccessTokenHandler ath;
 
@@ -66,22 +57,20 @@ public class DegreeYear {
         //initStudents(); // Development only.
     }
 
-    @Transactional
     public void initStudents() throws Exception {
-        final String accessToken =
-                "ODUxOTE1MzUzMDk2MTkzOjI5NmJkNDViNzc4MTZiMzAyMDYyNzQxNTgxZTUzOGEyYzUzNDI5ODMxMzFmOGM0MTJkMDk1ZmIwN2NkMzVlMDM3YzUyOWQxMGU0M2Y0YTNiMWFmYjU4ZWRhOThmNTc3N2U0MGE5N2U2MzY5MTdhMGZlMDlmYTlhYjBlMDc5ZTQ4";
+        Student[] degreeYearStudents = AccessTokenHandler.getInstance().getStudents(degree.getId(), getDegreeYear());
+        List<Student> sts = new ArrayList<Student>(Arrays.asList(degreeYearStudents));
 
-        final RestTemplate t = new RestTemplate();
-        final Student[] degreeYearStudents = ath.getStudents(degree.getId(), getDegreeYear());
-
-        final String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + accessToken;
-
-        final HttpHeaders requestHeaders = new HttpHeaders();
-        for (final Student student : degreeYearStudents) {
-            student.setDegreeYear(this);
+        for (Student s : sts) {
+            students.size();
+            if (students.contains(s)) {
+                sts.remove(s);
+            }
         }
-        students.addAll(Arrays.asList(degreeYearStudents));
-        studentsLoaded = true;
+        for (Student student : sts) {
+            student.setDegreeYear(this);
+            students.add(student);
+        }
     }
 
     public int getDegreeYear() {
@@ -310,6 +299,10 @@ public class DegreeYear {
 
     public boolean areStudentsLoaded() {
         return studentsLoaded;
+    }
+
+    public void setStudentsLoaded(boolean loaded) {
+        studentsLoaded = loaded;
     }
 
     public void addStudent(Student newStudent) {

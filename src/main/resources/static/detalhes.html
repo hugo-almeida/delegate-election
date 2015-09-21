@@ -36,14 +36,14 @@
 	
 	<div ng-show="getCurrentApplication().state == 'presente' || getCurrentElection().state == 'presente'" class="row"> 
 		<button class="btn btn-primary pull-right" ng-hide="add" ng-click="setAdd(true)"><span class="glyphicon glyphicon-plus"></span>Adicionar</button> 
-		<div class="dropdown pull-right" ng-show="add">
-			<i class="icon icon-search"></i>
-			<input id="dLabel" type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }" 
-				data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"/>
+		<div class="col-md-4 dropdown pull-right" ng-show="add" style="position: relative;">
+			<i class="icon icon-search" style="position: absolute;top: 8px;left: 20px;color: rgb(187, 187, 187);"></i>
+			<input id="dLabel" class="form-control" type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }" 
+				data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="padding-left: 28px;"/>
 			<table class="table table-hover dropdown-menu" ng-show="!isEmpty(students)" 
 				style="margin: 0 0 0 -10px; border: 1px solid #ddd;"  aria-labelledby="dLabel">
 				<tbody>
-					<tr ng-repeat="student in students">
+					<tr class="col-md-12" ng-repeat="student in students">
 						<td>
 							{{student.name}}
 							<span class="detail" style="vertical-align: -webkit-baseline-middle; display: inline-table;">{{student.username}}</span>

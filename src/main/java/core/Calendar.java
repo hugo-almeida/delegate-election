@@ -10,25 +10,16 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.web.client.RestTemplate;
 
 import endpoint.AccessTokenHandler;
 
 @Entity
 @Table(name = "calendar")
+@Configurable
 public class Calendar {
-
-    @Autowired
-    @Transient
-    Environment env;
-
-    @Autowired
-    @Transient
-    AccessTokenHandler ath;
 
     @Id
     @Column(name = "year")
@@ -49,13 +40,15 @@ public class Calendar {
         //initDegrees();
     }
 
-    public void init() {
+    public void init() throws Exception {
         final RestTemplate t = new RestTemplate();
-        final Degree[] c = ath.getDegrees();
+        //ath = AccessTokenHandler.getInstance();
+        final Degree[] c = AccessTokenHandler.getInstance().getDegrees();
 
         for (final Degree element : c) {
-            if (element.getType().equals("Licenciatura Bolonha") || element.getType().equals("Mestrado Bolonha")
-                    || element.getType().equals("Mestrado Integrado")) {
+            if (element.getType().equals(Degree.DegreeType.Bachelor.toString())
+                    || element.getType().equals(Degree.DegreeType.Integrated.toString())
+                    || element.getType().equals(Degree.DegreeType.Master.toString())) {
                 element.setCalendar(this);
                 element.setKey();
                 degrees.add(element);
@@ -78,6 +71,10 @@ public class Calendar {
 
     public Set<Degree> getDegrees() {
         return degrees;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
 
 }

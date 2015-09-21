@@ -12,7 +12,7 @@ public class testCalendar extends BaseCommand {
 
     @Command
     @Usage("Creates Calendar")
-    public String main(InvocationContext context) {
+    public String main(InvocationContext context) throws Exception {
         BeanFactory bf = (BeanFactory) context.getAttributes().get("spring.beanfactory");
         Controller tc = bf.getBean(Controller.class);
         return tc.createCalendar();

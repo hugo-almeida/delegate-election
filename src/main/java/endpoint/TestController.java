@@ -37,8 +37,8 @@ public class TestController {
     @Autowired
     Environment env;
 
-    @Autowired
-    AccessTokenHandler ath;
+//    @Autowired
+//    AccessTokenHandler ath;
 
     @RequestMapping("/sanity")
     public String test() {
@@ -47,8 +47,8 @@ public class TestController {
 
     @RequestMapping("/test-calendar")
     //@Bean
-    public String testCalendar() {
-        final Calendar c = new Calendar(2015);
+    public String testCalendar() throws Exception {
+        Calendar c = new Calendar(2015);
         c.init();
 //        Calendar c2 = new Calendar(2015);
 //        c2.init();
@@ -59,10 +59,11 @@ public class TestController {
 
     @RequestMapping("/access")
     public String access() throws Exception {
-        //AccessTokenHandler instance = AccessTokenHandler.getInstance();
-        ath.getAccessToken();
-        ath.getDegrees();
-        ath.getStudents("2761663971606", 2);
+        AccessTokenHandler instance = AccessTokenHandler.getInstance();
+//        instance.getCredentials();
+//        ath.getAccessToken();
+        instance.getDegrees();
+        instance.getStudents("2761663971606", 2);
         return "Stuff";
     }
 
