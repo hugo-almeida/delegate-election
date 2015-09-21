@@ -1,7 +1,6 @@
 package endpoint;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,10 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.security.oauth2.sso.EnableOAuth2Sso;
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurerAdapter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
@@ -85,6 +84,7 @@ public class Controller {
 
     private static final String ACCESS_TOKEN =
             "ODUxOTE1MzUzMDk2MTkzOjI5NmJkNDViNzc4MTZiMzAyMDYyNzQxNTgxZTUzOGEyYzUzNDI5ODMxMzFmOGM0MTJkMDk1ZmIwN2NkMzVlMDM3YzUyOWQxMGU0M2Y0YTNiMWFmYjU4ZWRhOThmNTc3N2U0MGE5N2U2MzY5MTdhMGZlMDlmYTlhYjBlMDc5ZTQ4";
+
     @Autowired
     StudentDAO studentDAO;
 
@@ -96,6 +96,11 @@ public class Controller {
 
     @Autowired
     PeriodDAO periodDAO;
+
+    @Autowired
+    Environment env;
+
+    Set<String> userset = null;
 
 //    @PostConstruct
 //    public void schedulePeriods() {
@@ -188,15 +193,20 @@ public class Controller {
                         .filter(s -> s.getDegreeYear().getDegree().getId().equals(degreeId)).collect(Collectors.toList()).get(0);
 
         // Desta forma é possível obter o voto do último periodo também.
-        final String voted = student.getDegreeYear().getCurrentElectionPeriod().getVote(istId);
-        if (voted == null) {
-            return new Gson().toJson("");
+        ElectionPeriod ePeriod = student.getDegreeYear().getCurrentElectionPeriod();
+        if (ePeriod == null) {
+            return new Gson().toJson("No election period.");
         }
+        String voted = ePeriod.getVote(istId);
         if (voted.isEmpty()) {
             return new Gson().toJson(null);
         }
-
-        return getUser(voted);
+        Student st =
+                studentDAO.findByUsernameAndDegreeAndCalendarYear(voted, degreeId, calendarDAO.findFirstByOrderByYearDesc()
+                        .getYear());
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        return gson.toJson(st);
     }
 
     @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.POST,
@@ -337,15 +347,25 @@ public class Controller {
     // TODO Test this!
     @RequestMapping(value = "/students", method = RequestMethod.GET)
     public @ResponseBody String findStudent(@RequestParam(value = "begins", required = false) String start) {
-        final RestTemplate t = new RestTemplate();
-        final String infoUrl =
-                "https://fenix.tecnico.ulisboa.pt/api/bennu-core/users/find?begins=" + start + "&access_token=" + ACCESS_TOKEN;
-
-        final HttpHeaders requestHeaders = new HttpHeaders();
-        final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
-        final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
-        final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
-        return result.getAsString();
+//        final RestTemplate t = new RestTemplate();
+//        final String infoUrl =
+//                env.getProperty("environment.uri") + "/api/bennu-core/users/find?begins=" + start + "&access_token="
+//                        + ACCESS_TOKEN;
+//
+//        final HttpHeaders requestHeaders = new HttpHeaders();
+//        final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
+//        final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
+//        final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
+        Iterable<Student> students = studentDAO.findByUsername(start, calendarDAO.findFirstByOrderByYearDesc().getYear());
+        if (students.iterator().hasNext()) {
+            Set<Student> result = new HashSet<Student>();
+            result.add(students.iterator().next());
+            return gson.toJson(result);
+        }
+        Set<Student> sts = studentDAO.findByName(start, calendarDAO.findFirstByOrderByYearDesc().getYear());
+        return gson.toJson(sts);
     }
 
     /***************************** Manager API *****************************/
@@ -521,7 +541,6 @@ public class Controller {
 
         if (period.getStart().isAfter(LocalDate.now())) {
             dy.removePeriod(period);
-            degreeDAO.save(dy.getDegree());
             periodDAO.delete(period);
             return new Gson().toJson("deleted period " + periodId);
         }
@@ -592,9 +611,13 @@ public class Controller {
             final Set<Vote> votes = ((ElectionPeriod) period).getVotes();
             Student st = null;
             for (final Vote v : votes) {
-                st = studentDAO.findByUsernameAndDegreeAndCalendarYear(v.getVoted(), period.getDegreeYear().getDegree().getId(),
-                        period.getDegreeYear().getCalendarYear());
-                candidates.add(st);
+                st =
+                        studentDAO.findByUsernameAndDegreeAndCalendarYear(v.getVoted(), period.getDegreeYear().getDegree()
+                                .getId(), period.getDegreeYear().getCalendarYear());
+                if (st != null) {
+                    candidates.add(st);
+                }
+                st = null;
             }
         }
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -611,34 +634,19 @@ public class Controller {
         }
 
         final Set<Student> students = period.getDegreeYear().getStudents();
-        Student st = null;
         for (final Student s : students) {
-            if (s.getUsername().equals(istId)) {
-                st = s;
+            if (s.getUsername().equals(istId) && !period.getCandidates().contains(s)) {
+                period.addCandidate(s);
+                studentDAO.save(s);
+                return new Gson().toJson("ok");
             }
         }
-        //Student doesn't exist in DegreeYear must be created
-        if (st == null) {
-            final RestTemplate t = new RestTemplate();
-            final String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
-
-            st = t.getForObject(infoUrl, Student.class);
-            st.setDegreeYear(period.getDegreeYear());
-            final HttpHeaders requestHeaders = new HttpHeaders();
-            requestHeaders.set("__username__", istId);
-            final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
-            final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
-            final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
-            if (!result.get("email").isJsonNull()) {
-                st.setEmail(result.get("email").toString());
-            }
-            if (!result.get("photo").isJsonNull()) {
-                st.setPhotoType(result.getAsJsonObject("photo").get("type").toString());
-                st.setPhotoBytes(result.getAsJsonObject("photo").get("data").toString());
-            }
+        Iterable<Student> sts = studentDAO.findByUsername(istId, calendarDAO.findFirstByOrderByYearDesc().getYear());
+        if (sts != null && sts.iterator().hasNext()) {
+            Student s = sts.iterator().next();
+            period.addCandidate(s);
+            studentDAO.save(s);
         }
-        period.addCandidate(st);
-        studentDAO.save(st);
         return new Gson().toJson("ok");
     }
 
@@ -692,9 +700,15 @@ public class Controller {
                 votos.put(voted, 1);
             }
         }
+        if (votos.keySet().contains("")) {
+            int i = votos.get("");
+            votos.remove("");
+            votos.put("branco", i);
+        }
         for (String s : votos.keySet()) {
             result.addProperty(s, votos.get(s));
         }
+
         return new Gson().toJson(result);
     }
 
@@ -721,9 +735,13 @@ public class Controller {
         return new Gson().toJson(result);
     }
 
-    /***************************** Commands *****************************/
+    /*****************************
+     * Commands
+     * 
+     * @throws Exception
+     *****************************/
 
-    public String createCalendar() {
+    public String createCalendar() throws Exception {
         final LocalDate now = LocalDate.now();
         final Calendar lastCreatedCalendar = calendarDAO.findFirstByOrderByYearDesc();
         if (lastCreatedCalendar != null) {
@@ -825,28 +843,27 @@ public class Controller {
         }
     }
 
-    @RequestMapping(value = "/get-user", method = RequestMethod.POST)
-    public @ResponseBody String getUser(@RequestBody String username) {
-        final RestTemplate t = new RestTemplate();
-        t.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-
-        final String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
-
-        final HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.set("__username__", username);
-        final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
-        final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
-        final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
-
-        final Gson gson = new Gson();
-        return gson.toJson(result);
-    }
+//    @RequestMapping(value = "/get-user", method = RequestMethod.POST)
+//    public @ResponseBody String getUser(@RequestBody String username) {
+//        final RestTemplate t = new RestTemplate();
+//        t.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+//
+//        final String infoUrl = env.getProperty("environment.uri") + "/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
+//
+//        final HttpHeaders requestHeaders = new HttpHeaders();
+//        requestHeaders.set("__username__", username);
+//        final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
+//        final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
+//        final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
+//
+//        final Gson gson = new Gson();
+//        return gson.toJson(result);
+//    }
 
     @RequestMapping(value = "/mock/{id}")
     public @ResponseBody String mock(@PathVariable String id) {
         final RestTemplate t = new RestTemplate();
-
-        final String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
+        final String infoUrl = env.getProperty("uri") + "/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
         final HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.set("__username__", id);
         final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
@@ -887,23 +904,23 @@ public class Controller {
     }
 
     private boolean hasAccessToManagement() {
-        final Properties prop = new Properties();
-        try {
-            prop.load(getClass().getResourceAsStream("/pedagogico.properties"));
-        } catch (final IOException e) {
-            e.printStackTrace();
+        if (userset == null) {
+            final Properties prop = new Properties();
+            try {
+                prop.load(getClass().getResourceAsStream("/pedagogico.properties"));
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+            String userarray[];
+
+            final String list = prop.getProperty("users");
+            userarray = list.split(",");
+
+            userset = new HashSet<String>();
+            for (final String s : userarray) {
+                userset.add(s);
+            }
         }
-        String userarray[];
-
-        final String list = prop.getProperty("users");
-        userarray = list.split(",");
-
-        final Set<String> userset = new HashSet<String>();
-
-        for (final String s : userarray) {
-            userset.add(s);
-        }
-
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username;
         final Map<String, Object> userDetails;

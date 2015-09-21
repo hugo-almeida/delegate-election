@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import core.Calendar;
 import core.CalendarDAO;
@@ -32,7 +33,7 @@ public class ScheduledTasks {
     // TODO Excepções não devem impedir a continuação do método
 
 //    @Scheduled(cron = "0/5 * * * * *")
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void updateCurrentPeriods() {
         // Obtem calendario actual
         Calendar calendar = calendarDAO.findFirstByOrderByYearDesc();
@@ -65,24 +66,24 @@ public class ScheduledTasks {
                 Period newActivePeriod = degreeYear.getNextPeriod(LocalDate.now());
                 if (newActivePeriod != null && newActivePeriod.getStart().isEqual(LocalDate.now())) {
                     degreeYear.setActivePeriod(newActivePeriod);
-
+                    degreeYear.setStudentsLoaded(true);
                     if (candidates != null) {
                         newActivePeriod.setCandidates(candidates);
                     } else {
                         Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
-                        if (lastPeriod != null) {
+                        if (lastPeriod != null && lastPeriod.getCandidates() != null) {
                             newActivePeriod.setCandidates(lastPeriod.getCandidates());
                         }
                     }
-
                     periodDAO.save(newActivePeriod);
                 }
             }
         }
     }
 
-    @Scheduled(cron = "0 0 * * * *")
-    public void retrieveStudents() {
+    @Scheduled(cron = "0 30 0 * * *")
+    @Transactional
+    public void retrieveStudents() throws Exception {
         Calendar calendar = calendarDAO.findFirstByOrderByYearDesc();
         if (calendar == null) {
             return;
@@ -93,20 +94,20 @@ public class ScheduledTasks {
             return;
         }
 
-        for (final Degree degree : degrees) {
-            for (final DegreeYear degreeYear : degree.getYears()) {
-                Period activePeriod = degreeYear.getActivePeriod();
-                if (activePeriod != null && !degreeYear.areStudentsLoaded()) {
+        for (Degree degree : degrees) {
+            for (DegreeYear degreeYear : degree.getYears()) {
+                if (!degreeYear.areStudentsLoaded()) {
                     degreeYear.initStudents();
-                    degreeDAO.save(degreeYear.getDegree());
+                    //degreeDAO.save(degreeYear.getDegree());
                 }
             }
         }
+        degreeDAO.save(degrees);
 
     }
 
     @Scheduled(cron = "0 59 23 31 8 *")
-    public void createCalendar() {
+    public void createCalendar() throws Exception {
         final Calendar calendar = new Calendar(LocalDate.now().getYear());
         calendar.init();
         calendarDAO.save(calendar);

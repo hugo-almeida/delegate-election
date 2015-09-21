@@ -1,8 +1,10 @@
 package core;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -14,21 +16,17 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import javax.persistence.Transient;
 
 import core.Period.PeriodType;
+import endpoint.AccessTokenHandler;
 
 @Entity
 @Table(name = "DegreeYear")
 public class DegreeYear {
+
+    @Transient
+    AccessTokenHandler ath;
 
     @EmbeddedId
     private DegreeDegreeYearPK degreeDegreeYearPK;
@@ -59,37 +57,20 @@ public class DegreeYear {
         //initStudents(); // Development only.
     }
 
-    @Transactional
-    public void initStudents() {
-        final String accessToken =
-                "ODUxOTE1MzUzMDk2MTkzOjI5NmJkNDViNzc4MTZiMzAyMDYyNzQxNTgxZTUzOGEyYzUzNDI5ODMxMzFmOGM0MTJkMDk1ZmIwN2NkMzVlMDM3YzUyOWQxMGU0M2Y0YTNiMWFmYjU4ZWRhOThmNTc3N2U0MGE5N2U2MzY5MTdhMGZlMDlmYTlhYjBlMDc5ZTQ4";
+    public void initStudents() throws Exception {
+        Student[] degreeYearStudents = AccessTokenHandler.getInstance().getStudents(degree.getId(), getDegreeYear());
+        List<Student> sts = new ArrayList<Student>(Arrays.asList(degreeYearStudents));
 
-        final RestTemplate t = new RestTemplate();
-        final Student[] degreeYearStudents =
-                t.getForObject("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees/" + degree.getId()
-                        + "/students?curricularYear=" + getDegreeYear() + "&access_token=" + accessToken, Student[].class);
-
-        final String infoUrl = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person?access_token=" + accessToken;
-
-        final HttpHeaders requestHeaders = new HttpHeaders();
-        for (final Student student : degreeYearStudents) {
-            student.setDegreeYear(this);
-
-            requestHeaders.set("__username__", student.getUsername());
-            final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
-
-            final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
-            final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
-            if (!result.get("email").isJsonNull()) {
-                student.setEmail(result.get("email").toString());
-            }
-            if (!result.get("photo").isJsonNull()) {
-                student.setPhotoType(result.getAsJsonObject("photo").get("type").toString());
-                student.setPhotoBytes(result.getAsJsonObject("photo").get("data").toString());
+        for (Student s : sts) {
+            students.size();
+            if (students.contains(s)) {
+                sts.remove(s);
             }
         }
-        students.addAll(Arrays.asList(degreeYearStudents));
-        studentsLoaded = true;
+        for (Student student : sts) {
+            student.setDegreeYear(this);
+            students.add(student);
+        }
     }
 
     public int getDegreeYear() {
@@ -318,6 +299,10 @@ public class DegreeYear {
 
     public boolean areStudentsLoaded() {
         return studentsLoaded;
+    }
+
+    public void setStudentsLoaded(boolean loaded) {
+        studentsLoaded = loaded;
     }
 
     public void forceStudentsLoaded() {

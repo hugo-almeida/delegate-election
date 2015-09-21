@@ -21,14 +21,14 @@ public class StudentAdapter implements JsonSerializer<Student> {
         studentObject.addProperty("name", s.getName());
         studentObject.addProperty("username", s.getUsername());
 
-        if (s.getPhotoBytes() == null) {
-            photoObject.add("data", parser.parse(""));
-            photoObject.add("type", parser.parse(""));
-        } else {
-            photoObject.add("data", parser.parse(s.getPhotoBytes()));
-            photoObject.add("type", parser.parse(s.getPhotoType()));
-        }
-        studentObject.add("photo", photoObject);
+//        if (s.getPhotoBytes() == null) {
+//            photoObject.add("data", parser.parse(""));
+//            photoObject.add("type", parser.parse(""));
+//        } else {
+//            photoObject.add("data", parser.parse(s.getPhotoBytes()));
+//            photoObject.add("type", parser.parse(s.getPhotoType()));
+//        }
+//        studentObject.add("photo", photoObject);
 
         return studentObject;
     }

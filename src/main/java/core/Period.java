@@ -70,7 +70,7 @@ public abstract class Period implements Serializable {
     @ManyToMany(mappedBy = "applicationPeriod", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     protected Set<Student> candidates;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "degree_name", referencedColumnName = "degree_year_pk_degree_name", insertable = true,
                     updatable = false),
@@ -229,17 +229,17 @@ public abstract class Period implements Serializable {
 
     @PrePersist
     @PreUpdate
-    public void checkActivation() {
-        if (!start.isAfter(LocalDate.now()) && !end.isBefore(LocalDate.now())) {
-            if (!degreeYear.areStudentsLoaded()) {
-                degreeYear.initStudents();
-            }
-            degreeYear.setActivePeriod(this);
-            Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
-            if (lastPeriod != null) {
-                setCandidates(lastPeriod.getCandidates());
-            }
-        }
+    public void checkActivation() throws Exception {
+//        if (!start.isAfter(LocalDate.now()) && !end.isBefore(LocalDate.now())) {
+//            if (!degreeYear.areStudentsLoaded()) {
+//                degreeYear.initStudents();
+//            }
+//            degreeYear.setActivePeriod(this);
+//            Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
+//            if (lastPeriod != null) {
+//                setCandidates(lastPeriod.getCandidates());
+//            }
+//        }
     }
 
     // Isto apenas serve para os Unit Tests (já que estes não vão à db.. mas deviam)

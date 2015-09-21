@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.Month;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +34,12 @@ public class TestController {
     @Autowired
     PeriodDAO pd;
 
+    @Autowired
+    Environment env;
+
+//    @Autowired
+//    AccessTokenHandler ath;
+
     @RequestMapping("/sanity")
     public String test() {
         return "It's working!";
@@ -40,14 +47,24 @@ public class TestController {
 
     @RequestMapping("/test-calendar")
     //@Bean
-    public String testCalendar() {
-        final Calendar c = new Calendar(2015);
+    public String testCalendar() throws Exception {
+        Calendar c = new Calendar(2015);
         c.init();
 //        Calendar c2 = new Calendar(2015);
 //        c2.init();
         cd.save(c);
 //        cd.save(c2);
         return "Done";
+    }
+
+    @RequestMapping("/access")
+    public String access() throws Exception {
+        AccessTokenHandler instance = AccessTokenHandler.getInstance();
+//        instance.getCredentials();
+//        ath.getAccessToken();
+        instance.getDegrees();
+        instance.getStudents("2761663971606", 2);
+        return "Stuff";
     }
 
     @RequestMapping("/timer-period")

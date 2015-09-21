@@ -48,15 +48,15 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 				.success(function(data) { 
 					sc.students = data;
 				});*/
-				http.get('degrees/2761663971606/years/2/students?begins='+query)	//for testing purposes only
-				.success(function(data) { 
-					sc.students = data;
-				});
-//				http.get('students?begins='+query)
+//				http.get('degrees/2761663971606/years/1/students?begins='+query)	//for testing purposes only
 //				.success(function(data) { 
 //					sc.students = data;
-//					log.log(data);
 //				});
+				http.get('students?begins='+query)
+				.success(function(data) { 
+					sc.students = data;
+					log.log(data);
+				});
 			}
 			else {
 				sc.students = [];
