@@ -305,6 +305,10 @@ public class DegreeYear {
         studentsLoaded = loaded;
     }
 
+    public void forceStudentsLoaded() {
+        studentsLoaded = true;
+    }
+
     public void addStudent(Student newStudent) {
         students.add(newStudent);
     }
