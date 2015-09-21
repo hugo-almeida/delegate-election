@@ -30,12 +30,12 @@
 					</tr>
 				</thead>
 				<tbody>
-					<td ng-show="voto && voto != 'null'">
+					<td ng-show="voto && voto != null">
 						<img class="avatar" ng-src="{{imgURL(voto.username)}}">
 						{{voto.name}}
 						<span class="detail">{{voto.username}}</span>
 					</td>
-					<td ng-show="voto == 'null'">
+					<td ng-show="voto == null">
 						{{'BLANK_VOTE' | translate}}
 					</td>
 				</tbody>

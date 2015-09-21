@@ -195,7 +195,7 @@ public class Controller {
             return new Gson().toJson("");
         }
         if (voted.isEmpty()) {
-            return new Gson().toJson("null");
+            return new Gson().toJson(null);
         }
 
         return getUser(voted);
