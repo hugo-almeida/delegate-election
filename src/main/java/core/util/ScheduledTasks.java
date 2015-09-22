@@ -34,6 +34,7 @@ public class ScheduledTasks {
 
 //    @Scheduled(cron = "0/5 * * * * *")
     @Scheduled(cron = "0 0 * * * *")
+    @Transactional
     public void updateCurrentPeriods() {
         // Obtem calendario actual
         Calendar calendar = calendarDAO.findFirstByOrderByYearDesc();
