@@ -199,7 +199,7 @@ public class Controller {
         }
         String voted = ePeriod.getVote(istId);
         if (voted.isEmpty()) {
-            return new Gson().toJson("null");
+            return new Gson().toJson(null);
         }
         Student st =
                 studentDAO.findByUsernameAndDegreeAndCalendarYear(voted, degreeId, calendarDAO.findFirstByOrderByYearDesc()

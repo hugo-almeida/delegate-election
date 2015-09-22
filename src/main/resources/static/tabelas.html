@@ -48,16 +48,16 @@
 								aria-haspopup="true" aria-expanded="false"></i> <!-- should use option-vertical icon -->
 					
 							<ul class="dropdown-menu">
-								<li ng-show="isEmpty(year.applicationPeriod)" data-toggle="modal" data-target="#editModal"
+								<li ng-show="isEmpty(year.applicationPeriod) || year.applicationPeriod.state == 'passado'" data-toggle="modal" data-target="#editModal"
 									ng-click="setSelectionDetails('Candidatura', 'Criar', degree, year)">
 									<a href="#">Criar - Candidatura</a></li>
-								<li ng-show="isEmpty(year.electionPeriod)" data-toggle="modal" data-target="#editModal" 
+								<li ng-show="isEmpty(year.electionPeriod) || year.electionPeriod.state == 'passado'" data-toggle="modal" data-target="#editModal" 
 									ng-click="setSelectionDetails('Votação', 'Criar', degree, year)">
 									<a href="#">Criar - Votação</a></li>
-								<li ng-show="!isEmpty(year.applicationPeriod)" data-toggle="modal" data-target="#editModal"
+								<li ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state != 'passado'" data-toggle="modal" data-target="#editModal"
 									ng-click="setSelectionDetails('Candidatura', 'Estender', degree, year)">
 									<a href="#">Estender - Candidatura</a></li>
-								<li ng-show="!isEmpty(year.electionPeriod)" data-toggle="modal" data-target="#editModal"
+								<li ng-show="!isEmpty(year.electionPeriod) && year.electionPeriod.state != 'passado'" data-toggle="modal" data-target="#editModal"
 									ng-click="setSelectionDetails('Votação', 'Estender', degree, year)">
 									<a href="#">Estender - Votação</a></li>
 								<li ng-show="!isEmpty(year.applicationPeriod) && year.applicationPeriod.state=='futuro'" data-toggle="modal" data-target="#removeModal"
