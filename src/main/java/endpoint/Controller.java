@@ -198,12 +198,14 @@ public class Controller {
             return new Gson().toJson("No election period.");
         }
         String voted = ePeriod.getVote(istId);
+        if (voted == null) {
+            return new Gson().toJson("");
+        }
         if (voted.isEmpty()) {
             return new Gson().toJson(null);
         }
-        Student st =
-                studentDAO.findByUsernameAndDegreeAndCalendarYear(voted, degreeId, calendarDAO.findFirstByOrderByYearDesc()
-                        .getYear());
+        Student st = studentDAO.findByUsernameAndDegreeAndCalendarYear(voted, degreeId,
+                calendarDAO.findFirstByOrderByYearDesc().getYear());
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
         return gson.toJson(st);
@@ -611,9 +613,8 @@ public class Controller {
             final Set<Vote> votes = ((ElectionPeriod) period).getVotes();
             Student st = null;
             for (final Vote v : votes) {
-                st =
-                        studentDAO.findByUsernameAndDegreeAndCalendarYear(v.getVoted(), period.getDegreeYear().getDegree()
-                                .getId(), period.getDegreeYear().getCalendarYear());
+                st = studentDAO.findByUsernameAndDegreeAndCalendarYear(v.getVoted(), period.getDegreeYear().getDegree().getId(),
+                        period.getDegreeYear().getCalendarYear());
                 if (st != null) {
                     candidates.add(st);
                 }
