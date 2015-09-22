@@ -94,7 +94,11 @@ public abstract class Period implements Serializable {
     }
 
     public Period(LocalDate start, LocalDate end, DegreeYear degreeYear) {
-        if (end.isBefore(start) || start.isBefore(LocalDate.now())) {
+//        if (end.isBefore(start) || start.isBefore(LocalDate.now())) {
+//            throw new IllegalArgumentException();
+//        }
+        if (end.isBefore(start)) {
+            throw new IllegalArgumentException();
         }
         //this.periodPK = new PeriodPK(degreeYear.getDegreeName(), degreeYear.getDegreeYear(), degreeYear.getCalendarYear());
         this.start = start;

@@ -86,6 +86,8 @@ public class UserRestServiceTests {
 
     private Student studentOneTwo;
 
+    private ApplicationPeriod pastApplicationPeriod;
+
     @Before
     public void setUp() {
         calendarRepository.deleteAll();
@@ -133,12 +135,16 @@ public class UserRestServiceTests {
 
         applicationPeriod = new ApplicationPeriod(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), firstDegreeYear);
         electionPeriod = new ElectionPeriod(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), secondDegreeYear);
+        pastApplicationPeriod =
+                new ApplicationPeriod(LocalDate.now().minusDays(10), LocalDate.now().minusDays(5), thirdDegreeYear);
 
         firstDegreeYear.addPeriod(applicationPeriod);
         firstDegreeYear.setActivePeriod(applicationPeriod);
 
         secondDegreeYear.addPeriod(electionPeriod);
         secondDegreeYear.setActivePeriod(electionPeriod);
+
+        thirdDegreeYear.addPeriod(pastApplicationPeriod);
 
         applicationPeriod.addCandidate(studentOne);
 
@@ -167,7 +173,7 @@ public class UserRestServiceTests {
     }
 
     @Test
-    public void studentWithThreeDegreesTest() {
+    public void studentWithTwoDegreesTest() {
         when().get("/students/{istId}/degrees", studentOne.getUsername()).then().assertThat().statusCode(200).body("", hasSize(2))
                 .body("id", hasItems(thirdDegreeYear.getDegree().getId(), firstDegreeYear.getDegree().getId()));
     }
@@ -178,19 +184,6 @@ public class UserRestServiceTests {
                 secondDegreeYear.getDegree().getId());
         response.then().assertThat().statusCode(200);
         assertEquals("Resposta não devia ter conteúdo.", "\"\"", response.getBody().asString());
-    }
-
-    @Test
-    public void candidateStudentTest() {
-        when().get("/degrees/{degreeId}/years/{year}/candidates", firstDegreeYear.getDegree().getId(),
-                firstDegreeYear.getDegreeYear()).then().assertThat().statusCode(200)
-                .body("username", hasItem(studentOne.getUsername()));
-    }
-
-    @Test
-    public void nonCandidateStudentTest() {
-        when().get("/degrees/{degreeId}/years/{year}/candidates", secondDegreeYear.getDegree().getId(),
-                secondDegreeYear.getDegreeYear()).then().assertThat().statusCode(200).body("", hasSize(0));
     }
 
     @Test
@@ -221,6 +214,19 @@ public class UserRestServiceTests {
     }
 
     @Test
+    public void candidateStudentTest() {
+        when().get("/degrees/{degreeId}/years/{year}/candidates", firstDegreeYear.getDegree().getId(),
+                firstDegreeYear.getDegreeYear()).then().assertThat().statusCode(200)
+                .body("username", hasItem(studentOne.getUsername()));
+    }
+
+    @Test
+    public void nonCandidateStudentTest() {
+        when().get("/degrees/{degreeId}/years/{year}/candidates", secondDegreeYear.getDegree().getId(),
+                secondDegreeYear.getDegreeYear()).then().assertThat().statusCode(200).body("", hasSize(0));
+    }
+
+    @Test
     public void addCandidateStudentTest() {
         fakeUser(studentFive.getUsername());
 
@@ -244,7 +250,7 @@ public class UserRestServiceTests {
     @Test
     public void checkNonCandidateStudentTest() {
         MockMvcResponse response = when().get("/degrees/{degreeId}/years/{year}/candidates/{istId}",
-                secondDegreeYear.getDegree().getId(), secondDegreeYear.getDegreeYear(), studentOne.getUsername());
+                thirdDegreeYear.getDegree().getId(), thirdDegreeYear.getDegreeYear(), studentOne.getUsername());
         response.then().assertThat().statusCode(200);
         assertEquals("Resposta não devia ter conteúdo.", "\"\"", response.getBody().asString());
     }
@@ -384,10 +390,36 @@ public class UserRestServiceTests {
 
     @Test
     public void getHistoryTest() {
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        JsonArray array = new JsonArray();
+
+        JsonObject json = new JsonObject();
+        json.addProperty("degreeId", degreeTwo.getId());
+        JsonArray years = new JsonArray();
+        JsonObject yearObject = new JsonObject();
+        yearObject.addProperty("degreeYear", thirdDegreeYear.getDegreeYear());
+        JsonObject applicationObject = new JsonObject();
+        applicationObject.addProperty("applicationPeriodStart", LocalDate.now().plusDays(6).format(dtf));
+        applicationObject.addProperty("applicationPeriodEnd", LocalDate.now().plusDays(7).format(dtf));
+        JsonObject electionObject = new JsonObject();
+        electionObject.addProperty("electionPeriodStart", LocalDate.now().minusDays(1).format(dtf));
+        electionObject.addProperty("electionPeriodEnd", LocalDate.now().plusDays(1).format(dtf));
+
+        yearObject.add("applicationPeriod", applicationObject);
+        yearObject.add("electionPeriod", electionObject);
+        years.add(yearObject);
+        json.add("years", years);
+        array.add(json);
+
         fakeUser("ist173833");
-        when().get("/degrees/{degreeId}/years/{year}/history", degreeOne.getId(), firstDegreeYear.getDegreeYear()).peek().then()
-                .assertThat().statusCode(200).body("periods", hasSize(1)).body("periods.info", hasItem(1))
-                .body("periods.periodType", hasItem(applicationPeriod.getType().toString()));
+        given().body(new Gson().toJson(array)).when().put("/periods").then().assertThat().statusCode(200);
+
+        fakeUser("ist173833");
+        when().get("/degrees/{degreeId}/years/{year}/history", degreeTwo.getId(), thirdDegreeYear.getDegreeYear()).peek().then()
+                .assertThat().statusCode(200).body("periods", hasSize(2)).body("periods[0].info", equalTo(0))
+                .body("periods[0].periodType", equalTo(electionPeriod.getType().toString())).body("periods[1].info", equalTo(0))
+                .body("periods[1].periodType", equalTo(applicationPeriod.getType().toString()));
     }
 
     @Test
@@ -426,6 +458,50 @@ public class UserRestServiceTests {
 
         assertEquals(LocalDate.now().plusDays(3).format(dtf), period.getStart().format(dtf));
         assertEquals(LocalDate.now().plusDays(5).format(dtf), period.getEnd().format(dtf));
+    }
+
+//    @Test
+//    public void createPeriodInThePastTest() {
+//        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//
+//        JsonObject json = new JsonObject();
+//        json.addProperty("degreeId", degreeTwo.getId());
+//        json.addProperty("degreeYear", thirdDegreeYear.getDegreeYear());
+//        json.addProperty("periodType", PeriodType.Election.toString());
+//        json.addProperty("start", LocalDate.now().minusDays(1).format(dtf));
+//        json.addProperty("end", LocalDate.now().format(dtf));
+//
+//        fakeUser("ist173833");
+//        given().body(new Gson().toJson(json)).when().post("/periods").then().assertThat().statusCode(200);
+//
+//        Period period = degreeRepository.findByIdAndYear(degreeTwo.getId(), thirdDegreeYear.getCalendarYear())
+//                .getDegreeYear(thirdDegreeYear.getDegreeYear()).getCurrentElectionPeriod();
+//
+//        if (period != null) {
+//            fail("Periodo foi criado!");// Não é suposto poder criar periodos a iniciar no passado.
+//        }
+//    }
+
+    @Test
+    public void createPeriodBadDatesTest() {
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        JsonObject json = new JsonObject();
+        json.addProperty("degreeId", degreeTwo.getId());
+        json.addProperty("degreeYear", thirdDegreeYear.getDegreeYear());
+        json.addProperty("periodType", PeriodType.Election.toString());
+        json.addProperty("start", LocalDate.now().format(dtf));
+        json.addProperty("end", LocalDate.now().minusDays(1).format(dtf));
+
+        fakeUser("ist173833");
+        given().body(new Gson().toJson(json)).when().post("/periods").then().assertThat().statusCode(200);
+
+        Period period = degreeRepository.findByIdAndYear(degreeTwo.getId(), thirdDegreeYear.getCalendarYear())
+                .getDegreeYear(thirdDegreeYear.getDegreeYear()).getCurrentElectionPeriod();
+
+        if (period != null) {
+            fail("Periodo foi criado!");// Não é suposto poder criar periodos que terminam antes de comecar
+        }
     }
 
     @Test

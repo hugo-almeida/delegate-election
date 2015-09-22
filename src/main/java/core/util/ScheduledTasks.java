@@ -101,9 +101,14 @@ public class ScheduledTasks {
 
         for (Degree degree : degrees) {
             for (DegreeYear degreeYear : degree.getYears()) {
-                if (!degreeYear.areStudentsLoaded()) {
-                    degreeYear.initStudents();
-                    //degreeDAO.save(degreeYear.getDegree());
+                try {
+                    if (!degreeYear.areStudentsLoaded()) {
+                        degreeYear.initStudents();
+                        //degreeDAO.save(degreeYear.getDegree());
+                    }
+                } catch (Exception e) {
+                    // Devia guardar excepcao no log
+                    // Desta forma, ainda que o processamento de um ano/curso falhe, apenas esse fica por processar
                 }
             }
         }
