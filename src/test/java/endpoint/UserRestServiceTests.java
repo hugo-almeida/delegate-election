@@ -72,11 +72,11 @@ public class UserRestServiceTests {
 
     private DegreeYear secondDegreeYear;
 
-    private Student studentOneTwo;
+    private Student studentSix;
 
     private Student studentFive;
-    private ApplicationPeriod applicationPeriodOne;
-    private ElectionPeriod electionPeriodActive;
+    private ApplicationPeriod applicationPeriod;
+    private ElectionPeriod electionPeriod;
 
     private ElectionPeriod electionPeriodPast;
 
@@ -84,7 +84,9 @@ public class UserRestServiceTests {
 
     private DegreeYear thirdDegreeYear;
 
-    private Student studentOneThree;
+    private Student studentOneTwo;
+
+    private ApplicationPeriod pastApplicationPeriod;
 
     @Before
     public void setUp() {
@@ -106,53 +108,45 @@ public class UserRestServiceTests {
 
         studentOne = new Student("Student1", "id1", "email1@email.com", "", "");
         studentOneTwo = new Student("Student1", "id1", "email1@email.com", "", "");
-        studentOneThree = new Student("Student1", "id1", "email1@email.com", "", "");
         studentTwo = new Student("Student2", "id2", "email2@email.com", "", "");
         studentThree = new Student("Student3", "id3", "email3@email.com", "", "");
         studentFour = new Student("Student4", "id4", "email4@email.com", "", "");
         studentFive = new Student("Student5", "id5", "email5@email.com", "", "");
+        studentSix = new Student("Student6", "id6", "email6@email.com", "", "");
 
         studentOne.setDegreeYear(firstDegreeYear);
         firstDegreeYear.addStudent(studentOne);
         studentFive.setDegreeYear(firstDegreeYear);
         firstDegreeYear.addStudent(studentFive);
 
-        studentOneTwo.setDegreeYear(secondDegreeYear);
-        secondDegreeYear.addStudent(studentOneTwo);
+        studentSix.setDegreeYear(secondDegreeYear);
+        secondDegreeYear.addStudent(studentSix);
         studentTwo.setDegreeYear(secondDegreeYear);
         secondDegreeYear.addStudent(studentTwo);
         studentFour.setDegreeYear(secondDegreeYear);
         secondDegreeYear.addStudent(studentFour);
 
-        studentOneThree.setDegreeYear(thirdDegreeYear);
-        thirdDegreeYear.addStudent(studentOneThree);
+        studentOneTwo.setDegreeYear(thirdDegreeYear);
+        thirdDegreeYear.addStudent(studentOneTwo);
 
         firstDegreeYear.forceStudentsLoaded();
         secondDegreeYear.forceStudentsLoaded();
         thirdDegreeYear.forceStudentsLoaded();
 
-        applicationPeriodOne = new ApplicationPeriod(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), firstDegreeYear);
-//        applicationPeriodPast =
-//        new ApplicationPeriod(LocalDate.now().minusDays(5), LocalDate.now().minusDays(4), secondDegreeYear);
-//        electionPeriodPast = new ElectionPeriod(LocalDate.now().minusDays(3), LocalDate.now().minusDays(2), secondDegreeYear);
-        electionPeriodActive = new ElectionPeriod(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), secondDegreeYear);
+        applicationPeriod = new ApplicationPeriod(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), firstDegreeYear);
+        electionPeriod = new ElectionPeriod(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), secondDegreeYear);
+        pastApplicationPeriod =
+                new ApplicationPeriod(LocalDate.now().minusDays(10), LocalDate.now().minusDays(5), thirdDegreeYear);
 
-        firstDegreeYear.addPeriod(applicationPeriodOne);
-        firstDegreeYear.setActivePeriod(applicationPeriodOne);
+        firstDegreeYear.addPeriod(applicationPeriod);
+        firstDegreeYear.setActivePeriod(applicationPeriod);
 
-//        Set<Student> candidates = new HashSet<Student>();
-//        candidates.add(studentOne);
-//        electionPeriod.setCandidates(candidates);
-//        secondDegreeYear.addPeriod(applicationPeriodPast);
-//        secondDegreeYear.addPeriod(electionPeriodPast);
-        secondDegreeYear.addPeriod(electionPeriodActive);
-        secondDegreeYear.setActivePeriod(electionPeriodActive);
+        secondDegreeYear.addPeriod(electionPeriod);
+        secondDegreeYear.setActivePeriod(electionPeriod);
 
-        applicationPeriodOne.addCandidate(studentOne);
+        thirdDegreeYear.addPeriod(pastApplicationPeriod);
 
-//        calendarRepository.save(calendar);
-//
-//        electionPeriod.vote(new Vote(studentTwo.getUsername(), studentFour.getUsername(), electionPeriod));
+        applicationPeriod.addCandidate(studentOne);
 
         calendarRepository.save(calendar);
 
@@ -179,9 +173,9 @@ public class UserRestServiceTests {
     }
 
     @Test
-    public void studentWithThreeDegreesTest() {
-        when().get("/students/{istId}/degrees", studentOne.getUsername()).then().assertThat().statusCode(200).body("", hasSize(3))
-                .body("id", hasItems(secondDegreeYear.getDegree().getId(), firstDegreeYear.getDegree().getId()));
+    public void studentWithTwoDegreesTest() {
+        when().get("/students/{istId}/degrees", studentOne.getUsername()).then().assertThat().statusCode(200).body("", hasSize(2))
+                .body("id", hasItems(thirdDegreeYear.getDegree().getId(), firstDegreeYear.getDegree().getId()));
     }
 
     @Test
@@ -193,19 +187,6 @@ public class UserRestServiceTests {
     }
 
     @Test
-    public void candidateStudentTest() {
-        when().get("/degrees/{degreeId}/years/{year}/candidates", firstDegreeYear.getDegree().getId(),
-                firstDegreeYear.getDegreeYear()).then().assertThat().statusCode(200)
-                .body("username", hasItem(studentOne.getUsername()));
-    }
-
-    @Test
-    public void nonCandidateStudentTest() {
-        when().get("/degrees/{degreeId}/years/{year}/candidates", secondDegreeYear.getDegree().getId(),
-                secondDegreeYear.getDegreeYear()).then().assertThat().statusCode(200).body("", hasSize(0));
-    }
-
-    @Test
     public void voteTest() {
         fakeUser(studentTwo.getUsername());
         given().body(studentFour.getUsername())
@@ -213,7 +194,7 @@ public class UserRestServiceTests {
                 .then().assertThat().statusCode(200).body("username", equalTo(studentFour.getUsername()));
 
         when().get("/students/{istId}/degrees/{degreeId}/votes", studentTwo.getUsername(), secondDegreeYear.getDegree().getId())
-                .then().assertThat().statusCode(200).body("$", equalTo(studentFour.getUsername()));
+                .then().assertThat().statusCode(200).body("username", equalTo(studentFour.getUsername()));
     }
 
     @Test
@@ -229,7 +210,20 @@ public class UserRestServiceTests {
                 .then().assertThat().statusCode(200).body("username", equalTo(studentFour.getUsername()));
 
         when().get("/students/{istId}/degrees/{degreeId}/votes", studentTwo.getUsername(), secondDegreeYear.getDegree().getId())
-                .then().assertThat().statusCode(200).body("$", equalTo(studentFour.getUsername()));
+                .then().assertThat().statusCode(200).body("username", equalTo(studentFour.getUsername()));
+    }
+
+    @Test
+    public void candidateStudentTest() {
+        when().get("/degrees/{degreeId}/years/{year}/candidates", firstDegreeYear.getDegree().getId(),
+                firstDegreeYear.getDegreeYear()).then().assertThat().statusCode(200)
+                .body("username", hasItem(studentOne.getUsername()));
+    }
+
+    @Test
+    public void nonCandidateStudentTest() {
+        when().get("/degrees/{degreeId}/years/{year}/candidates", secondDegreeYear.getDegree().getId(),
+                secondDegreeYear.getDegreeYear()).then().assertThat().statusCode(200).body("", hasSize(0));
     }
 
     @Test
@@ -256,7 +250,7 @@ public class UserRestServiceTests {
     @Test
     public void checkNonCandidateStudentTest() {
         MockMvcResponse response = when().get("/degrees/{degreeId}/years/{year}/candidates/{istId}",
-                secondDegreeYear.getDegree().getId(), secondDegreeYear.getDegreeYear(), studentOne.getUsername());
+                thirdDegreeYear.getDegree().getId(), thirdDegreeYear.getDegreeYear(), studentOne.getUsername());
         response.then().assertThat().statusCode(200);
         assertEquals("Resposta não devia ter conteúdo.", "\"\"", response.getBody().asString());
     }
@@ -282,15 +276,15 @@ public class UserRestServiceTests {
 
     @Test
     public void findOneStudentByUsenameTest() {
-        when().get("/degrees/{degreeId}/years/{year}/students/?begins={start}", secondDegreeYear.getDegree().getId(),
-                secondDegreeYear.getDegreeYear(), studentOne.getUsername()).then().assertThat().statusCode(200)
+        when().get("/degrees/{degreeId}/years/{year}/students/?begins={start}", thirdDegreeYear.getDegree().getId(),
+                thirdDegreeYear.getDegreeYear(), studentOne.getUsername()).then().assertThat().statusCode(200)
                 .body("", hasSize(1)).body("username", hasItem(studentOne.getUsername()));
     }
 
     @Test
     public void findOneStudentByNameTest() {
-        when().get("/degrees/{degreeId}/years/{year}/students/?begins={start}", secondDegreeYear.getDegree().getId(),
-                secondDegreeYear.getDegreeYear(), studentOne.getName()).then().assertThat().statusCode(200).body("", hasSize(1))
+        when().get("/degrees/{degreeId}/years/{year}/students/?begins={start}", thirdDegreeYear.getDegree().getId(),
+                thirdDegreeYear.getDegreeYear(), studentOne.getName()).then().assertThat().statusCode(200).body("", hasSize(1))
                 .body("username", hasItem(studentOne.getUsername()));
     }
 
@@ -337,8 +331,8 @@ public class UserRestServiceTests {
         fakeUser("ist173833");
         given().body(degreeOne.getId()).when()
                 .get("/degrees/{degreeId}/years/{year}/periods", degreeOne.getId(), firstDegreeYear.getDegreeYear()).then()
-                .assertThat().statusCode(200).body("applicationStart", equalTo(applicationPeriodOne.getStart().format(dtf)))
-                .body("applicationEnd", equalTo(applicationPeriodOne.getEnd().format(dtf))).body("electionStart", equalTo(""))
+                .assertThat().statusCode(200).body("applicationStart", equalTo(applicationPeriod.getStart().format(dtf)))
+                .body("applicationEnd", equalTo(applicationPeriod.getEnd().format(dtf))).body("electionStart", equalTo(""))
                 .body("electionEnd", equalTo(""));
     }
 
@@ -396,10 +390,36 @@ public class UserRestServiceTests {
 
     @Test
     public void getHistoryTest() {
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        JsonArray array = new JsonArray();
+
+        JsonObject json = new JsonObject();
+        json.addProperty("degreeId", degreeTwo.getId());
+        JsonArray years = new JsonArray();
+        JsonObject yearObject = new JsonObject();
+        yearObject.addProperty("degreeYear", thirdDegreeYear.getDegreeYear());
+        JsonObject applicationObject = new JsonObject();
+        applicationObject.addProperty("applicationPeriodStart", LocalDate.now().plusDays(6).format(dtf));
+        applicationObject.addProperty("applicationPeriodEnd", LocalDate.now().plusDays(7).format(dtf));
+        JsonObject electionObject = new JsonObject();
+        electionObject.addProperty("electionPeriodStart", LocalDate.now().minusDays(1).format(dtf));
+        electionObject.addProperty("electionPeriodEnd", LocalDate.now().plusDays(1).format(dtf));
+
+        yearObject.add("applicationPeriod", applicationObject);
+        yearObject.add("electionPeriod", electionObject);
+        years.add(yearObject);
+        json.add("years", years);
+        array.add(json);
+
         fakeUser("ist173833");
-        when().get("/degrees/{degreeId}/years/{year}/history", degreeOne.getId(), firstDegreeYear.getDegreeYear()).peek().then()
-                .assertThat().statusCode(200).body("periods", hasSize(1)).body("periods.info", hasItem(1))
-                .body("periods.periodType", hasItem(applicationPeriodOne.getType().toString()));
+        given().body(new Gson().toJson(array)).when().put("/periods").then().assertThat().statusCode(200);
+
+        fakeUser("ist173833");
+        when().get("/degrees/{degreeId}/years/{year}/history", degreeTwo.getId(), thirdDegreeYear.getDegreeYear()).peek().then()
+                .assertThat().statusCode(200).body("periods", hasSize(2)).body("periods[0].info", equalTo(0))
+                .body("periods[0].periodType", equalTo(electionPeriod.getType().toString())).body("periods[1].info", equalTo(0))
+                .body("periods[1].periodType", equalTo(applicationPeriod.getType().toString()));
     }
 
     @Test
@@ -409,10 +429,10 @@ public class UserRestServiceTests {
         fakeUser("ist173833");
         when().get("/periods").then().assertThat().statusCode(200).body("", hasSize(2))
                 .body("years.applicationPeriod.applicationPeriodStart",
-                        hasItem(hasItem(applicationPeriodOne.getStart().format(dtf))))
-                .body("years.applicationPeriod.applicationPeriodEnd", hasItem(hasItem(applicationPeriodOne.getEnd().format(dtf))))
-                .body("years.electionPeriod.electionPeriodStart", hasItem(hasItem(electionPeriodActive.getStart().format(dtf))))
-                .body("years.electionPeriod.electionPeriodEnd", hasItem(hasItem(electionPeriodActive.getEnd().format(dtf))));
+                        hasItem(hasItem(applicationPeriod.getStart().format(dtf))))
+                .body("years.applicationPeriod.applicationPeriodEnd", hasItem(hasItem(applicationPeriod.getEnd().format(dtf))))
+                .body("years.electionPeriod.electionPeriodStart", hasItem(hasItem(electionPeriod.getStart().format(dtf))))
+                .body("years.electionPeriod.electionPeriodEnd", hasItem(hasItem(electionPeriod.getEnd().format(dtf))));
     }
 
     @Test
@@ -438,6 +458,50 @@ public class UserRestServiceTests {
 
         assertEquals(LocalDate.now().plusDays(3).format(dtf), period.getStart().format(dtf));
         assertEquals(LocalDate.now().plusDays(5).format(dtf), period.getEnd().format(dtf));
+    }
+
+//    @Test
+//    public void createPeriodInThePastTest() {
+//        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//
+//        JsonObject json = new JsonObject();
+//        json.addProperty("degreeId", degreeTwo.getId());
+//        json.addProperty("degreeYear", thirdDegreeYear.getDegreeYear());
+//        json.addProperty("periodType", PeriodType.Election.toString());
+//        json.addProperty("start", LocalDate.now().minusDays(1).format(dtf));
+//        json.addProperty("end", LocalDate.now().format(dtf));
+//
+//        fakeUser("ist173833");
+//        given().body(new Gson().toJson(json)).when().post("/periods").then().assertThat().statusCode(200);
+//
+//        Period period = degreeRepository.findByIdAndYear(degreeTwo.getId(), thirdDegreeYear.getCalendarYear())
+//                .getDegreeYear(thirdDegreeYear.getDegreeYear()).getCurrentElectionPeriod();
+//
+//        if (period != null) {
+//            fail("Periodo foi criado!");// Não é suposto poder criar periodos a iniciar no passado.
+//        }
+//    }
+
+    @Test
+    public void createPeriodBadDatesTest() {
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        JsonObject json = new JsonObject();
+        json.addProperty("degreeId", degreeTwo.getId());
+        json.addProperty("degreeYear", thirdDegreeYear.getDegreeYear());
+        json.addProperty("periodType", PeriodType.Election.toString());
+        json.addProperty("start", LocalDate.now().format(dtf));
+        json.addProperty("end", LocalDate.now().minusDays(1).format(dtf));
+
+        fakeUser("ist173833");
+        given().body(new Gson().toJson(json)).when().post("/periods").then().assertThat().statusCode(200);
+
+        Period period = degreeRepository.findByIdAndYear(degreeTwo.getId(), thirdDegreeYear.getCalendarYear())
+                .getDegreeYear(thirdDegreeYear.getDegreeYear()).getCurrentElectionPeriod();
+
+        if (period != null) {
+            fail("Periodo foi criado!");// Não é suposto poder criar periodos que terminam antes de comecar
+        }
     }
 
     @Test

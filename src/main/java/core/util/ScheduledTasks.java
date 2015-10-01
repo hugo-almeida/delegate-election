@@ -30,7 +30,6 @@ public class ScheduledTasks {
     PeriodDAO periodDAO;
 
     // Isto assume que a app está sempre a correr.
-    // TODO Excepções não devem impedir a continuação do método
 
 //    @Scheduled(cron = "0/5 * * * * *")
     @Scheduled(cron = "0 0 * * * *")
@@ -49,34 +48,39 @@ public class ScheduledTasks {
 
         for (final Degree degree : degrees) {
             for (final DegreeYear degreeYear : degree.getYears()) {
-                Set<Student> candidates = null;
-                // Em cada degreeYear, verifica se o currentPeriod ja terminou
-                Period activePeriod = degreeYear.getActivePeriod();
-                if (activePeriod != null) {
-                    if (activePeriod.getEnd().isBefore(LocalDate.now())) {
-                        // Se terminou, tira esse de activo
-                        activePeriod.setInactive();
-                        candidates = activePeriod.getCandidates();
-                        periodDAO.save(activePeriod);
-                    } else {
-                        // Se nao terminou, continua para o proximo degreeYear
-                        continue;
-                    }
-                }
-                // Depois verifica se há algum para entrar em vigor no dia actual, caso haja, coloca-o como activo
-                Period newActivePeriod = degreeYear.getNextPeriod(LocalDate.now());
-                if (newActivePeriod != null && newActivePeriod.getStart().isEqual(LocalDate.now())) {
-                    degreeYear.setActivePeriod(newActivePeriod);
-                    degreeYear.setStudentsLoaded(true);
-                    if (candidates != null) {
-                        newActivePeriod.setCandidates(candidates);
-                    } else {
-                        Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
-                        if (lastPeriod != null && lastPeriod.getCandidates() != null) {
-                            newActivePeriod.setCandidates(lastPeriod.getCandidates());
+                try {
+                    Set<Student> candidates = null;
+                    // Em cada degreeYear, verifica se o currentPeriod ja terminou
+                    Period activePeriod = degreeYear.getActivePeriod();
+                    if (activePeriod != null) {
+                        if (activePeriod.getEnd().isBefore(LocalDate.now())) {
+                            // Se terminou, tira esse de activo
+                            activePeriod.setInactive();
+                            candidates = activePeriod.getCandidates();
+                            periodDAO.save(activePeriod);
+                        } else {
+                            // Se nao terminou, continua para o proximo degreeYear
+                            continue;
                         }
                     }
-                    periodDAO.save(newActivePeriod);
+                    // Depois verifica se há algum para entrar em vigor no dia actual, caso haja, coloca-o como activo
+                    Period newActivePeriod = degreeYear.getNextPeriod(LocalDate.now());
+                    if (newActivePeriod != null && newActivePeriod.getStart().isEqual(LocalDate.now())) {
+                        degreeYear.setActivePeriod(newActivePeriod);
+                        degreeYear.setStudentsLoaded(true);
+                        if (candidates != null) {
+                            newActivePeriod.setCandidates(candidates);
+                        } else {
+                            Period lastPeriod = degreeYear.getLastPeriod(LocalDate.now());
+                            if (lastPeriod != null && lastPeriod.getCandidates() != null) {
+                                newActivePeriod.setCandidates(lastPeriod.getCandidates());
+                            }
+                        }
+                        periodDAO.save(newActivePeriod);
+                    }
+                } catch (Exception e) {
+                    // Devia guardar excepcao no log
+                    // Desta forma, ainda que o processamento de um ano/curso falhe, apenas esse fica por processar
                 }
             }
         }
@@ -97,9 +101,14 @@ public class ScheduledTasks {
 
         for (Degree degree : degrees) {
             for (DegreeYear degreeYear : degree.getYears()) {
-                if (!degreeYear.areStudentsLoaded()) {
-                    degreeYear.initStudents();
-                    //degreeDAO.save(degreeYear.getDegree());
+                try {
+                    if (!degreeYear.areStudentsLoaded()) {
+                        degreeYear.initStudents();
+                        //degreeDAO.save(degreeYear.getDegree());
+                    }
+                } catch (Exception e) {
+                    // Devia guardar excepcao no log
+                    // Desta forma, ainda que o processamento de um ano/curso falhe, apenas esse fica por processar
                 }
             }
         }
