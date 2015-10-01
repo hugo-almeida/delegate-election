@@ -72,9 +72,8 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 		});
 //		$log.log('checked application');
 		$http.get('students/'+$rootScope.credentials.username+'/degrees/'+$rootScope.degree.id+'/votes')
-		.success(function(data) { 
-			if(data != '') {
-				
+		.success(function(data) {
+			if(data != '' && data != "Student hasn't voted." && data != 'No election period.' ) {
 				$rootScope.voted = true;
 				$rootScope.voto = data;
 			}
@@ -108,10 +107,10 @@ angular.module('delegados').controller('electionCtrl', ['$rootScope', '$scope', 
 		if($rootScope.degree != null) {
 			$http.get('/degrees/' + $rootScope.degree.id + '/years/' + $rootScope.degree.curricularYear + '/periods')
 				.success(function(data) {
-					if (data.applicationStart && data.applicationEnd) {
+					if (data.start && data.end) {
 //						$log.log('exists');
-						$scope.start = data.applicationStart;
-						$scope.end = data.applicationEnd;
+						$scope.start = data.start;
+						$scope.end = data.end;
 //						$log.log('start: ' + $scope.start + ' end: ' + $scope.end);
 						$rootScope.nextPeriod = true;
 					}

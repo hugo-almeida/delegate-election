@@ -231,7 +231,8 @@
 										<img class="avatar"  ng-src="{{imgURL(candidate.username)}}">
 										 {{candidate.name}}<span class="detail">{{candidate.username}}</span>
 									</td>
-									<td ng-show="inspectedPeriod().periodType=='ELECTION'">{{candidate.selfProposed}}</td>
+									<td ng-show="inspectedPeriod().periodType=='ELECTION'"><span ng-show="candidate.selfProposed"><i class="glyphicon glyphicon-check"></i></span>
+<span ng-hide="candidate.selfProposed"></span></td>
 									<td ng-show="inspectedPeriod().periodType=='ELECTION'">{{candidate.votes}}
 									</td>
 								</tr>

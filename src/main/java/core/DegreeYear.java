@@ -153,6 +153,19 @@ public class DegreeYear {
 
     public ApplicationPeriod getCurrentApplicationPeriod() {
         ApplicationPeriod period = null;
+        Period active = getActivePeriod();
+        if (active != null && active.getType().equals(PeriodType.Application)) {
+            return (ApplicationPeriod) active;
+        }
+        for (final Period p : periods) {
+            if (p.getType().equals(PeriodType.Application) && p.getStart().isAfter(LocalDate.now())
+                    && (period == null || p.getStart().isBefore(period.getStart()))) {
+                period = (ApplicationPeriod) p;
+            }
+        }
+        if (period != null) {
+            return period;
+        }
         for (final Period p : periods) {
             if (p.getType().equals(PeriodType.Application) && (period == null || p.getStart().isAfter(period.getStart()))) {
                 period = (ApplicationPeriod) p;
@@ -163,9 +176,32 @@ public class DegreeYear {
 
     public ElectionPeriod getCurrentElectionPeriod() {
         ElectionPeriod period = null;
+        Period active = getActivePeriod();
+        if (active != null && active.getType().equals(PeriodType.Election)) {
+            return (ElectionPeriod) active;
+        }
+        for (final Period p : periods) {
+            if (p.getType().equals(PeriodType.Election) && p.getStart().isAfter(LocalDate.now())
+                    && (period == null || p.getStart().isBefore(period.getStart()))) {
+                period = (ElectionPeriod) p;
+            }
+        }
+        if (period != null) {
+            return period;
+        }
         for (final Period p : periods) {
             if (p.getType().equals(PeriodType.Election) && (period == null || p.getStart().isAfter(period.getStart()))) {
                 period = (ElectionPeriod) p;
+            }
+        }
+        return period;
+    }
+
+    public Period getNextPeriod() {
+        Period period = null;
+        for (final Period p : periods) {
+            if (p.getStart().isAfter(LocalDate.now()) && (period == null || p.getStart().isBefore(period.getStart()))) {
+                period = p;
             }
         }
         return period;
