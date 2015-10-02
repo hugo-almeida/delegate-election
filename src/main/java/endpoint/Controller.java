@@ -345,7 +345,7 @@ public class Controller {
         if (start != null) {
             filteredStudents =
                     students.stream()
-                            .filter(s -> s.getName().toLowerCase().equals(start.toLowerCase())
+                            .filter(s -> s.getName().toLowerCase().contains(start.toLowerCase())
                                     || s.getUsername().toLowerCase().equals(start.toLowerCase())).collect(Collectors.toSet());
         }
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -659,10 +659,10 @@ public class Controller {
             period.addCandidate(s);
             studentDAO.save(s);
         }
-        return new Gson().toJson("ok");
+        return new Gson().toJson("ok?");
     }
 
-    @RequestMapping(value = "periods/{periodId}/selfProposed", method = RequestMethod.POST,
+    @RequestMapping(value = "/periods/{periodId}/selfProposed", method = RequestMethod.POST,
             produces = "application/json; charset=utf-8")
     public @ResponseBody String selfPropposed(@PathVariable int periodId, @RequestBody String studentJson) {
         Period period = periodDAO.findById(periodId);
@@ -676,19 +676,19 @@ public class Controller {
         }
         JsonObject result = new JsonObject();
         for (String s : usernames) {
-            Student st =
-                    studentDAO.findByUsernameAndDegreeAndCalendarYear(s, period.getDegreeYear().getDegree().getId(), period
-                            .getDegreeYear().getCalendarYear());
-            if (candidates.contains(st)) {
-                result.addProperty(s, true);
-            } else {
-                result.addProperty(s, false);
+            Iterator<Student> stIt = studentDAO.findByUsername(s, period.getDegreeYear().getCalendarYear()).iterator();
+            if (stIt.hasNext()) {
+                if (candidates.contains(stIt.next())) {
+                    result.addProperty(s, true);
+                } else {
+                    result.addProperty(s, false);
+                }
             }
         }
         return new Gson().toJson(result);
     }
 
-    @RequestMapping(value = "periods/{periodId}/votes", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    @RequestMapping(value = "/periods/{periodId}/votes", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     public @ResponseBody String periodVotes(@PathVariable int periodId) {
         final Period period = periodDAO.findById(periodId);
         if (period == null) {
@@ -777,38 +777,6 @@ public class Controller {
         }
     }
 
-//    public String addPeriod2(String periodType, LocalDate startDate, LocalDate endDate, String acronym, int year) {
-////        DegreeYear degreeYear =
-////                degreeDAO.findByIdAndYear(acronym, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year);
-////        if (degreeYear == null) {
-////            return "There is no Degree with that Acronym.";
-////        }
-//////        Period period = degreeYear.addPeriod(startDate, endDate, periodType);
-//////        if (period != null) {
-////////            period.schedulePeriod(periodDAO, degreeDAO);
-//////            periodDAO.save(period);
-//////            return "OK";
-//////            //return period.getType() + " with Id " + period.getId() + " created.";
-//////        } else {
-//////            return "Failed to create Period.";
-//////        }
-////        if (periodType.equals(PeriodType.Application.toString())) {
-////            final Period period = degreeYear.addPeriod(startDate, endDate, periodType);
-////            if (period != null) {
-//////                period.schedulePeriod(periodDAO, degreeDAO);
-////                periodDAO.save(period);
-////            }
-////        } else if (periodType.equals(PeriodType.Election.toString())) {
-////            final Period period = degreeYear.addPeriod(startDate, endDate, periodType);
-////            if (period != null) {
-//////                period.schedulePeriod(periodDAO, degreeDAO);
-////                periodDAO.save(period);
-////            }
-////        }
-////
-////        return new Gson().toJson("ok");
-//
-//    }
     public String command(String periodJson) {
 
         final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -856,23 +824,6 @@ public class Controller {
         }
     }
 
-//    @RequestMapping(value = "/get-user", method = RequestMethod.POST)
-//    public @ResponseBody String getUser(@RequestBody String username) {
-//        final RestTemplate t = new RestTemplate();
-//        t.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-//
-//        final String infoUrl = env.getProperty("environment.uri") + "/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
-//
-//        final HttpHeaders requestHeaders = new HttpHeaders();
-//        requestHeaders.set("__username__", username);
-//        final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
-//        final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
-//        final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
-//
-//        final Gson gson = new Gson();
-//        return gson.toJson(result);
-//    }
-
     @RequestMapping(value = "/mock/{id}")
     public @ResponseBody String mock(@PathVariable String id) {
         final RestTemplate t = new RestTemplate();
@@ -897,8 +848,6 @@ public class Controller {
         }
         return "ok";
     }
-
-    /************************************* MVC ***************************************/
 
     private String getLoggedUsername() {
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -955,16 +904,9 @@ public class Controller {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.logout()
-                    .and()
-                    .antMatcher("/**")
+            http.logout().and().antMatcher("/**").authorizeRequests().antMatchers("/index.html", "/", "/login").permitAll().and()
                     .authorizeRequests()
-                    .antMatchers("/index.html", "/", "/login", "/test-calendar", "/get-user")
-                    .permitAll()
-                    .and()
-                    .authorizeRequests()
-                    .antMatchers("/home.html", "/resource", "/user", "/period", "/vote", "/user", "/get-candidates", "/apply",
-                            "/deapply", "get-students", "/students/**", "/degrees/**", "/pedagogico", "/periods", "/estudante")
+                    .antMatchers("/home.html", "/user", "/user", "/students/**", "/degrees/**", "/periods/**, /roles/**")
                     .authenticated().and().csrf().csrfTokenRepository(csrfTokenRepository()).and()
                     .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
         }
@@ -994,79 +936,5 @@ public class Controller {
             repository.setHeaderName("X-XSRF-TOKEN");
             return repository;
         }
-    }
-
-    @RequestMapping("/set-demo")
-    public @ResponseBody String setDemo() {
-
-//        //Periodo no Futuro
-        DegreeYear degreeYear =
-                degreeDAO.findByAcronymAndYear("LEAN", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
-        LocalDate start = LocalDate.of(2015, 9, 20);
-        LocalDate end = LocalDate.of(2015, 9, 25);
-        Period p = degreeYear.addPeriod(start, end, "APPLICATION");
-        periodDAO.save(p);
-
-        //Periodo Candidatura Activo
-        degreeYear = degreeDAO.findByAcronymAndYear("LEE", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
-        start = LocalDate.of(2015, 9, 1);
-        end = LocalDate.of(2015, 9, 7);
-        p = degreeYear.addPeriod(start, end, "APPLICATION");
-        periodDAO.save(p);
-
-        //Periodo Votação Activo
-        degreeYear = degreeDAO.findByAcronymAndYear("LEGI", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
-        start = LocalDate.of(2015, 8, 24);
-        end = LocalDate.of(2015, 8, 28);
-        p = degreeYear.addPeriod(start, end, "APPLICATION");
-        p = periodDAO.save(p);
-        Set<Student> st = p.getDegreeYear().getStudents();
-        Iterator<Student> it = st.iterator();
-        p.addCandidate(it.next());
-        p.addCandidate(it.next());
-        p.addCandidate(it.next());
-        Set<Student> candidates = p.getCandidates();
-        periodDAO.save(p);
-        start = LocalDate.of(2015, 9, 1);
-        end = LocalDate.of(2015, 9, 7);
-        p = degreeYear.addPeriod(start, end, "ELECTION");
-        periodDAO.save(p);
-        p.setCandidates(candidates);
-        periodDAO.save(p);
-
-        //Periodo Votação Terminado
-        degreeYear = degreeDAO.findByAcronymAndYear("LEGM", calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(2);
-        start = LocalDate.of(2015, 8, 20);
-        end = LocalDate.of(2015, 8, 22);
-        p = degreeYear.addPeriod(start, end, "APPLICATION");
-
-        final Set<Student> st2 = p.getDegreeYear().getStudents();
-        final Iterator<Student> it2 = st2.iterator();
-        final Student s1 = it2.next();
-        final Student s2 = it2.next();
-        final Student s3 = it2.next();
-        final Student s4 = it2.next();
-        p = periodDAO.save(p);
-        p.addCandidate(s1);
-        p.addCandidate(s2);
-        p.addCandidate(s3);
-        final Set<Student> candidates2 = p.getCandidates();
-        periodDAO.save(p);
-        start = LocalDate.of(2015, 8, 24);
-        end = LocalDate.of(2015, 8, 28);
-        p = degreeYear.addPeriod(start, end, "ELECTION");
-        p.addCandidate(s1);
-        p.addCandidate(s2);
-        p.addCandidate(s3);
-        final Period x = periodDAO.save(p);
-        //ElectionPeriod ePeriod = (ElectionPeriod) p;
-        final ElectionPeriod ePeriod = (ElectionPeriod) periodDAO.findById(x.getId());
-        ePeriod.vote(s1, s2);
-        ePeriod.vote(s2, s2);
-        ePeriod.vote(s3, s1);
-        ePeriod.vote(s4, s4);
-        periodDAO.save(ePeriod);
-
-        return new Gson().toJson("Done");
     }
 }

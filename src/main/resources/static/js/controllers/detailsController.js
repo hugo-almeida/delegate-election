@@ -71,14 +71,27 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 	}
 	
 	sc.addCandidate = function(istid) {
-//		log.log(sc.getCurrentApplication());
-		http.post('periods/' + sc.getCurrentApplication().applicationPeriodId + '/candidates/' + istid).success(function(data) {
-//			log.log(data);
-		}).then(function(data) {
-			history.loadCandidates();
-			sc.query = '';
-			sc.students = [];
-		});
+		log.log(sc.getCurrentApplication());
+		log.log(sc.getCurrentElection());
+
+		if(sc.getCurrentApplication() && sc.getCurrentApplication().state == 'presente') {
+			http.post('periods/' + sc.getCurrentApplication().applicationPeriodId + '/candidates/' + istid).success(function(data) {
+//				log.log(data);
+			}).then(function(data) {
+				history.loadCandidates();
+				sc.query = '';
+				sc.students = [];
+			});
+		}
+		else if(sc.getCurrentElection() && sc.getCurrentElection().state == 'presente') {
+			http.post('periods/' + sc.getCurrentElection().electionPeriodId + '/candidates/' + istid).success(function(data) {
+	//			log.log(data);
+			}).then(function(data) {
+				history.loadCandidates();
+				sc.query = '';
+				sc.students = [];
+			});
+		}
 	}
 	
 	sc.colSpan = function() {
