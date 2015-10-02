@@ -85,6 +85,9 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 						for(index in candidates) {
 							candidates[index].votes = data[candidates[index].username];
 						}
+						if(data.branco) {
+							candidates.blank = data.branco;
+						}
 					});
 				}
 			}).then(function(data) {
@@ -114,6 +117,9 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 				http.get('periods/' + id + '/votes', result).success(function(data) {
 					for(index in inspectCandidates) {
 						inspectCandidates[index].votes = data[inspectCandidates[index].username];
+					}
+					if(data.branco) {
+						inspectCandidates.blank = data.branco;
 					}
 				});
 			}

@@ -86,60 +86,20 @@
 						</span>
 					</td>
 				</tr>
+				<tr ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro' && getCandidates().blank">
+					<td>
+						Votos em branco
+					</td>
+					<td>
+					</td>
+					<td>
+						{{getCandidates().blank}}
+					</td>
+				</tr>
 			</tbody>
-<!-- 			<tfoot> -->
-<!-- 				<tr class="new"> -->
-<!-- 					<td ng-show="(getCurrentApplication().state && getCurrentApplication().state =='presente') || (getCurrentElection().state && getCurrentElection().state =='presente')" colspan="colSpan()"> -->
-<!-- 						<div class="dropdown"> -->
-<!-- 							<i class="icon icon-search"></i> -->
-<!-- 							<input id="dLabel" type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"  -->
-<!-- 								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"/> -->
-<!-- 							<table class="table table-hover dropdown-menu" ng-show="!isEmpty(students)"  -->
-<!-- 								style="margin: 0 0 0 -10px; border: 1px solid #ddd;"  aria-labelledby="dLabel"> -->
-<!-- 								<tbody> -->
-<!-- 									<tr ng-repeat="student in students"> -->
-<!-- 										<td> -->
-<!-- 											{{student.name}} -->
-<!-- 											<span class="detail" style="vertical-align: -webkit-baseline-middle; display: inline-table;">{{student.username}}</span> -->
-<!-- 											<button ng-show="true" class="btn btn-default btn-xs pull-right" ng-click="addCandidate(student.username)">Adicionar</button> -->
-<!-- 										</td>	 -->
-<!-- 									</tr> -->
-<!-- 								</tbody> -->
-<!-- 							</table> -->
-<!-- 						</div> -->
-<!-- 					</td> -->
-<!-- 					<td ng-show="getCurrentElection().state && getCurrentElection().state =='presente'" colspan="3"> -->
-<!-- 						<div class="dropdown"> -->
-<!-- 							<i class="icon icon-search"></i> -->
-<!-- 							<input id="dLabel" type="text" placeholder="Novo…" ng-model="query" ng-change="loadStudents(query)" ng-model-options="{ debounce: 300 }"  -->
-<!-- 								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"/> -->
-<!-- 							<table class="table table-hover dropdown-menu" ng-show="!isEmpty(students)"  -->
-<!-- 								style="margin: 0 0 0 -10px; border: 1px solid #ddd;" aria-labelledby="dLabel"> -->
-<!-- 								<tbody> -->
-<!-- 									<tr ng-repeat="student in students"> -->
-<!-- 										<td> -->
-<!-- 											{{student.name}} -->
-<!-- 											<span class="detail" style="vertical-align: -webkit-baseline-middle; display: inline-table;">{{student.username}}</span> -->
-<!-- 											<button ng-show="true" class="btn btn-default btn-xs pull-right" ng-click="addCandidate(student.username)">Adicionar</button> -->
-<!-- 										</td>	 -->
-<!-- 									</tr> -->
-<!-- 								</tbody> -->
-<!-- 							</table> -->
-<!-- 						</div> -->
-<!--			</td> -->
-<!-- 				</tr> -->
-<!-- 			</tfoot> -->
 		</table>
 	</div>
-	
-<!-- 	<div class="dropdown"> -->
-<!-- 					<input id="dLabel" type="text" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> -->
-<!-- 					<table class="table table-hover dropdown-menu" aria-labelledby="dLabel"> -->
-<!-- 					    <tr> -->
-<!-- 					    	<td>hi!</td> -->
-<!-- 					    </tr> -->
-<!-- 					</table> -->
-<!-- 					</div> -->
+
 					
 	<h3>Histórico</h3>
 	<div ng-show="isEmpty(history().periods)" class="empty">
@@ -231,9 +191,20 @@
 										<img class="avatar"  ng-src="{{imgURL(candidate.username)}}">
 										 {{candidate.name}}<span class="detail">{{candidate.username}}</span>
 									</td>
-									<td ng-show="inspectedPeriod().periodType=='ELECTION'"><span ng-show="candidate.selfProposed"><i class="glyphicon glyphicon-check"></i></span>
-<span ng-hide="candidate.selfProposed"></span></td>
+									<td ng-show="inspectedPeriod().periodType=='ELECTION'">
+										<span ng-show="candidate.selfProposed"><i class="glyphicon glyphicon-check"></i></span>										
+										<span ng-hide="candidate.selfProposed"></span></td>
 									<td ng-show="inspectedPeriod().periodType=='ELECTION'">{{candidate.votes}}
+									</td>
+								</tr>
+								<tr ng-show="inspectedPeriod().periodType=='ELECTION' && candidates().blank">
+									<td>
+										Votos em branco
+									</td>
+									<td>
+									</td>
+									<td>
+										{{candidates().blank}}
 									</td>
 								</tr>
 							</tbody>
