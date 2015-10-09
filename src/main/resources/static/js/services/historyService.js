@@ -1,6 +1,8 @@
 angular.module('delegados').factory('history', ['$log', '$http', function(log, http){
 	var academicYear = "";
 	
+	var acronym = "";
+	
 	var degree = {}
 	
 	var history = {};
@@ -10,6 +12,14 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	var inspect = {};
 	
 	var inspectCandidates = [];
+	
+	function getAcronym() {
+		return acronym;
+	}
+	
+	function setAcronym(a) {
+		acronym = a; 
+	}
 	
 	function getHistory() {
 		return history;
@@ -137,6 +147,8 @@ angular.module('delegados').factory('history', ['$log', '$http', function(log, h
 	
 	return {
 		getCandidates: getCandidates,
+		getAcronym: getAcronym,
+		setAcronym: setAcronym,
 		getInspectedPeriod: getInspectedPeriod,
 		getInspectedPeriodCandidates: getInspectedPeriodCandidates,
 		getHistory: getHistory,

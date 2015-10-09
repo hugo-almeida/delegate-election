@@ -11,6 +11,10 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 		sc.add = !sc.add;
 	} 
 	
+	sc.degreeAcronym = function() {
+		return history.getAcronym();
+	}
+	
 	sc.history = function () {
 		return history.getHistory();
 	};
@@ -37,8 +41,12 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 		return history.getCandidates();
 	}
 	
-	sc.assign = function(username) {
-//		log.log('assigning ' + username + ' as delegado stub');
+	sc.assign = function(username, degreeName, degreeYear) {
+ 		log.log('assigning ' + username + ' as delegado for ' + degreeName);
+		http.get('/delegates/' + degreeName + '/' + username + '/' + degreeYear)
+		.success(function(data) {
+			log.log('yay!');
+		});
 	}
 	
 	sc.loadStudents = function(query) {
