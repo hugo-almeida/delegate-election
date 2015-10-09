@@ -26,10 +26,6 @@ import org.springframework.cloud.security.oauth2.sso.EnableOAuth2Sso;
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurerAdapter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
@@ -83,9 +78,6 @@ import core.Vote;
 @RestController
 public class Controller {
 
-    private static final String ACCESS_TOKEN =
-            "ODUxOTE1MzUzMDk2MTkzOjI5NmJkNDViNzc4MTZiMzAyMDYyNzQxNTgxZTUzOGEyYzUzNDI5ODMxMzFmOGM0MTJkMDk1ZmIwN2NkMzVlMDM3YzUyOWQxMGU0M2Y0YTNiMWFmYjU4ZWRhOThmNTc3N2U0MGE5N2U2MzY5MTdhMGZlMDlmYTlhYjBlMDc5ZTQ4";
-
     @Autowired
     StudentDAO studentDAO;
 
@@ -102,74 +94,6 @@ public class Controller {
     Environment env;
 
     Set<String> userset = null;
-
-//    @PostConstruct
-//    public void schedulePeriods() {
-//        Calendar calendar = calendarDAO.findFirstByOrderByYearDesc();
-//        if (calendar == null) {
-//            return;
-//        }
-//
-//        final Set<Degree> degrees = calendar.getDegrees();
-//        if (degrees == null) {
-//            return;
-//        }
-//
-//        final LocalDate today = LocalDate.now();
-//        final LocalDate tomorrow = today.plus(1, ChronoUnit.DAYS);
-//
-//        if (!today.isBefore(LocalDate.of(today.getYear(), 9, 1)) && calendar.getYear() < today.getYear()) {
-//            calendar = new Calendar(LocalDate.now().getYear());
-//            calendar.init();
-//            calendarDAO.save(calendar);
-//        }
-//
-//        for (final Degree degree : degrees) {
-//            for (final DegreeYear degreeYear : degree.getYears()) {
-//                final Period newActivePeriod = degreeYear.getNextPeriod(tomorrow);
-//                if (newActivePeriod != null && newActivePeriod.getStart().isEqual(tomorrow)) {
-//                    degreeYear.initStudents();
-//                    degreeDAO.save(degreeYear.getDegree());
-//                }
-//            }
-//        }
-//
-//        for (final Degree degree : degrees) {
-//            for (final DegreeYear degreeYear : degree.getYears()) {
-//                Set<Student> candidates = null;
-//                // Em cada degreeYear, verifica se o currentPeriod ja terminou
-//                final Period activePeriod = degreeYear.getActivePeriod();
-//                if (activePeriod != null) {
-//                    if (activePeriod.getEnd().isBefore(today)) {
-//                        // Se terminou, tira esse de activo
-//                        activePeriod.setInactive();
-//                        candidates = activePeriod.getCandidates();
-//                        periodDAO.save(activePeriod);
-//                    } else {
-//                        // Se nao terminou, continua para o proximo degreeYear
-//                        continue;
-//                    }
-//                }
-//                // Depois verifica se há algum para entrar em vigor no dia actual, caso haja, coloca-o como activo
-//                final Period newActivePeriod = degreeYear.getNextPeriod(today);
-//                if (newActivePeriod != null && newActivePeriod.getStart().isEqual(today)) {
-//                    degreeYear.setActivePeriod(newActivePeriod);
-//
-//                    if (candidates != null) {
-//                        newActivePeriod.setCandidates(candidates);
-//                    } else {
-//                        final Period lastPeriod = degreeYear.getLastPeriod(today);
-//                        if (lastPeriod != null) {
-//                            newActivePeriod.setCandidates(lastPeriod.getCandidates());
-//                        }
-//                    }
-//
-//                    periodDAO.save(newActivePeriod);
-//                }
-//            }
-//        }
-//        // Aqui deve correr os tres metodos em ScheduledTasks se necessario.
-//    }
 
     @RequestMapping(value = "/students/{istId}/degrees", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     public @ResponseBody String getStudentDegrees(@PathVariable String istId) {
@@ -313,10 +237,10 @@ public class Controller {
     @RequestMapping(value = "/degrees/{degreeId}/years/{year}/candidates/{istId}", method = RequestMethod.DELETE,
             produces = "application/json; charset=utf-8")
     public @ResponseBody String removeCandidate(@PathVariable String degreeId, @PathVariable int year, @PathVariable String istId) {
-//Debug
-//        if (!getLoggedUsername().equals(istId)) {
-//            return new Gson().toJson("");
-//        }
+
+        if (!getLoggedUsername().equals(istId)) {
+            return new Gson().toJson("");
+        }
 
         final List<Student> candidateList =
                 degreeDAO.findByIdAndYear(degreeId, calendarDAO.findFirstByOrderByYearDesc().getYear()).getDegreeYear(year)
@@ -356,15 +280,7 @@ public class Controller {
     // TODO Test this!
     @RequestMapping(value = "/students", method = RequestMethod.GET)
     public @ResponseBody String findStudent(@RequestParam(value = "begins", required = false) String start) {
-//        final RestTemplate t = new RestTemplate();
-//        final String infoUrl =
-//                env.getProperty("environment.uri") + "/api/bennu-core/users/find?begins=" + start + "&access_token="
-//                        + ACCESS_TOKEN;
-//
-//        final HttpHeaders requestHeaders = new HttpHeaders();
-//        final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
-//        final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
-//        final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
+
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.registerTypeAdapter(Student.class, new StudentAdapter()).create();
         Iterable<Student> students = studentDAO.findByUsername(start, calendarDAO.findFirstByOrderByYearDesc().getYear());
@@ -556,20 +472,6 @@ public class Controller {
             periodDAO.delete(period);
             return new Gson().toJson("deleted period " + periodId);
         }
-//        final GsonBuilder gsonBuilder = new GsonBuilder();
-//        final Gson gson = gsonBuilder.registerTypeAdapter(DegreeChange.class, new DegreeYearAdapter()).create();
-//        final DegreeChange[] degrees = gson.fromJson(periodsJson, DegreeChange[].class);
-//        for (final DegreeChange degreeChange : degrees) {
-//            for (final Integer year : degreeChange.getPeriods().keySet()) {
-//                for (final PeriodChange change : degreeChange.getPeriods().get(year)) {
-//                    final Period period = periodDAO.findById(change.getPeriodId());
-//                    if (period.getStart().isAfter(LocalDate.now())) {
-////             /           period.unschedulePeriod(periodDAO, degreeDAO);
-//                        periodDAO.delete(change.getPeriodId());
-//                    }
-//                }
-//            }
-//        }
         return new Gson().toJson("didn't delete period " + periodId);
     }
 
@@ -602,9 +504,6 @@ public class Controller {
                 && !degreeYear.hasPeriodBetweenDates(start, newEnd, period)) {
             period.setEnd(newEnd);
         }
-
-//        period.unschedulePeriod(periodDAO, degreeDAO);
-//        period.schedulePeriod(periodDAO, degreeDAO);
 
         periodDAO.save(period);
         return new Gson().toJson("ok");
@@ -748,6 +647,24 @@ public class Controller {
         return new Gson().toJson(result);
     }
 
+    @RequestMapping(value = "/delegates/{degreeAcronym}/{istId}/{degreeYear}", method = RequestMethod.GET)
+    public @ResponseBody String setDelegates(@PathVariable String degreeAcronym, @PathVariable String istId,
+            @PathVariable Integer degreeYear) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("Unauthorized");
+        }
+        if (degreeAcronym != null && istId != null && degreeYear != null) {
+            try {
+                return AccessTokenHandler.getInstance().setDelegates(degreeAcronym, istId, degreeYear);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return e.getMessage();
+            }
+        } else {
+            return new Gson().toJson("Wrong Parameters");
+        }
+    }
+
     /*****************************
      * Commands
      * 
@@ -822,31 +739,6 @@ public class Controller {
         } else {
             return gson.toJson(auth.getPrincipal());
         }
-    }
-
-    @RequestMapping(value = "/mock/{id}")
-    public @ResponseBody String mock(@PathVariable String id) {
-        final RestTemplate t = new RestTemplate();
-        final String infoUrl = env.getProperty("uri") + "/api/fenix/v1/person?access_token=" + ACCESS_TOKEN;
-        final HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.set("__username__", id);
-        final HttpEntity<String> requestEntity = new HttpEntity<String>(requestHeaders);
-        final HttpEntity<String> response = t.exchange(infoUrl, HttpMethod.GET, requestEntity, String.class);
-        final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
-
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth instanceof OAuth2Authentication) {
-            final OAuth2Authentication oauth = (OAuth2Authentication) auth;
-            oauth.setDetails(result);
-            final UsernamePasswordAuthenticationToken upat =
-                    new UsernamePasswordAuthenticationToken(oauth.getDetails(), null, oauth.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(upat);
-        } else {
-            final UsernamePasswordAuthenticationToken upat =
-                    new UsernamePasswordAuthenticationToken(result, null, auth.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(upat);
-        }
-        return "ok";
     }
 
     private String getLoggedUsername() {

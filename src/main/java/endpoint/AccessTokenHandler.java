@@ -1,11 +1,15 @@
 package endpoint;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -111,5 +115,31 @@ public class AccessTokenHandler {
         }
 //        } while (students == null);
         return students;
+    }
+
+    public String setDelegates(String degreeAcronym, String istId, Integer degreeYear) throws Exception {
+        if (accessToken == null) {
+            getAccessToken();
+        }
+        OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> userDetails = (Map<String, Object>) auth.getUserAuthentication().getDetails();
+
+        OAuth2AuthenticationDetails authDetails = (OAuth2AuthenticationDetails) auth.getDetails();
+
+        RestTemplate t = new RestTemplate();
+        String infoUrl =
+                base_domain + "/api/fenix/v1/degrees/" + degreeAcronym + "/delegates?access_token=" + authDetails.getTokenValue();
+        JsonObject json = new JsonObject();
+        json.addProperty("delegateId", istId);
+        json.addProperty("curricularYear", degreeYear.toString());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+        headers.add("Accept", "*/*");
+
+        HttpEntity<String> requestEntity = new HttpEntity<String>(json.toString(), headers);
+        HttpEntity<String> responseEntity = t.exchange(infoUrl, HttpMethod.PUT, requestEntity, String.class);
+
+        return responseEntity.getBody().toString();
     }
 }

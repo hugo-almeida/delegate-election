@@ -74,6 +74,7 @@ angular.module('delegados').controller('tablesCtrl', ['$rootScope', '$scope', '$
 	
 	sc.showDetails = function(degree, year) {
 		history.setAcademicYear(sc.currentYear);
+		history.setAcronym(degree.degree);
 		history.loadHistory(degree.degreeId, year).then(function(data) {
 			history.setDegree(degree.years[year-1]);
 		});

@@ -82,7 +82,7 @@
 					</td>
 					<td ng-show="getCurrentElection().state && getCurrentElection().state != 'futuro'">{{candidate.votes}}
 						<span class="pull-right" ng-show="getCurrentElection().state == 'passado'">
-							<button class="btn btn-default btn-xs" ng-click="assign(candidate.username)">Atribuir</button>
+							<button class="btn btn-default btn-xs" ng-click="assign(candidate.username, degreeAcronym(), history().degreeYear)">Atribuir</button>
 						</span>
 					</td>
 				</tr>
