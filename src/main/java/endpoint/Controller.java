@@ -111,6 +111,9 @@ public class Controller {
     @RequestMapping(value = "/students/{istId}/degrees/{degreeId}/votes", method = RequestMethod.GET,
             produces = "application/json; charset=utf-8")
     public @ResponseBody String getVote(@PathVariable String istId, @PathVariable String degreeId) {
+        if (!getLoggedUsername().equals(istId)) {
+            return new Gson().toJson("");
+        }
 
         final Student student =
                 StreamSupport
@@ -166,6 +169,10 @@ public class Controller {
         ElectionPeriod ePeriod;
         try {
             ePeriod = (ElectionPeriod) period;
+            String voted = ePeriod.getVote(istId);
+            if (voted != null) {
+                return new Gson().toJson("Student has already voted.");
+            }
             ePeriod.vote(student, candidate);
         } catch (final ClassCastException e) {
             // Se o cast não foi possivel, o periodo actual nao e de eleicao
@@ -512,6 +519,9 @@ public class Controller {
     @RequestMapping(value = "/periods/{periodId}/candidates", method = RequestMethod.GET,
             produces = "application/json; charset=utf-8")
     public @ResponseBody String getCandidatesFromPeriod(@PathVariable int periodId) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
         final Period period = periodDAO.findById(periodId);
         if (period == null) {
             return new Gson().toJson("No Period with that Id");
@@ -539,6 +549,9 @@ public class Controller {
     @RequestMapping(value = "/periods/{periodId}/candidates/{istId}", method = RequestMethod.POST,
             produces = "application/json; charset=utf-8")
     public @ResponseBody String addCandidateToPeriod(@PathVariable int periodId, @PathVariable String istId) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
         final Period period = periodDAO.findById(periodId);
         if (period == null) {
             return new Gson().toJson("No Period with that Id");
@@ -564,6 +577,9 @@ public class Controller {
     @RequestMapping(value = "/periods/{periodId}/selfProposed", method = RequestMethod.POST,
             produces = "application/json; charset=utf-8")
     public @ResponseBody String selfPropposed(@PathVariable int periodId, @RequestBody String studentJson) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
         Period period = periodDAO.findById(periodId);
         Set<Student> candidates = period.getCandidates();
         JsonParser parser = new JsonParser();
@@ -589,6 +605,9 @@ public class Controller {
 
     @RequestMapping(value = "/periods/{periodId}/votes", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     public @ResponseBody String periodVotes(@PathVariable int periodId) {
+        if (!hasAccessToManagement()) {
+            return new Gson().toJson("");
+        }
         final Period period = periodDAO.findById(periodId);
         if (period == null) {
             return new Gson().toJson("Periodo com esse Id não existe.");
