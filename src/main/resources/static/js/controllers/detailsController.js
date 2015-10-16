@@ -46,6 +46,12 @@ angular.module('delegados').controller('detailsCtrl', ['$rootScope', '$scope', '
 		http.get('/delegates/' + degreeName + '/' + username + '/' + degreeYear)
 		.success(function(data) {
 			log.log('yay!');
+			if(data.error){
+				sc.assignementSuccess = false;
+			} 
+			else {
+				sc.assignementSuccess = true;
+			}
 		});
 	}
 	

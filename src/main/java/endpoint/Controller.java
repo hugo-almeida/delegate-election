@@ -677,7 +677,9 @@ public class Controller {
                 return AccessTokenHandler.getInstance().setDelegates(degreeAcronym, istId, degreeYear);
             } catch (Exception e) {
                 e.printStackTrace();
-                return e.getMessage();
+                JsonObject json = new JsonObject();
+                json.addProperty("error", e.getMessage());
+                return json.toString();
             }
         } else {
             return new Gson().toJson("Wrong Parameters");

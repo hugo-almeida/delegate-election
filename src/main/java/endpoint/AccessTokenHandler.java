@@ -139,7 +139,6 @@ public class AccessTokenHandler {
 
         HttpEntity<String> requestEntity = new HttpEntity<String>(json.toString(), headers);
         HttpEntity<String> responseEntity = t.exchange(infoUrl, HttpMethod.PUT, requestEntity, String.class);
-
         return responseEntity.getBody().toString();
     }
 }
